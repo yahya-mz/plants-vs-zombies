@@ -5,7 +5,8 @@ module com.pvz.plantsvszombies {
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires org.kordamp.bootstrapfx.core;
+    requires java.desktop;
 
-    opens com.pvz.plantsvszombies to javafx.fxml;
-    exports com.pvz.plantsvszombies;
+    opens com.pvz.plantsvszombies.GUI to javafx.fxml;
+    exports com.pvz.plantsvszombies.GUI;
 }
