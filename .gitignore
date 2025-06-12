@@ -4,6 +4,10 @@
 ### target folder
 target/
 
+### target folder
+target/
+resources/
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
