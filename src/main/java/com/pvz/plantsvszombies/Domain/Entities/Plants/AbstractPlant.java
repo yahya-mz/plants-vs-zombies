@@ -1,6 +1,8 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
-public abstract class AbstractPlant {
+import com.pvz.plantsvszombies.Domain.Entities.IGameObject;
+
+public abstract class AbstractPlant implements IGameObject {
     int row;
     int column;
 

@@ -30,7 +30,7 @@ public class PeashooterVisualObject extends AbstractAnimatedVisualObject {
 
     public PeashooterVisualObject(PeaShooterGameObject gameObject) {
         _gameObject = gameObject;
-        gameObject.subscribeToStartShooting(new IEventSubscriber() {//notify
+        gameObject.subscribeToShootingEvent(new IEventSubscriber() {//notify
             @Override
             public void _notify(IGameObject gameObject) {
                 System.out.println("Fading out");
