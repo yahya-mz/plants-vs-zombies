@@ -29,7 +29,7 @@ public class MapVisualObject extends AbstractVisualObject {
 //        ));
         this._node = gridPane;
         this._mapObject = object;
-        plant();
+        plant(new PeashooterVisualObject(), 1, 1);
     }
 
     @Override
@@ -37,14 +37,15 @@ public class MapVisualObject extends AbstractVisualObject {
 
     }
 
-    public void plant() {
-        var testPlant = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
-        var testPlant2 = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
-        var testPlant3 = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
-        var testPlant4 = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
-        ((GridPane) this._node).add(testPlant, 1, 1);
-        ((GridPane) this._node).add(testPlant2, 2, 1);
-        ((GridPane) this._node).add(testPlant3, 1, 2);
-        ((GridPane) this._node).add(testPlant4, 2, 2);
+    public void plant(AbstractVisualObject object, int row, int column) {
+        ((GridPane) this._node).add(object.getNode(), row, column);
+//        var testPlant = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
+//        var testPlant2 = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
+//        var testPlant3 = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
+//        var testPlant4 = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
+//        ((GridPane) this._node).add(testPlant, 1, 1);
+//        ((GridPane) this._node).add(testPlant2, 2, 1);
+//        ((GridPane) this._node).add(testPlant3, 1, 2);
+//        ((GridPane) this._node).add(testPlant4, 2, 2);
     }
 }

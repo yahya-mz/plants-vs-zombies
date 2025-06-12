@@ -27,13 +27,13 @@ public class PeaShooterGameObject extends AbstractPlant {
         this._coordinate = coordinate;
     }
 
-    public void shoot() {
+    private void shoot() {
         for (IEventSubscriber eventSubscriber : _shootingEventSubscribers) {
             eventSubscriber._notify(this);
         }
     }
 
-    public void eaten() {
+    private void eaten() {
         for (IEventSubscriber eventSubscriber : _eatenEventSubscribers) {
             eventSubscriber._notify(this);
         }

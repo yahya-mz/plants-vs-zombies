@@ -1,9 +1,11 @@
 package com.pvz.plantsvszombies.GameEngine;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.Events.PlantSpawnEvent;
 import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
 import com.pvz.plantsvszombies.Domain.Entities.IGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.PeaShooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 
@@ -58,6 +60,16 @@ public class DayEngine implements IGameEngine {
             System.out.println("Droppig");
             dropSunFromSky();
         }
+        if (getMilliseconds() % 4000.0 == 0) {
+            String sunObjectId = "SKY-SUN_" + UUID.randomUUID();
+            Coordinate coordinate = new Coordinate(
+                    _random.nextDouble(-0.5 * _windowWidth, 0.5 * _windowWidth),
+                    -_windowHeight / 2
+            );
+//            var obj = PeaShooterGameObject.createSunGameObject();
+//            PlantSpawnEvent.emit(MapGameObject.createMapGameObject());
+        }
+
         tick++;
     }
 

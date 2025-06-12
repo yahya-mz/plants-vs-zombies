@@ -6,6 +6,7 @@ import com.pvz.plantsvszombies.Domain.Entities.IGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeaShooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
 import com.pvz.plantsvszombies.GUI.MainApp;
+import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.scene.Cursor;
@@ -16,8 +17,6 @@ import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
 public class PeashooterVisualObject extends AbstractAnimatedVisualObject {
-
-
     public enum States {
         Shooting,
         Standing
@@ -37,8 +36,15 @@ public class PeashooterVisualObject extends AbstractAnimatedVisualObject {
                 changeStateTo(States.Shooting);
             }
         });
+        var temp_this = this;
+        gameObject.subscribeToEatenEvent(new IEventSubscriber() {//notify
+            @Override
+            public void _notify(IGameObject gameObject) {
+                VisualEngine.getInstance().disposeObject(temp_this);
+            }
+        });
         _visualCoordinate = gameObject.getCoordinate();
-        _node = new ImageView(new Image(MainApp.class.getResource("/com/pvz/plantsvszombies/graphics/Plants/Sun/Sun_0.png").toString()));
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
         _node.setTranslateY(_visualCoordinate.y());
         _node.setTranslateX(_visualCoordinate.x());
 
@@ -61,6 +67,7 @@ public class PeashooterVisualObject extends AbstractAnimatedVisualObject {
             case Shooting -> {
                 _currentState = States.Shooting;
                 playAnimation(PeaShooterAnimation.Animations.SHOOTING); // فریم‌های پرتاب توپ
+                changeStateTo(States.Standing);
             }
             case Standing -> {
                 _currentState = States.Standing;
