@@ -1,5 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.Animations;
 
+import com.pvz.plantsvszombies.GlobalSettings;
 import javafx.scene.image.Image;
 
 import java.io.File;
@@ -15,7 +16,7 @@ public class SunAnimations {
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(SunAnimations.class.getResource("/com/pvz/plantsvszombies/graphics/Plants/Sun").getPath());
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Sun"));
         for (int i = 0; i < SunAnimations.Animations.values().length; i++) {
             var animationImages = new File(animationsDirectory.getPath() + "/" + SunAnimations.Animations.values()[i].name()).listFiles();
             Objects.requireNonNull(animationImages);

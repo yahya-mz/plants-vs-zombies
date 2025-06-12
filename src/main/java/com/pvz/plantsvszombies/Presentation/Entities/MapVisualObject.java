@@ -1,15 +1,11 @@
 package com.pvz.plantsvszombies.Presentation.Entities;
 
-import com.pvz.plantsvszombies.Domain.Entities.AbstractPlant;
 import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 public class MapVisualObject extends AbstractVisualObject {
     MapGameObject _mapObject;
@@ -22,7 +18,7 @@ public class MapVisualObject extends AbstractVisualObject {
         System.out.println("Demo");
         gridPane.setBackground(new Background(
                 new BackgroundImage(
-                        new Image(GlobalSettings.getResource("/graphics/Items/Background/Background_0.jpg").toString()),
+                        new Image(GlobalSettings.getResource("graphics/Items/Background/Background_0.jpg").toString()),
                         BackgroundRepeat.NO_REPEAT,
                         BackgroundRepeat.NO_REPEAT,
                         BackgroundPosition.CENTER,
@@ -42,10 +38,10 @@ public class MapVisualObject extends AbstractVisualObject {
     }
 
     public void plant() {
-        var testPlant = new ImageView(new Image(GlobalSettings.getResource("/graphics/Plants/Peashooter/Peashooter_0.png")));
-        var testPlant2 = new ImageView(new Image(GlobalSettings.getResource("/graphics/Plants/Peashooter/Peashooter_0.png")));
-        var testPlant3 = new ImageView(new Image(GlobalSettings.getResource("/graphics/Plants/Peashooter/Peashooter_0.png")));
-        var testPlant4 = new ImageView(new Image(GlobalSettings.getResource("/graphics/Plants/Peashooter/Peashooter_0.png")));
+        var testPlant = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
+        var testPlant2 = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
+        var testPlant3 = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
+        var testPlant4 = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Peashooter/Peashooter_0.png")));
         ((GridPane) this._node).add(testPlant, 1, 1);
         ((GridPane) this._node).add(testPlant2, 2, 1);
         ((GridPane) this._node).add(testPlant3, 1, 2);

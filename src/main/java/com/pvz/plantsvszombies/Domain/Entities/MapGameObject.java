@@ -2,11 +2,9 @@ package com.pvz.plantsvszombies.Domain.Entities;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Events.MapSpawnEvent;
-import com.pvz.plantsvszombies.Domain.Entities.Events.SkySunSpawnEvent;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlant;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MapGameObject implements IGameObject {
 
@@ -53,7 +51,7 @@ public class MapGameObject implements IGameObject {
 
     public boolean isOccupied(int row, int column) {
         for (AbstractPlant plant : _plants) {
-            if (plant.column == column && plant.row == row) {
+            if (plant.getColumn() == column && plant.getRow() == row) {
                 return false;
             }
         }
@@ -61,7 +59,7 @@ public class MapGameObject implements IGameObject {
     }
 
     public void plant(AbstractPlant plant) {
-        if (!isOccupied(plant.row, plant.column))
+        if (!isOccupied(plant.getRow(), plant.getColumn()))
             this._plants.add(plant);
 
     }
