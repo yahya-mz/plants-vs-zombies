@@ -46,9 +46,11 @@ public class GeneralTransformAnimation {
     }
 
     public GeneralTransformAnimation transformX(double speed, double distance) {
-        _timeline = new Timeline(0, new KeyFrame(Duration.millis(1000.0 / GlobalSettings.FPS), (e) -> {
-            _visualObject.getNode().setTranslateX(_visualObject.getNode().getTranslateY() + speed);
-        }));
+        var keyFrame = new KeyFrame(Duration.millis(Math.abs(distance / speed) / GlobalSettings.FPS * 1000), new KeyValue(_visualObject.getNode().translateXProperty(), _visualObject.getNode().getTranslateX() +
+                speed / Math.abs(speed) * distance));
+        _timeline = new Timeline(0, keyFrame);
+        _timeline.setCycleCount(1);
+        _timeline.playFromStart();
         return this;
     }
 

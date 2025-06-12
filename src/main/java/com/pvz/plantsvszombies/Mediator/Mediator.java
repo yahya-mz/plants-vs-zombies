@@ -2,9 +2,11 @@ package com.pvz.plantsvszombies.Mediator;
 
 import com.pvz.plantsvszombies.Domain.Entities.Events.AbstractEvent;
 import com.pvz.plantsvszombies.Domain.Entities.Events.FlowerSunSpawnEvent;
+import com.pvz.plantsvszombies.Domain.Entities.Events.MapSpawnEvent;
 import com.pvz.plantsvszombies.Domain.Entities.Events.SkySunSpawnEvent;
 import com.pvz.plantsvszombies.Presentation.EventHandlers.EventHandler;
 import com.pvz.plantsvszombies.Presentation.EventHandlers.FlowerSunSpawnEventHandler;
+import com.pvz.plantsvszombies.Presentation.EventHandlers.MapSpawnEventHandler;
 import com.pvz.plantsvszombies.Presentation.EventHandlers.SkySunSpawnEventHandler;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.application.Platform;
@@ -23,6 +25,7 @@ public class Mediator {
     static {
         handlers.put(FlowerSunSpawnEvent.class, new FlowerSunSpawnEventHandler());
         handlers.put(SkySunSpawnEvent.class, new SkySunSpawnEventHandler());
+        handlers.put(MapSpawnEvent.class, new MapSpawnEventHandler());
     }
 
     public static void _notify(AbstractEvent event) {
@@ -32,7 +35,7 @@ public class Mediator {
                     handlers.get(event.getClass()).handle(event);
 
                 } catch (Exception ex) {
-
+                    System.out.println("Exception occurred on event handle: " + ex.getMessage());
                 }
             });
         } catch (Exception ex) {

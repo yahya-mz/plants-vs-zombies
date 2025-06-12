@@ -3,6 +3,7 @@ package com.pvz.plantsvszombies.GameEngine;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
 import com.pvz.plantsvszombies.Domain.Entities.IGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 
@@ -48,6 +49,7 @@ public class DayEngine implements IGameEngine {
     }
 
     public void start() {
+        initMap();
     }
 
     public void update() {
@@ -73,6 +75,15 @@ public class DayEngine implements IGameEngine {
         var sun = SunGameObject.createSunGameObject(this, sunObjectId, coordinate);
         this._gameObjects.add(sun);
         sun.spawn();
+    }
+
+    private void initMap() {
+        String objectId = "MAP_" + UUID.randomUUID();
+        Coordinate coordinate = new Coordinate(
+                0, 0
+        );
+        MapGameObject map = MapGameObject.createMapGameObject(5, 9, objectId, coordinate);
+        map.spawn();
     }
 
     private double getMilliseconds() {

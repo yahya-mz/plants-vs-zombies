@@ -33,8 +33,6 @@ public class MainApp extends Application {
         ));
         var btn = new Button("Start Day");
 
-        var _imageView = new ImageView(new Image(MainApp.class.getResource("/com/pvz/plantsvszombies/Sun_0.png").toString()));
-
         btn.setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 var gameStage = DayView.createStage();
@@ -42,6 +40,7 @@ public class MainApp extends Application {
                 VisualEngine.init(gameStage);
                 primaryStage.close();
                 gameStage.show();
+                dayEngine.start();
                 engineThreadRunning = true;
                 var gameEngineThread = new Thread(() -> {
                     while (engineThreadRunning) {

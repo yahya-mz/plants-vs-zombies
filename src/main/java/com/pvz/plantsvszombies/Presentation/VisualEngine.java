@@ -3,6 +3,7 @@ package com.pvz.plantsvszombies.Presentation;
 import com.pvz.plantsvszombies.Domain.Entities.IGameObject;
 import com.pvz.plantsvszombies.Presentation.Entities.AbstractVisualObject;
 import com.pvz.plantsvszombies.Presentation.Views.AbstractLevelView;
+import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 
@@ -26,6 +27,7 @@ public class VisualEngine {
     }
 
     public void disposeObject(AbstractVisualObject obj) {
+        ((Pane) obj.getNode().getParent()).getChildren().remove(obj.getNode());
         _visualObjects.remove(obj);
 //        _levelStage.getScene().getRoot().getChildrenUnmodifiable().remove(obj.getNode());
     }

@@ -1,25 +1,41 @@
 package com.pvz.plantsvszombies.Domain.Entities;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.Events.MapSpawnEvent;
+import com.pvz.plantsvszombies.Domain.Entities.Events.SkySunSpawnEvent;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MapGameObject implements IGameObject {
 
-    private int _rows;
-    private int _columns;
+    private final int _rows;
+    private final int _columns;
+
+    private final String _ID;
+    private final Coordinate _coordinate;
+
+
+    private boolean isDisposed = false;
 
     ArrayList<AbstractPlant> _plants;
 
-    private String _Id;
+    public static MapGameObject createMapGameObject(int rows, int columns, String id, Coordinate coordinate) {
+        return new MapGameObject(rows, columns, id, coordinate);
+    }
 
-    public MapGameObject() {
+    private MapGameObject(int rows, int columns, String id, Coordinate coordinate) {
         this._plants = new ArrayList<>();
+        this._columns = columns;
+        this._rows = rows;
+        this._ID = id;
+        this._coordinate = coordinate;
     }
 
     @Override
     public String getId() {
-        return this._Id;
+        return this._ID;
     }
 
     @Override
@@ -52,11 +68,17 @@ public class MapGameObject implements IGameObject {
 
     @Override
     public void spawn() {
-
+        MapSpawnEvent.emit(this);
     }
 
     @Override
     public void update() {
 
+    }
+
+    private ArrayList<IEventSubscriber> _timeOutSubscribers = new ArrayList<>();
+
+    public void subscribeToTimeOut(IEventSubscriber eventSubscriber) {
+        _timeOutSubscribers.add(eventSubscriber);
     }
 }

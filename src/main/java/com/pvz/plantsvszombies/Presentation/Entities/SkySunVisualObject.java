@@ -5,6 +5,7 @@ import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.IGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
 import com.pvz.plantsvszombies.GUI.MainApp;
+import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralFadingAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
@@ -38,7 +39,6 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
     private GeneralTransformAnimation _transformAnimation;
 
     public SkySunVisualObject(SunGameObject gameObject) {
-        _gameObject = gameObject;
         gameObject.subscribeToTimeOut(new IEventSubscriber() {
             @Override
             public void _notify(IGameObject gameObject) {
@@ -47,7 +47,8 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
             }
         });
         _visualCoordinate = gameObject.getCoordinate();
-        _node = new ImageView(new Image(MainApp.class.getResource("/com/pvz/plantsvszombies/graphics/Plants/Sun/Sun_0.png").toString()));
+        _gameObject = gameObject;
+        _node = new ImageView(new Image(GlobalSettings.getResource("/Sun_0.png")));
         _node.setCursor(Cursor.HAND);
         _node.setTranslateY(_visualCoordinate.y());
         _node.setTranslateX(_visualCoordinate.x());
@@ -90,6 +91,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
                 if (_currentState.equals(States.DROPPING)) {
                     _transformAnimation.interrupt();
                 }
+                _currentState = States.COLLECTING;
                 System.out.println(this.getNode().getTranslateY());
                 _transformAnimation.transform(-10, -10, 640 + this.getNode().getTranslateY(), 364 + this.getNode().getTranslateY());
 
@@ -98,8 +100,9 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
                 _currentState = States.FADING_OUT;
                 _fadingAnimation = GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(2500))
                         .setOnFinished((e) -> {
-                            ((Pane) this.getNode().getParent()).getChildren().remove(_node);
+//                            ((Pane) this.getNode().getParent()).getChildren().remove(_node);
                             VisualEngine.getInstance().disposeObject(this);
+                            _gameObject.dispose();
                         });
             }
         }

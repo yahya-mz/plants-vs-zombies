@@ -28,7 +28,6 @@ public class SunGameObject implements IGameObject {
         this._engine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
-
     }
 
     @Override
@@ -76,7 +75,13 @@ public class SunGameObject implements IGameObject {
 
     }
 
+    public void dispose() {
+        _engine.disposeObject(this);
+    }
+
     public void subscribeToTimeOut(IEventSubscriber eventSubscriber) {
         _timeOutSubscribers.add(eventSubscriber);
     }
+
+
 }
