@@ -6,7 +6,7 @@ import com.pvz.plantsvszombies.Mediator.Mediator;
 public class FlowerSunSpawnEvent extends AbstractEvent {
     public static void emit(SunGameObject object) {
         var event = new FlowerSunSpawnEvent(object);
-        Mediator._notify(event);
+//        Mediator._notify(event);
     }
 
     FlowerSunSpawnEvent(SunGameObject object){

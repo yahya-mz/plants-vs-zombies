@@ -1,7 +1,7 @@
 package com.pvz.plantsvszombies.Domain.Entities.Events;
 
-import com.pvz.plantsvszombies.Domain.Entities.IGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 
 public abstract class AbstractEvent {
-    public IGameObject _gameObject;
+    public AbstractGameObject _gameObject;
 }

@@ -2,23 +2,18 @@ package com.pvz.plantsvszombies.Presentation.Entities;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Entities.IGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
-import com.pvz.plantsvszombies.GUI.MainApp;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralFadingAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.SunAnimations;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
-import javafx.animation.Animation;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
 public class SkySunVisualObject extends AbstractAnimatedVisualObject {
@@ -30,7 +25,6 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
         FADING_OUT
     }
 
-    private Coordinate _visualCoordinate;
     private SunGameObject _gameObject;
 
     private States _currentState;
@@ -38,10 +32,13 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
     private GeneralFadingAnimation _fadingAnimation;
     private GeneralTransformAnimation _transformAnimation;
 
-    public SkySunVisualObject(SunGameObject gameObject) {
+    private VisualEngine _engine;
+
+    public SkySunVisualObject(SunGameObject gameObject, VisualEngine engine) {
+        _engine = engine;
         gameObject.subscribeToTimeOut(new IEventSubscriber() {
             @Override
-            public void _notify(IGameObject gameObject) {
+            public void _notify(AbstractGameObject gameObject) {
                 System.out.println("Fading out");
                 changeStateTo(States.FADING_OUT);
             }
@@ -63,7 +60,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
 
     @Override
     public void playAnimation(IAnimation animation) {
-        super.playAnimation(animation, SunAnimations.getFrames((SunAnimations.Animations) animation));
+        super.playAnimation(animation, SunAnimations.getFrames((SunAnimations.Animations) animation), Duration.millis(80));
     }
 
     @Override
@@ -76,7 +73,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
         switch (state) {
             case DROPPING -> {
                 _currentState = States.DROPPING;
-                _transformAnimation = GeneralTransformAnimation.attach(this).transformY(10, VisualEngine.getInstance().getLevelStage().getHeight() / 2);
+                _transformAnimation = GeneralTransformAnimation.attach(this).transformY(10, GlobalSettings.HEIGHT / 2.0);
                 // +10 means going down
             }
             case COLLECTING -> {
@@ -102,7 +99,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
                 _fadingAnimation = GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(2500))
                         .setOnFinished((e) -> {
 //                            ((Pane) this.getNode().getParent()).getChildren().remove(_node);
-                            VisualEngine.getInstance().disposeObject(this);
+                            _engine.disposeObject(this);
                             _gameObject.dispose();
                         });
             }

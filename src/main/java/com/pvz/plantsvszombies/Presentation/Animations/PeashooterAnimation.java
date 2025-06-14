@@ -5,9 +5,11 @@ import javafx.scene.image.Image;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 
-public class PeaShooterAnimation {
+public class PeashooterAnimation {
     public enum Animations implements IAnimation {
         SHOOTING,
         STANDING
@@ -18,8 +20,16 @@ public class PeaShooterAnimation {
     static {
         animations = new ArrayList<>();
         var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Peashooter"));
-        for (int i = 0; i < SunAnimations.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + SunAnimations.Animations.values()[i].name()).listFiles();
+        for (int i = 0; i < PeashooterAnimation.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + PeashooterAnimation.Animations.values()[i].name()).listFiles();
+            Arrays.sort(animationImages, Comparator.comparingInt(f -> {
+                String name = f.getName();
+                int dotIndex = name.lastIndexOf('.');
+                if (dotIndex != -1) {
+                    name = name.substring(0, dotIndex); // remove file extension
+                }
+                return Integer.parseInt(name); // assume name is a number
+            }));
             Objects.requireNonNull(animationImages);
             Image[] animationFrames = new Image[animationImages.length];
             for (int j = 0; j < animationImages.length; j++) {
@@ -29,7 +39,7 @@ public class PeaShooterAnimation {
         }
     }
 
-    public static Image[] getFrames(PeaShooterAnimation.Animations animation) {
+    public static Image[] getFrames(PeashooterAnimation.Animations animation) {
         return animations.get(animation.ordinal());
     }
 }

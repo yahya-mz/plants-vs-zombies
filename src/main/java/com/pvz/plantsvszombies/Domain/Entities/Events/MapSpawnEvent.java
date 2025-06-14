@@ -7,7 +7,7 @@ import com.pvz.plantsvszombies.Mediator.Mediator;
 public class MapSpawnEvent extends AbstractEvent {
     public static void emit(MapGameObject object) {
         var event = new MapSpawnEvent(object);
-        Mediator._notify(event);
+//        Mediator._notify(event);
     }
 
     MapSpawnEvent(MapGameObject object) {

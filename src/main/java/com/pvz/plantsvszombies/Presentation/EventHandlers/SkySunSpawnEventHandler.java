@@ -8,8 +8,6 @@ import com.pvz.plantsvszombies.Presentation.Entities.SkySunVisualObject;
 public class SkySunSpawnEventHandler implements EventHandler<SkySunSpawnEvent> {
     @Override
     public void handle(SkySunSpawnEvent event) throws Exception {
-        var gameObject = (SunGameObject) event._gameObject;
-        SkySunVisualObject object = new SkySunVisualObject(gameObject);
-        VisualEngine.getInstance().getLevelStage().spawnVisualObject(object);
+
     }
 }

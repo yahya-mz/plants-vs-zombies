@@ -3,7 +3,11 @@ package com.pvz.plantsvszombies;
 import java.util.Objects;
 
 public class GlobalSettings {
-    public static final int FPS = 30;
+    public static final int WIDTH = 1280;
+    public static final int HEIGHT = 728;
+
+
+    public static final int FPS = 300;
 
     public static String getResource(String path) {
         try{

@@ -1,17 +1,12 @@
 package com.pvz.plantsvszombies.GameEngine;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.Events.PlantSpawnEvent;
-import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
-import com.pvz.plantsvszombies.Domain.Entities.IGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeaShooterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.*;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class DayEngine implements IGameEngine {
 
@@ -20,7 +15,11 @@ public class DayEngine implements IGameEngine {
 
     private final Random _random = new Random();
 
-    private final ArrayList<IGameObject> _gameObjects;
+    private final ArrayList<AbstractGameObject> _gameObjects;
+    private MapGameObject _currentMap;
+
+    private final ArrayList<IEventSubscriber> _skySunSpawnEventSubscribers = new ArrayList<>();
+    private final ArrayList<IEventSubscriber> _mapSpawnEventSubscribers = new ArrayList<>();
 
     public DayEngine(double windowWidth, double windowHeight) {
 
@@ -31,8 +30,6 @@ public class DayEngine implements IGameEngine {
     }
 
     private int tick = 1;
-    private int milliseconds;
-
     private double _point;
 
     @Override
@@ -50,10 +47,12 @@ public class DayEngine implements IGameEngine {
         this._point -= point;
     }
 
+    @Override
     public void start() {
         initMap();
     }
 
+    @Override
     public void update() {
 //        System.out.println("frame: " + tick);
         if (getMilliseconds() % 3000.0 == 0) {
@@ -61,21 +60,55 @@ public class DayEngine implements IGameEngine {
             dropSunFromSky();
         }
         if (getMilliseconds() % 4000.0 == 0) {
-            String sunObjectId = "SKY-SUN_" + UUID.randomUUID();
-            Coordinate coordinate = new Coordinate(
-                    _random.nextDouble(-0.5 * _windowWidth, 0.5 * _windowWidth),
-                    -_windowHeight / 2
-            );
-//            var obj = PeaShooterGameObject.createSunGameObject();
-//            PlantSpawnEvent.emit(MapGameObject.createMapGameObject());
+//            PlantSpawnEvent.emit(obj);
+        }
+        Iterator<AbstractGameObject> iter = _gameObjects.iterator();
+        while (iter.hasNext()) {
+            AbstractGameObject obj = iter.next();
+        }
+        for (AbstractGameObject gameObject : _gameObjects) {
+            gameObject.update();
+
         }
 
         tick++;
     }
 
     @Override
-    public void disposeObject(IGameObject object) {
+    public void disposeObject(AbstractGameObject object) {
         _gameObjects.remove(object);
+    }
+
+    @Override
+    public void spawnObject(AbstractGameObject object) {
+//        if (object instanceof AbstractPlantGameObject) {
+//
+//        } else {
+//            for (IEventSubscriber subscriber : _objectSpawnSubscribers) {
+//                subscriber._notify(object);
+//            }
+//        }
+        this._gameObjects.add(object);
+    }
+
+    @Override
+    public void plantObject(AbstractPlantGameObject object) throws Exception {
+        if (!_currentMap.isOccupied(object.getRow(), object.getColumn())) {
+            this._gameObjects.add(object);
+            subtractPoint(object.getCost());
+            _currentMap.plant(object);
+        } else {
+            throw new Exception("Exception: A plant already exists in row:" + object.getRow() + " and col:" + object.getColumn());
+        }
+
+    }
+
+    public void subscribeToSkySunSpawnEvent(IEventSubscriber subscriber) {
+        this._skySunSpawnEventSubscribers.add(subscriber);
+    }
+
+    public void subscribeToMapSpawnEvent(IEventSubscriber subscriber) {
+        this._mapSpawnEventSubscribers.add(subscriber);
     }
 
     private void dropSunFromSky() {
@@ -86,6 +119,9 @@ public class DayEngine implements IGameEngine {
         );
         var sun = SunGameObject.createSunGameObject(this, sunObjectId, coordinate);
         this._gameObjects.add(sun);
+        for (IEventSubscriber eventSubscriber : _skySunSpawnEventSubscribers) {
+            eventSubscriber._notify(sun);
+        }
         sun.spawn();
     }
 
@@ -94,8 +130,12 @@ public class DayEngine implements IGameEngine {
         Coordinate coordinate = new Coordinate(
                 0, 0
         );
-        MapGameObject map = MapGameObject.createMapGameObject(5, 9, objectId, coordinate);
-        map.spawn();
+        MapGameObject map = MapGameObject.createMapGameObject(5, 9, objectId, coordinate, this);
+        this._currentMap = map;
+
+        for (IEventSubscriber subscriber : _mapSpawnEventSubscribers) {
+            subscriber._notify(map);
+        }
     }
 
     private double getMilliseconds() {

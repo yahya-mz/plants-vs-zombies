@@ -11,8 +11,6 @@ import com.pvz.plantsvszombies.Presentation.VisualEngine;
 public class MapSpawnEventHandler implements EventHandler<MapSpawnEvent> {
     @Override
     public void handle(MapSpawnEvent event) throws Exception {
-        var gameObject = (MapGameObject) event._gameObject;
-        MapVisualObject object = new MapVisualObject(gameObject);
-        VisualEngine.getInstance().getLevelStage().spawnVisualObject(object);
+
     }
 }

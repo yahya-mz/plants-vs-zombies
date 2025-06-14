@@ -3,17 +3,14 @@ package com.pvz.plantsvszombies.Domain.Entities;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Events.SkySunSpawnEvent;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class SunGameObject implements IGameObject {
+public class SunGameObject extends AbstractGameObject {
     private final double _points = 50;
     private final int _timeOutMilliseconds = 5000;
 
-    private final String _ID;
-    private final Coordinate _coordinate;
     private IGameEngine _engine;
 
     private boolean isDisposed = false;
@@ -29,20 +26,9 @@ public class SunGameObject implements IGameObject {
         this._ID = id;
         this._coordinate = coordinate;
     }
-
-    @Override
-    public String getId() {
-        return this._ID;
-    }
-
-    @Override
-    public Coordinate getCoordinate() {
-        return this._coordinate;
-    }
-
     @Override
     public void spawn() {
-        SkySunSpawnEvent.emit(this);
+//        SkySunSpawnEvent.emit(this);
 
         var temp_this = this;
         Timer timer = new Timer();

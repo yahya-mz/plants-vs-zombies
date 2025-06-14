@@ -1,21 +1,19 @@
 package com.pvz.plantsvszombies.GUI;
 
-import com.pvz.plantsvszombies.GameEngine.DayEngine;
-import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.Views.DayView;
-import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
+import com.pvz.plantsvszombies.GUI.Views.DayView;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.time.Duration;
+import java.util.UUID;
 
 public class MainApp extends Application {
 
@@ -36,27 +34,8 @@ public class MainApp extends Application {
         btn.setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 var gameStage = DayView.createStage();
-                DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);
-                VisualEngine.init(gameStage);
                 primaryStage.close();
                 gameStage.show();
-                dayEngine.start();
-                engineThreadRunning = true;
-                var gameEngineThread = new Thread(() -> {
-                    while (engineThreadRunning) {
-                        try {
-                            dayEngine.update();
-                            Thread.sleep(Duration.ofMillis(1000 / GlobalSettings.FPS));
-                        } catch (Exception ex) {
-
-                        }
-                    }
-                });
-                gameStage.setOnHiding((event) -> {
-                    System.out.println("Stopping GameEngine");
-                    engineThreadRunning = false;
-                });
-                gameEngineThread.start();
             }
         });
 
@@ -66,5 +45,19 @@ public class MainApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+    }
+
+    void demo(IGameEngine engine) throws Exception {
+        // Demo:
+        String PeashooterObjectId = "Peashooter" + UUID.randomUUID();
+        Coordinate coordinate2 = new Coordinate(-1280.0 / 2, 728.0 / 2);
+        var obj = PeashooterGameObject.createPeashooterGameObject(engine, PeashooterObjectId, coordinate2, 1, 1);
+        engine.plantObject(obj);
+
+
+        String PeashooterObjectId2 = "Peashooter" + UUID.randomUUID();
+        Coordinate coordinate3 = new Coordinate(-1280.0 / 2, 728.0 / 2);
+        var obj2 = PeashooterGameObject.createPeashooterGameObject(engine, PeashooterObjectId2, coordinate3, 2, 2);
+        engine.plantObject(obj2);
     }
 }
