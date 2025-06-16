@@ -26,7 +26,7 @@ public class PeashooterVisualObject extends AbstractPlantVisualObject {
 
     private VisualEngine _engine;
 
-    public PeashooterVisualObject(PeashooterGameObject gameObject, VisualEngine engine) {
+    public PeashooterVisualObject(PeashooterGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی
         _gameObject = gameObject;
         _engine = engine;
 
@@ -66,7 +66,7 @@ public class PeashooterVisualObject extends AbstractPlantVisualObject {
             System.out.println("demodemo");
             //changeStateTo(States.Standing);
             playAnimation(PeashooterAnimation.Animations.STANDING);//standing
-            Bounds boundsInScene = _node.localToScene(_node.getBoundsInLocal());
+            Bounds boundsInScene = _node.localToScene(_node.getBoundsInLocal());//?
 //            var x2 = this.getNode().getLayoutX();
             var x = boundsInScene.getMaxX();
             System.out.println("X: "+boundsInScene.getMaxX());

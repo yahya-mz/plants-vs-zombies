@@ -53,7 +53,7 @@ public class DayEngine implements IGameEngine {
     }
 
     @Override
-    public void update() {
+    public void update() {//updates every object
 //        System.out.println("frame: " + tick);
         if (getMilliseconds() % 3000.0 == 0) {
             System.out.println("Droppig");
@@ -94,9 +94,9 @@ public class DayEngine implements IGameEngine {
     @Override
     public void plantObject(AbstractPlantGameObject object) throws Exception {
         if (!_currentMap.isOccupied(object.getRow(), object.getColumn())) {
-            this._gameObjects.add(object);
-            subtractPoint(object.getCost());
-            _currentMap.plant(object);
+            this._gameObjects.add(object);//add to array
+            subtractPoint(object.getCost());//subtract cost
+            _currentMap.plant(object);//callig to plant objectical plant
         } else {
             throw new Exception("Exception: A plant already exists in row:" + object.getRow() + " and col:" + object.getColumn());
         }

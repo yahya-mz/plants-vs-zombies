@@ -60,7 +60,7 @@ public class MapGameObject extends AbstractGameObject {
         return false;
     }
 
-    public void plant(AbstractPlantGameObject plant) {
+    public void plant(AbstractPlantGameObject plant) {//calling visual
         System.out.println("Planting");
         this._plants.add(plant);
         for (IEventSubscriber eventSubscriber : _plantingEventSubscribers) {

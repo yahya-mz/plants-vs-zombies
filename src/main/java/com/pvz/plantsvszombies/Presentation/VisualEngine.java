@@ -17,7 +17,9 @@ import java.util.UUID;
 public class VisualEngine {
     private final int _width = 1280;
     private final int _height = 728;
-
+    //
+    private Class<? extends AbstractPlantVisualObject> selectedPlantType;
+    //
 
     private final ArrayList<AbstractVisualObject> _visualObjects = new ArrayList<>();
     private AbstractLevelView _levelStage;
@@ -95,6 +97,22 @@ public class VisualEngine {
             }
         });
     }
+
+
+    //
+    public void setSelectedPlantType(Class<? extends AbstractPlantVisualObject> type) {
+        this.selectedPlantType = type;
+    }
+
+    public Class<? extends AbstractPlantVisualObject> getSelectedPlantType() {
+        return this.selectedPlantType;
+    }
+
+    public void clearSelectedPlantType() {
+        this.selectedPlantType = null;
+    }
+    //
+
 
     public AbstractLevelView getLevelStage() {
         return this._levelStage;

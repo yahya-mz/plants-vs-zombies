@@ -91,7 +91,8 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
                 }
                 _currentState = States.COLLECTING;
                 System.out.println(this.getNode().getTranslateY());
-                _transformAnimation.transform(-10, -10, 640 + this.getNode().getTranslateY(), 364 + this.getNode().getTranslateY());
+                _transformAnimation.transform(-6, -3, 338 + this.getNode().getTranslateY(), 300 + this.getNode().getTranslateY());
+                changeStateTo(States.FADING_OUT);
 
             }
             case FADING_OUT -> {

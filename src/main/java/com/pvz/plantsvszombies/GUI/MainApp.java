@@ -1,63 +1,143 @@
+//}
 package com.pvz.plantsvszombies.GUI;
 
-import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
+import com.pvz.plantsvszombies.GameEngine.DayEngine;
+import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.GUI.Views.DayView;
+import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.util.UUID;
+import java.time.Duration;
 
 public class MainApp extends Application {
 
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
 
     private boolean engineThreadRunning = false;
 
     @Override
     public void start(Stage primaryStage) {
-        var root = new StackPane();
-        root.setBackground(new Background(
-                new BackgroundFill(Color.AQUA, CornerRadii.EMPTY, Insets.EMPTY)
-        ));
-        var btn = new Button("Start Day");
+        StackPane root = new StackPane();
 
-        btn.setOnMouseClicked(e -> {
-            if (e.getButton().equals(MouseButton.PRIMARY)) {
-                var gameStage = DayView.createStage();
-                primaryStage.close();
-                gameStage.show();
-            }
+        Image backgroundImage = new Image(GlobalSettings.getResource("graphics/Items/Background/daymenu.jpg").toString());
+        ImageView bgImageView = new ImageView(backgroundImage);
+
+        bgImageView.setPreserveRatio(true);
+        bgImageView.setFitWidth(800);
+        bgImageView.setFitHeight(533);
+
+        root.getChildren().add(bgImageView);
+
+        Button dayModeBtn = createHoverButton(
+                "graphics/Items/Buttons/day.png",
+                "graphics/Items/Buttons/day2.png",
+                250, 100
+        );
+
+        Button nightModeBtn = createHoverButton(
+                "graphics/Items/Buttons/night.png",
+                "graphics/Items/Buttons/night2.png",
+                250, 100
+        );
+
+        dayModeBtn.setOnAction(e -> {
+            launchGame(primaryStage);
         });
 
-        root.getChildren().add(btn);
-        Scene scene = new Scene(root, 320, 240);
-        primaryStage.setTitle("Hello!");
+        nightModeBtn.setOnAction(e -> {
+            // Add night mode functionality here
+        });
+
+
+        VBox buttonContainer = new VBox(-30, dayModeBtn, nightModeBtn);//VBox for mode btn
+        buttonContainer.setAlignment(Pos.CENTER);
+
+        root.getChildren().add(buttonContainer);
+        StackPane.setAlignment(buttonContainer, Pos.CENTER);
+
+
+        Scene scene = new Scene(root, 800, 533);
         primaryStage.setScene(scene);
+        primaryStage.setTitle("Plants vs Zombies");
+        primaryStage.setResizable(false);
         primaryStage.show();
 
     }
 
-    void demo(IGameEngine engine) throws Exception {
-        // Demo:
-        String PeashooterObjectId = "Peashooter" + UUID.randomUUID();
-        Coordinate coordinate2 = new Coordinate(-1280.0 / 2, 728.0 / 2);
-        var obj = PeashooterGameObject.createPeashooterGameObject(engine, PeashooterObjectId, coordinate2, 1, 1);
-        engine.plantObject(obj);
+    private Button createHoverButton(String normalImagePath, String hoverImagePath, double width, double height) {
+        Button button = new Button();
+
+        Image normalImage = new Image(GlobalSettings.getResource(normalImagePath).toString());
+        Image hoverImage = new Image(GlobalSettings.getResource(hoverImagePath).toString());
+        ImageView normalView = new ImageView(normalImage);
+        ImageView hoverView = new ImageView(hoverImage);
+
+        normalView.setFitWidth(width);
+        normalView.setFitHeight(height);
+        normalView.setPreserveRatio(true);
+        hoverView.setFitWidth(width);
+        hoverView.setFitHeight(height);
+        hoverView.setPreserveRatio(true);
+
+        button.setGraphic(normalView);
+        button.setCursor(javafx.scene.Cursor.HAND);
+
+        // حذف حاشیه، رنگ پس‌زمینه و هرگونه padding
+        button.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-border-color: transparent;");
+
+        // Hover effects
+        button.setOnMouseEntered(e -> button.setGraphic(hoverView));
+        button.setOnMouseExited(e -> button.setGraphic(normalView));
+
+        return button;
+    }
 
 
-        String PeashooterObjectId2 = "Peashooter" + UUID.randomUUID();
-        Coordinate coordinate3 = new Coordinate(-1280.0 / 2, 728.0 / 2);
-        var obj2 = PeashooterGameObject.createPeashooterGameObject(engine, PeashooterObjectId2, coordinate3, 2, 2);
-        engine.plantObject(obj2);
+    private void launchGame(Stage primaryStage) {//for launching game
+
+        try {
+            DayView gameStage = DayView.createStage();
+            DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);//they are static
+//            VisualEngine.init(gameStage);
+
+            primaryStage.hide();
+
+            gameStage.show();
+
+            engineThreadRunning = true;
+            Thread gameEngineThread = new Thread(() -> {
+                while (engineThreadRunning) {
+                    try {
+                        dayEngine.update();//every obj for doing a function
+                        Thread.sleep(Duration.ofMillis(1000 / GlobalSettings.FPS));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+
+            gameStage.setOnHiding(e -> {
+                engineThreadRunning = false;
+                primaryStage.show(); // Show main menu again
+            });
+
+            gameEngineThread.setDaemon(true);
+            gameEngineThread.start();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            primaryStage.show();
+        }
     }
 }
