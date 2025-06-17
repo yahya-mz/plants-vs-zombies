@@ -100,8 +100,9 @@ public class VisualEngine {
 
 
     //
-    public void setSelectedPlantType(Class<? extends AbstractPlantVisualObject> type) {
-        this.selectedPlantType = type;
+
+    public void setSelectedPlantType(Class<? extends AbstractPlantVisualObject> plantType) {
+        this.selectedPlantType = plantType;
     }
 
     public Class<? extends AbstractPlantVisualObject> getSelectedPlantType() {
@@ -111,6 +112,7 @@ public class VisualEngine {
     public void clearSelectedPlantType() {
         this.selectedPlantType = null;
     }
+
     //
 
 

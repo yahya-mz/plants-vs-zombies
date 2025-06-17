@@ -132,6 +132,10 @@ public class DayView extends AbstractLevelView {
         Button shuveltool = createShovelToolButton();
 
         HBox mainbar = new HBox(24);
+//        mainbar.setStyle("-fx-background-color: red;");-debug
+        mainbar.setMaxWidth(850);
+        mainbar.setMaxHeight(100);
+
         mainbar.getChildren().addAll(suncounter, plantbar, shuveltool);
         mainbar.setAlignment(Pos.TOP_CENTER);
 
@@ -152,6 +156,7 @@ public class DayView extends AbstractLevelView {
 
 
         var scene = new Scene(bottommostPlane, Width, Height);
+
 
         dayView.setScene(scene);
         dayView.setResizable(false);
@@ -208,14 +213,21 @@ public class DayView extends AbstractLevelView {
             cardpic.setSmooth(true);
             cardpic.setFitWidth(70);
 
-            switch (i){
-                case 1 : btn.setOnMouseClicked(e -> {
-                            if (e.getButton().equals(MouseButton.PRIMARY)) {
-                                _visualEngine.plant(PeashooterVisualObject.class
-                                        , 0, 0);
-                            }
-                });
-            }
+
+            final int plantType = i;
+            btn.setOnMouseClicked(e -> {
+                if (e.getButton().equals(MouseButton.PRIMARY)) {
+                    switch (plantType) {
+                        case 1 -> _visualEngine.setSelectedPlantType(PeashooterVisualObject.class);
+                        // سایر case ها برای گیاه‌های دیگه
+                        //            if (e.getButton().equals(MouseButton.PRIMARY)) {
+//                            this._visualEngine.plant(PeashooterVisualObject.class
+//                                , 4, 5);
+
+                    }
+                }
+            });
+
 
 
             btn.setGraphic(cardpic);
@@ -225,7 +237,6 @@ public class DayView extends AbstractLevelView {
             btn.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-border-color: transparent;");
 
 
-            final int plantType = i;
             btn.setOnAction(e -> {
                 System.out.println("Plant button " + plantType + " clicked");
             });

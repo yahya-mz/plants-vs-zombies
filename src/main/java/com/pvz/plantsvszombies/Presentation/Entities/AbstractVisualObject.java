@@ -11,4 +11,5 @@ public abstract class AbstractVisualObject {
         return this._node;
     }
     public abstract void spawn();
+
 }
