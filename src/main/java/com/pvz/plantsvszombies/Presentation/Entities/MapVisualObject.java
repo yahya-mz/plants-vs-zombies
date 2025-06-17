@@ -221,7 +221,7 @@ public class MapVisualObject extends AbstractVisualObject {
         mainContainer.setSpacing(20);
         mainContainer.setPadding(new Insets(140, 70, 0, 190));
 
-        // پس‌زمینه
+
         mainContainer.setBackground(new Background(
                 new BackgroundImage(
                         new Image(GlobalSettings.getResource("graphics/Items/Background/daymap.jpg").toString(), true),
@@ -276,11 +276,11 @@ public class MapVisualObject extends AbstractVisualObject {
 
 
             Insets rowMargin = switch (row) {//جابه جایی هر ردیف
-                case 0 -> new Insets(-13, -10, -10, -10);  // بالا، راست، پایین، چپ
-                case 1 -> new Insets(5, -10, -10, -20);
+                case 0 -> new Insets(-13, -10, -10, -10);
+                case 1 -> new Insets(5, -10, -10, -20);//up,right,down,left
                 case 2 -> new Insets(7, -10, -10, -30);
                 case 3 -> new Insets(7, -10, -10, -40);
-                case 4 -> new Insets(7, -10, -10, -50);
+                case 4 -> new Insets(7, -10, -10, -52);
                 default -> Insets.EMPTY;
             };
             VBox.setMargin(rowBox, rowMargin);
@@ -302,7 +302,7 @@ public class MapVisualObject extends AbstractVisualObject {
                             _engine.plant(_engine.getSelectedPlantType(), r, c);
                             _engine.clearSelectedPlantType();
                         } else {
-                            System.out.println("هیچ گیاهی انتخاب نشده است.");
+                            System.out.println("no plant have been selected!!!");
                         }
                     }
                 });
@@ -320,7 +320,6 @@ public class MapVisualObject extends AbstractVisualObject {
 
         this._node = mainContainer;
 
-        // شنیدن رویداد کاشت
         _mapObject.subscribeToPlantingEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
@@ -331,7 +330,6 @@ public class MapVisualObject extends AbstractVisualObject {
             }
         });
 
-        // شنیدن رویداد شلیک گلوله
         _mapObject.subscribeToSpawningObjectEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
@@ -346,7 +344,6 @@ public class MapVisualObject extends AbstractVisualObject {
 
     @Override
     public void spawn() {
-        // اختیاری: افکت ورود
     }
 
     public void plant(AbstractVisualObject object, int row, int column) {
@@ -357,7 +354,7 @@ public class MapVisualObject extends AbstractVisualObject {
         });
 
         StackPane cell = visualGrid[row][column];
-        cell.getChildren().add(object.getNode()); // اضافه به روی دکمه
+        cell.getChildren().add(object.getNode());
     }
 
     public void spawnByCoordinate(AbstractVisualObject object) {
