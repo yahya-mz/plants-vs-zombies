@@ -7,7 +7,7 @@ public class GlobalSettings {
     public static final int HEIGHT = 728;
 
 
-    public static final int FPS = 300;
+    public static final int FPS = 30;
 
     public static String getResource(String path) {
         try{

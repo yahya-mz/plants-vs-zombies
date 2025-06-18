@@ -83,12 +83,11 @@ public class VisualEngine {
         });
     }
 
-    public void plant(Class<? extends AbstractPlantVisualObject> plantType, int x, int y) {
+    public void plant(Class<? extends AbstractPlantVisualObject> plantType, int x, int y, Coordinate coordinate) {
         Platform.runLater(() -> {
             if (plantType == PeashooterVisualObject.class) {
                 String PeashooterObjectId = "Peashooter" + UUID.randomUUID();
-                Coordinate coordinate2 = new Coordinate(-1280.0 / 2, 728.0 / 2);
-                var obj = PeashooterGameObject.createPeashooterGameObject(this._gameEngine, PeashooterObjectId, coordinate2, x, y);
+                var obj = PeashooterGameObject.createPeashooterGameObject(this._gameEngine, PeashooterObjectId, coordinate, x, y);
                 try {
                     this._gameEngine.plantObject(obj);
                 } catch (Exception ex) {

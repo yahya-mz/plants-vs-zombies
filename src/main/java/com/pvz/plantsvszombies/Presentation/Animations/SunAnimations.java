@@ -18,7 +18,7 @@ public class SunAnimations {
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Sun/"));
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Sun"));
         for (int i = 0; i < SunAnimations.Animations.values().length; i++) {
             var animationImages = new File(animationsDirectory.getPath() + "/" + SunAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {

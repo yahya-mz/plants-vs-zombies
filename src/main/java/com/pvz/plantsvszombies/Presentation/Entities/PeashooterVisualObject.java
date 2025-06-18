@@ -64,15 +64,8 @@ public class PeashooterVisualObject extends AbstractPlantVisualObject {
     public void spawn() {
         Platform.runLater(() -> {
             System.out.println("demodemo");
-            //changeStateTo(States.Standing);
             playAnimation(PeashooterAnimation.Animations.STANDING);//standing
-            Bounds boundsInScene = _node.localToScene(_node.getBoundsInLocal());//?
-//            var x2 = this.getNode().getLayoutX();
-            var x = boundsInScene.getMaxX();
-            System.out.println("X: "+boundsInScene.getMaxX());
-            _gameObject.setCoordinate(
-                    new Coordinate(x - 640.0, this.getNode().getLayoutY() - 364)
-            );
+
         });
     }
 

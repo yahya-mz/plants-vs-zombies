@@ -46,6 +46,9 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
         _visualCoordinate = gameObject.getCoordinate();
         _gameObject = gameObject;
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Sun/Sun_0.png")));
+        ((ImageView) _node).setFitWidth(80);
+        ((ImageView) _node).setFitHeight(80);
+        ((ImageView) _node).setPreserveRatio(true);
 
         _node.setCursor(Cursor.HAND);
         _node.setTranslateY(_visualCoordinate.y());
@@ -67,6 +70,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
     public void spawn() {
         changeStateTo(States.DROPPING);
         playAnimation(SunAnimations.Animations.SHINING);
+
     }
 
     public SkySunVisualObject changeStateTo(States state) {

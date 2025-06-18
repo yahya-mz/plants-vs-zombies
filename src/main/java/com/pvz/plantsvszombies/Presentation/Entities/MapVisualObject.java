@@ -299,7 +299,7 @@ public class MapVisualObject extends AbstractVisualObject {
                 cellButton.setOnMouseClicked(e -> {
                     if (e.getButton().equals(MouseButton.PRIMARY)) {
                         if (_engine.getSelectedPlantType() != null) {
-                            _engine.plant(_engine.getSelectedPlantType(), r, c);
+                            _engine.plant(_engine.getSelectedPlantType(), r, c, new Coordinate(cellButton.localToScene(cellButton.getLayoutBounds()).getCenterX()-640,cellButton.localToScene(cellButton.getLayoutBounds()).getCenterY()-364));
                             _engine.clearSelectedPlantType();
                         } else {
                             System.out.println("no plant have been selected!!!");
