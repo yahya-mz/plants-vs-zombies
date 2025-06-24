@@ -10,6 +10,6 @@ public abstract class AbstractVisualObject {
     public Node getNode(){
         return this._node;
     }
-    public abstract void spawn();
 
+    public abstract void spawn();
 }

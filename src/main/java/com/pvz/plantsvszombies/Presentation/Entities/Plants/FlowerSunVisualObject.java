@@ -1,6 +1,5 @@
-package com.pvz.plantsvszombies.Presentation.Entities;
+package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
-import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
@@ -9,6 +8,8 @@ import com.pvz.plantsvszombies.Presentation.Animations.GeneralFadingAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.SunAnimations;
+import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.SkySunVisualObject;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
@@ -16,7 +17,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.util.Duration;
 
-public class SkySunVisualObject extends AbstractAnimatedVisualObject {
+public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
 
 
     public enum States {
@@ -34,7 +35,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
 
     private VisualEngine _engine;
 
-    public SkySunVisualObject(SunGameObject gameObject, VisualEngine engine) {
+    public FlowerSunVisualObject(SunGameObject gameObject, VisualEngine engine) {
         _engine = engine;
         gameObject.subscribeToTimeOut(new IEventSubscriber() {
             @Override
@@ -51,10 +52,8 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
         ((ImageView) _node).setPreserveRatio(true);
 
         _node.setCursor(Cursor.HAND);
-        _node.setManaged(false);
-        _node.relocate(_visualCoordinate.x(),_visualCoordinate.y());
-        _node.setTranslateY(-50);
-//        _node.setTranslateX(_visualCoordinate.x());
+        _node.setTranslateY(_visualCoordinate.y());
+        _node.setTranslateX(_visualCoordinate.x());
 
         _node.setOnMouseClicked((e) -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
@@ -72,18 +71,25 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
     public void spawn() {
         changeStateTo(States.DROPPING);
         playAnimation(SunAnimations.Animations.SHINING);
+
     }
 
     public SkySunVisualObject changeStateTo(States state) {
         switch (state) {
             case DROPPING -> {
                 _currentState = States.DROPPING;
-                _transformAnimation = GeneralTransformAnimation.attach(this).transformY(10, GlobalSettings.HEIGHT / 2.0);
+                //my idea--change this
+                _transformAnimation = GeneralTransformAnimation.attach(this).transform(4, 4, 20, 20)
+                        .then((event) -> {
+                            _transformAnimation = GeneralTransformAnimation.attach(this).transform(4, 4, 10, -20);
+                        });
+
                 // +10 means going down
             }
+
             case COLLECTING -> {
                 if (_currentState == States.COLLECTING) {
-                    return this;
+                    break;
                 }
                 _gameObject.gain();
                 if (_currentState.equals(States.FADING_OUT)) {
@@ -91,23 +97,17 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
                     _fadingAnimation = null;
                     _node.setOpacity(1);
                 }
-                if (_currentState.equals(States.DROPPING)) {
+                if (_currentState.equals(States.DROPPING)) {//we may not need this
                     _transformAnimation.interrupt();
                 }
                 _currentState = States.COLLECTING;
-                var demo = this._node.getTranslateX();
-                var demo2 = this._node.getTranslateY();
-
-                var verticalDistance = 9 - this._node.getTranslateY();
-                var horizontalDistance = 166 - _visualCoordinate.x();
-                _transformAnimation.transform(Math.max(6 * horizontalDistance / verticalDistance, 6), Math.max(6 * verticalDistance / horizontalDistance, 6), horizontalDistance, verticalDistance);
-                _fadingAnimation = GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(4000))
-                        .setOnFinished((e) -> {
-                            _engine.disposeObject(this);
-                            _gameObject.dispose();
-                        });
+                System.out.println(this.getNode().getTranslateY());
+                //change this
+                _transformAnimation.transform(-6, -3, 338 + this.getNode().getTranslateY(), 300 + this.getNode().getTranslateY());
+                changeStateTo(States.FADING_OUT);
 
             }
+
             case FADING_OUT -> {
                 _currentState = States.FADING_OUT;
                 _fadingAnimation = GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(2500))

@@ -1,6 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.Animations;
 
-import com.pvz.plantsvszombies.Presentation.Entities.WallnutVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.WallnutVisualObject;
 import javafx.scene.image.Image;
 
 import java.io.File;

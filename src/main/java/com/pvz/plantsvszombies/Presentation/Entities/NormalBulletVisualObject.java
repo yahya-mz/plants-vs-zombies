@@ -14,31 +14,37 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class NormalBulletVisualObject extends AbstractVisualObject {
+
     private final NormalBulletGameObject _gameObject;
+    private VisualEngine _engine;
 
     public enum States {
         MOVING,
         COLLIDE
     }
 
-    public NormalBulletVisualObject(NormalBulletGameObject gameObject) {
-        _gameObject = gameObject;
+    public NormalBulletVisualObject(NormalBulletGameObject gameObject,VisualEngine engine) {
+        this._gameObject = gameObject;
+        this._engine = engine;
+
         gameObject.subscribeToCollisionEvent((object) -> {
             changeStateTo(States.COLLIDE);
         });
         _visualCoordinate = gameObject.getCoordinate();
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Bullets/PeaNormal/PeaNormal_0.png")));
-        _node.setTranslateY(_visualCoordinate.y());
-        _node.setTranslateX(_visualCoordinate.x());
+        _node.setManaged(false);
+        _node.relocate(_visualCoordinate.x(), _visualCoordinate.y() - 35);
 
         _gameObject.subscribeToMovementEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
-//                i++;
+                i++;
 //                System.out.println(gameObject.getCoordinate().x());
                 Bounds boundsInScene = _node.localToScene(_node.getBoundsInLocal());
-                double old_x = boundsInScene.getCenterX() - 640;
-                _node.setTranslateX(_node.getTranslateX() + gameObject.getCoordinate().x() - old_x);
+//                System.out.println(i / 100);
+                _node.relocate(_visualCoordinate.x(), _visualCoordinate.y() - 35);
+//                _node.setLayoutY(gameObject.getCoordinate().y());
+//                _node.setTranslateX(_node.getTranslateX() + gameObject.getCoordinate().x() - old_x);
             }
         });
     }
@@ -56,7 +62,7 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
 //                GeneralTransformAnimation.attach(this).transformX(10, VisualEngine.getInstance().getWidth() / 2.0);
             }
             case COLLIDE -> {
-
+                _engine.disposeObject(this);
             }
         }
         return null;

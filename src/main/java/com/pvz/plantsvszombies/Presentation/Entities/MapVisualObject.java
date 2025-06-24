@@ -1,22 +1,22 @@
 package com.pvz.plantsvszombies.Presentation.Entities;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.application.Platform;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 
@@ -192,21 +192,11 @@ import javafx.scene.layout.*;
 //    }
 //}
 
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
-import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.VisualEngine;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.layout.*;
-import javafx.scene.input.MouseButton;
+
+import java.util.List;
 
 public class MapVisualObject extends AbstractVisualObject {
     MapGameObject _mapObject;
@@ -299,26 +289,52 @@ public class MapVisualObject extends AbstractVisualObject {
                 cellButton.setOnMouseClicked(e -> {
                     if (e.getButton().equals(MouseButton.PRIMARY)) {
                         if (_engine.getSelectedPlantType() != null) {
-                            _engine.plant(_engine.getSelectedPlantType(), r, c, new Coordinate(cellButton.localToScene(cellButton.getLayoutBounds()).getCenterX()-640,cellButton.localToScene(cellButton.getLayoutBounds()).getCenterY()-364));
+                            _engine.plant(_engine.getSelectedPlantType(), r, c, new Coordinate(cellButton.localToScene(cellButton.getLayoutBounds()).getCenterX(), cellButton.localToScene(cellButton.getLayoutBounds()).getCenterY()));
                             _engine.clearSelectedPlantType();
                         } else {
                             System.out.println("no plant have been selected!!!");
                         }
                     }
                 });
+//                cellButton.setOnMouseEntered((event) -> {
+//                    var demo = pick(mainContainer, event.getSceneX(), event.getSceneY());
+//                    System.out.println( event.getSceneX());
+//                    System.out.println( event.getSceneY());
+//                    for (Node _row : mainContainer.getChildren()) {
+//                        for (Node _col : ((HBox) _row).getChildren()) {
+//                            if (((StackPane) _col).getChildren().get(0).equals(demo)) {
+//                                System.out.println(mainContainer.getChildren().indexOf(_row) + ", " + ((HBox) _row).getChildren().indexOf(_col));
+//                            }
+//                        }
+//                    }
+//                });
 
                 StackPane cell = new StackPane();
                 cell.getChildren().add(cellButton);
                 visualGrid[row][col] = cell;
-
                 rowBox.getChildren().add(cell);
             }
-
             mainContainer.getChildren().add(rowBox);
         }
-        //
+        mainContainer.layout();
+        var blocks = new MapBlock[_mapObject.getRows() * _mapObject.getColumns()];
+        for (int i = 0; i < _mapObject.getRows(); i++) {
+            for (int j = 0; j < _mapObject.getColumns(); j++) {
+                var n = ((StackPane) ((HBox) (mainContainer.getChildren().get(i))).getChildren().get(j));
+                final int i_final = i;
+                final int j_final = j;
+                n.needsLayoutProperty().addListener((obs2, oldVal, newVal) -> { // When needsLayout is set to false, it means everything about layout bounds is set
+                    if (!newVal) {
+                        var x = ((StackPane) n).localToScene(n.getLayoutBounds());
+                        var y = ((StackPane) n).localToScene(n.getLayoutBounds());
+                        blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxX()));
+                    }
+                });
+            }
+        }
 
         this._node = mainContainer;
+        _mapObject.initBlocks(blocks);
 
         _mapObject.subscribeToPlantingEvent(new IEventSubscriber() {
             @Override
@@ -326,6 +342,10 @@ public class MapVisualObject extends AbstractVisualObject {
                 if (gameObject instanceof PeashooterGameObject p) {
                     var visualObject = new PeashooterVisualObject(p, _engine);
                     plant(visualObject, p.getRow(), p.getColumn());
+                }
+                if (gameObject instanceof RepeaterGameObject rp) {
+                    var visualObject = new RepeaterVisualObject(rp, _engine);
+                    plant(visualObject, rp.getRow(), rp.getColumn());
                 }
             }
         });
@@ -335,7 +355,7 @@ public class MapVisualObject extends AbstractVisualObject {
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
                     if (gameObject instanceof NormalBulletGameObject bullet) {
-                        spawnByCoordinate(new NormalBulletVisualObject(bullet));
+                        spawnByCoordinate(new NormalBulletVisualObject(bullet,engine));
                     }
                 });
             }
@@ -359,6 +379,39 @@ public class MapVisualObject extends AbstractVisualObject {
 
     public void spawnByCoordinate(AbstractVisualObject object) {
         _engine.spawnVisualObject(object);
+    }
+
+    private static Node pick(Node node, double sceneX, double sceneY) {
+        Point2D p = node.sceneToLocal(sceneX, sceneY, true /* rootScene */);
+
+        // check if the given node has the point inside it, or else we drop out
+        if (!node.contains(p)) return null;
+
+        // at this point we know that _at least_ the given node is a valid
+        // answer to the given point, so we will return that if we don't find
+        // a better child option
+        if (node instanceof Parent) {
+            // we iterate through all children in reverse order, and stop when we find a match.
+            // We do this as we know the elements at the end of the list have a higher
+            // z-order, and are therefore the better match, compared to children that
+            // might also intersect (but that would be underneath the element).
+            Node bestMatchingChild = null;
+            List<Node> children = ((Parent) node).getChildrenUnmodifiable();
+            for (int i = children.size() - 1; i >= 0; i--) {
+                Node child = children.get(i);
+                p = child.sceneToLocal(sceneX, sceneY, true /* rootScene */);
+                if (child.isVisible() && !child.isMouseTransparent() && child.contains(p)) {
+                    bestMatchingChild = child;
+                    break;
+                }
+            }
+
+            if (bestMatchingChild != null) {
+                return pick(bestMatchingChild, sceneX, sceneY);
+            }
+        }
+
+        return node;
     }
 }
 

@@ -4,6 +4,7 @@ package com.pvz.plantsvszombies.GUI;
 import com.pvz.plantsvszombies.GameEngine.DayEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.GUI.Views.DayView;
+import com.pvz.plantsvszombies.Mediator.Mediator;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -23,8 +24,6 @@ public class MainApp extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
-    private boolean engineThreadRunning = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -108,32 +107,11 @@ public class MainApp extends Application {
 
         try {
             DayView gameStage = DayView.createStage();
-            DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);//they are static
-//            VisualEngine.init(gameStage);
-
-            primaryStage.hide();
-
             gameStage.show();
-
-            engineThreadRunning = true;
-            Thread gameEngineThread = new Thread(() -> {
-                while (engineThreadRunning) {
-                    try {
-                        dayEngine.update();//every obj for doing a function
-                        Thread.sleep(Duration.ofMillis(1000 / GlobalSettings.FPS));
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            });
-
             gameStage.setOnHiding(e -> {
-                engineThreadRunning = false;
                 primaryStage.show(); // Show main menu again
+                Mediator.getInstance().stopEngine();
             });
-
-            gameEngineThread.setDaemon(true);
-            gameEngineThread.start();
 
         } catch (Exception e) {
             e.printStackTrace();

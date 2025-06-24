@@ -19,7 +19,7 @@ public abstract class AbstractAnimatedVisualObject extends AbstractVisualObject 
     private final Timeline _animationTimeLine;
 
 
-    AbstractAnimatedVisualObject() {
+    public AbstractAnimatedVisualObject() {
         this._animationTimeLine = new Timeline();
     }
 

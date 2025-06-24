@@ -2,7 +2,7 @@
 //
 //import com.pvz.plantsvszombies.GameEngine.DayEngine;
 //import com.pvz.plantsvszombies.Mediator.Mediator;
-//import com.pvz.plantsvszombies.Presentation.Entities.PeashooterVisualObject;
+//import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
 //import com.pvz.plantsvszombies.Presentation.VisualEngine;
 //import javafx.geometry.Insets;
 //import javafx.scene.Scene;
@@ -75,7 +75,8 @@ package com.pvz.plantsvszombies.GUI.Views;
 import com.pvz.plantsvszombies.GameEngine.DayEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
-import com.pvz.plantsvszombies.Presentation.Entities.PeashooterVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -89,9 +90,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-
-import java.awt.*;
 
 public class DayView extends AbstractLevelView {
 
@@ -223,7 +221,7 @@ public class DayView extends AbstractLevelView {
                         //            if (e.getButton().equals(MouseButton.PRIMARY)) {
 //                            this._visualEngine.plant(PeashooterVisualObject.class
 //                                , 4, 5);
-
+                        case 8 -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
                     }
                 }
             });

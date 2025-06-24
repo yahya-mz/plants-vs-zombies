@@ -11,7 +11,6 @@ import java.util.Objects;
 
 public class PeashooterAnimation {
     public enum Animations implements IAnimation {
-        SHOOTING,
         STANDING
     }
 

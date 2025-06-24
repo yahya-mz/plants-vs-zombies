@@ -24,12 +24,7 @@ public class CherryBombGameObject extends AbstractPlantGameObject {
     }
 
     @Override
-    public double getHealth() {
-        return 0;
-    }
+    public void getHit(int damage) {
 
-    @Override
-    public double getCost() {
-        return 0;
     }
 }

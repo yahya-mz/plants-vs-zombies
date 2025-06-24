@@ -1,14 +1,14 @@
-package com.pvz.plantsvszombies.Presentation.Entities;
+package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 
-import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
 import com.pvz.plantsvszombies.Presentation.Animations.WallnutAnimations;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
+import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
-import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
@@ -17,7 +17,7 @@ public class WallnutVisualObject extends AbstractAnimatedVisualObject {
 
 
     public enum States {
-        FULLHEALTH,
+        FULL_HEALTH,
         CRACKED1,
         CRACKED2
     }
@@ -34,35 +34,33 @@ public class WallnutVisualObject extends AbstractAnimatedVisualObject {
     public WallnutVisualObject(WallNutGameObject gameObject, VisualEngine engine) {
         _engine = engine;
 
-//        gameObject.subscribeToFullHealthEvent(new IEventSubscriber() {
-//            @Override
-//            public void _notify(AbstractGameObject gameObject) {
-//                System.out.println("wallnut will be full health again");
-//                changeStateTo(States.FULLHEALTH);
-//            }
-//        });
-//        gameObject.subscribeToBeingEatenEvent1(new IEventSubscriber() {
-//            @Override
-//            public void _notify(AbstractGameObject gameObject) {
-//                System.out.println("wallnut being cracked1");
-//                changeStateTo(States.CRACKED1);
-//            }
-//        });
-//        gameObject.subscribeToFullHealthEvent2(new IEventSubscriber() {
-//            @Override
-//            public void _notify(AbstractGameObject gameObject) {
-//                System.out.println("wallnut will be full health again");
-//                changeStateTo(States.FULLHEALTH);
-//            }
-//        });
-        
+        gameObject.subscribeToCracked_1_Event(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                System.out.println("wallnut will be full health again");
+                changeStateTo(States.CRACKED1);
+            }
+        });
+        gameObject.subscribeToCracked_2_Event(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                System.out.println("wallnut being cracked1");
+                changeStateTo(States.CRACKED2);
+            }
+        });
+        gameObject.subscribeToEatenEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                System.out.println("WallNut is dead");
+            }
+        });
+
         _visualCoordinate = gameObject.getCoordinate();
         _gameObject = gameObject;
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Plants/WallNut/WallNut/WallNut_0.png")));
 
-        _node.setCursor(Cursor.HAND);
-        _node.setTranslateY(_visualCoordinate.y());
-        _node.setTranslateX(_visualCoordinate.x());
+//        _node.setTranslateY(_visualCoordinate.y());
+//        _node.setTranslateX(_visualCoordinate.x());
 
 
     }
@@ -74,14 +72,14 @@ public class WallnutVisualObject extends AbstractAnimatedVisualObject {
 
     @Override
     public void spawn() {
-        changeStateTo(States.FULLHEALTH);
+        changeStateTo(States.FULL_HEALTH);
         playAnimation(WallnutAnimations.Animations.STANDING);
     }
 
-    public SkySunVisualObject changeStateTo(States state) {
+    public WallnutVisualObject changeStateTo(States state) {
         switch (state) {
-            case FULLHEALTH -> {
-                _currentState = States.FULLHEALTH;
+            case FULL_HEALTH -> {
+                _currentState = States.FULL_HEALTH;
                 playAnimation(WallnutAnimations.Animations.STANDING);
 
             }
@@ -89,7 +87,7 @@ public class WallnutVisualObject extends AbstractAnimatedVisualObject {
                 if (_currentState == States.CRACKED1) {
                     break;
                 }
-                if (_currentState.equals(States.FULLHEALTH)) {
+                if (_currentState.equals(States.FULL_HEALTH)) {
                     changeStateTo(States.CRACKED1);
                     playAnimation(WallnutAnimations.Animations.CRACKED1);
                 }
@@ -98,7 +96,6 @@ public class WallnutVisualObject extends AbstractAnimatedVisualObject {
             case CRACKED2 -> {
                 _currentState = States.CRACKED2;
                 playAnimation(WallnutAnimations.Animations.CRACKED2);
-
             }
         }
         return null;

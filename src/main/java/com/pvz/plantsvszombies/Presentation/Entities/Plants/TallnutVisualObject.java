@@ -1,12 +1,12 @@
-package com.pvz.plantsvszombies.Presentation.Entities;
+package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 
-import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
 import com.pvz.plantsvszombies.Presentation.Animations.WallnutAnimations;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
+import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.SkySunVisualObject;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;

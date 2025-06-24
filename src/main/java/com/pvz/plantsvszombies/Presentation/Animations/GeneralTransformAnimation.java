@@ -6,6 +6,8 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -54,14 +56,19 @@ public class GeneralTransformAnimation {
         return this;
     }
 
-    public GeneralTransformAnimation transform(double horizontalSpeed, double verticalSpeed, double horizontalDistance, double VerticalDistance) {
-        var horizontalKeyFrame = new KeyFrame(Duration.millis(Math.abs(horizontalDistance / horizontalSpeed) / GlobalSettings.FPS * 1000), new KeyValue(_visualObject.getNode().translateXProperty(), _visualObject.getNode().getTranslateY() +
-                horizontalSpeed / Math.abs(horizontalSpeed) * horizontalDistance));
-        var verticalKeyFrame = new KeyFrame(Duration.millis(Math.abs(VerticalDistance / verticalSpeed) / GlobalSettings.FPS * 1000), new KeyValue(_visualObject.getNode().translateYProperty(), _visualObject.getNode().getTranslateY() +
-                verticalSpeed / Math.abs(verticalSpeed) * VerticalDistance));
+    public GeneralTransformAnimation transform(double horizontalSpeed, double verticalSpeed, double horizontalDistance, double verticalDistance) {
+        var horizontalKeyFrame = new KeyFrame(Duration.millis(Math.abs(horizontalDistance / horizontalSpeed) / GlobalSettings.FPS * 1000), new KeyValue(_visualObject.getNode().translateXProperty(), _visualObject.getNode().getTranslateX() +
+                horizontalDistance));
+        var verticalKeyFrame = new KeyFrame(Duration.millis(Math.abs(verticalDistance / verticalSpeed) / GlobalSettings.FPS * 1000), new KeyValue(_visualObject.getNode().translateYProperty(), _visualObject.getNode().getTranslateY() +
+                verticalDistance));
         _timeline = new Timeline(0, horizontalKeyFrame, verticalKeyFrame);
         _timeline.setCycleCount(1);
         _timeline.playFromStart();
+        return this;
+    }
+
+    public GeneralTransformAnimation then(EventHandler<ActionEvent> eventHandler) {
+        _timeline.setOnFinished(eventHandler);
         return this;
     }
 }

@@ -13,7 +13,8 @@ public class MapGameObject extends AbstractGameObject {
 
     private boolean isDisposed = false;
 
-    ArrayList<AbstractPlantGameObject> _plants;
+    //    AbstractPlantGameObject[] _plants;
+    MapBlock[] _blocks;
 
     private IGameEngine _engine;
 
@@ -25,9 +26,11 @@ public class MapGameObject extends AbstractGameObject {
     }
 
     private MapGameObject(int rows, int columns, String id, Coordinate coordinate, IGameEngine engine) {
-        this._plants = new ArrayList<>();
+//        this._plants = new AbstractPlantGameObject[_rows * _columns]; Error, might not have been initialized
         this._columns = columns;
         this._rows = rows;
+//        this._plants = new AbstractPlantGameObject[_rows * _columns];
+        this._blocks = new MapBlock[_rows * _columns];
         this._ID = id;
         this._coordinate = coordinate;
         this._engine = engine;
@@ -51,18 +54,25 @@ public class MapGameObject extends AbstractGameObject {
 
     }
 
+    public void initBlocks(MapBlock[] blocks) {
+        _blocks = blocks;
+    }
+
+    public MapBlock getBlock(int row, int col) {
+        return _blocks[_columns * row + col];
+    }
+
     public boolean isOccupied(int row, int column) {
-        for (AbstractPlantGameObject plant : _plants) {
-            if (plant.getColumn() == column && plant.getRow() == row) {
-                return true;
-            }
-        }
-        return false;
+        return (_blocks[_columns * row + column].getPlant() != null);
+    }
+
+    public AbstractPlantGameObject getPlantAtBlock(int row, int column) {
+        return _blocks[_columns * row + column].getPlant();
     }
 
     public void plant(AbstractPlantGameObject plant) {//calling visual
         System.out.println("Planting");
-        this._plants.add(plant);
+        _blocks[plant.getRow() * _rows + plant.getColumn()].setPlant(plant);
         for (IEventSubscriber eventSubscriber : _plantingEventSubscribers) {
             eventSubscriber._notify(plant);
         }

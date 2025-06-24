@@ -6,20 +6,14 @@ import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.UUID;
 
 public class PeashooterGameObject extends AbstractPlantGameObject {
-    private final String _ID;
-    private Coordinate _coordinate;
-
-    private final double _health = 50;
-    private final double _cost = 100;
-
+    private final Duration _coolDown = Duration.ofMillis(4000);
     private IGameEngine _engine;
-
     private int tick = 1;
-
     private boolean isDisposed = false;
 
     private ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
@@ -36,21 +30,9 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
         this._coordinate = coordinate;
         this._row = row;
         this._column = column;
-    }
 
-    private void shoot() {
-        String BulletObjectId = "NormalBullet" + UUID.randomUUID();
-        var bulletObj = NormalBulletGameObject.createNormalBulletGameObject(_engine, BulletObjectId, this._coordinate.copy());
-        _engine.spawnObject(bulletObj);
-        for (IEventSubscriber eventSubscriber : _shootingEventSubscribers) {
-            eventSubscriber._notify(bulletObj);
-        }
-    }
-
-    private void eaten() {
-        for (IEventSubscriber eventSubscriber : _eatenEventSubscribers) {
-            eventSubscriber._notify(this);
-        }
+        this._cost = 100;
+        this._health = 50;
     }
 
     public void subscribeToShootingEvent(IEventSubscriber event) {
@@ -61,17 +43,6 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
         this._eatenEventSubscribers.add(event);
     }
 
-
-    @Override
-    public String getId() {
-        return this._ID;
-    }
-
-    @Override
-    public Coordinate getCoordinate() {
-        return this._coordinate;
-    }
-
     @Override
     public void spawn() {
 
@@ -79,29 +50,44 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
 
     @Override
     public void update() {
-        tick++;
-        if (getMilliseconds() % 4000 == 0) {
-            shoot();
+        if (!this.isDisposed) {
+            tick++;
+            if (getMilliseconds() % _coolDown.toMillis() == 0) {
+                shoot();
+            }
         }
     }
 
     @Override
-    public double getHealth() {
-        return this._health;
-    }
+    public void getHit(int damage) {
+        _health -= damage;
+        if (_health <= 0) {
+            eaten();
+        }
 
-    @Override
-    public double getCost() {
-        return this._cost;
     }
 
     private double getMilliseconds() {
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }
 
-    public void setCoordinate(Coordinate coordinate) {
-        this._coordinate = coordinate;
+    private void shoot() {
+        String BulletObjectId = "NormalBullet" + UUID.randomUUID();
+        var bulletObj = NormalBulletGameObject.createNormalBulletGameObject(_engine, BulletObjectId, this._coordinate.copy(),getRow());
+        _engine.spawnObject(bulletObj);
+        for (IEventSubscriber eventSubscriber : _shootingEventSubscribers) {
+            eventSubscriber._notify(bulletObj);
+        }
     }
 
+    private void eaten() {
+        this.isDisposed = true;
+        this._engine.disposeObject(this);
+        this._engine = null;
+
+        for (IEventSubscriber eventSubscriber : _eatenEventSubscribers) {
+            eventSubscriber._notify(this);
+        }
+    }
 
 }

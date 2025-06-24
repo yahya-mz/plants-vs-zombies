@@ -10,11 +10,10 @@ public abstract class AbstractGameObject {
     public String getId() {
         return this._ID;
     }
-
     public Coordinate getCoordinate() {
         return this._coordinate;
     }
-    public abstract void spawn();
 
+    public abstract void spawn();
     public abstract void update();
 }
