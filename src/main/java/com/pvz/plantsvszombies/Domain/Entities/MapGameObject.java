@@ -5,6 +5,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Events.MapSpawnEvent;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MapGameObject extends AbstractGameObject {
 
@@ -13,8 +14,7 @@ public class MapGameObject extends AbstractGameObject {
 
     private boolean isDisposed = false;
 
-    //    AbstractPlantGameObject[] _plants;
-    MapBlock[] _blocks;
+    private MapBlock[] _blocks;
 
     private IGameEngine _engine;
 
@@ -69,10 +69,18 @@ public class MapGameObject extends AbstractGameObject {
     public AbstractPlantGameObject getPlantAtBlock(int row, int column) {
         return _blocks[_columns * row + column].getPlant();
     }
+    public MapBlock getBlockByCoordinate(Coordinate coordinate) {
+        for(MapBlock mapBlock:_blocks){
+            if (mapBlock.contains(coordinate)){
+                return mapBlock;
+            }
+        }
+        return null;
+    }
 
     public void plant(AbstractPlantGameObject plant) {//calling visual
         System.out.println("Planting");
-        _blocks[plant.getRow() * _rows + plant.getColumn()].setPlant(plant);
+        this._blocks[plant.getRow() * _columns + plant.getColumn()]._plant = plant;
         for (IEventSubscriber eventSubscriber : _plantingEventSubscribers) {
             eventSubscriber._notify(plant);
         }

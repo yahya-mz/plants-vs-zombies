@@ -25,8 +25,8 @@ public class NormalBulletGameObject extends AbstractBulletGameObject {
         this._row = row;
         this._bulletType = BulletType.NORMAL_BULLET;
 
-        this._speed = 5;
-        this._damage = 50;
+        this._speed = 7;
+        this._damage = 25;
     }
 
     @Override

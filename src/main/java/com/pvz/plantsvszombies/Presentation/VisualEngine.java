@@ -5,15 +5,13 @@ import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.SunFlowerGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.GameEngine.DayEngine;
 import com.pvz.plantsvszombies.Presentation.Entities.*;
 import com.pvz.plantsvszombies.GUI.Views.AbstractLevelView;
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.AbstractPlantVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.SunFlowerVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.Entities.Zombies.NormalZombieVisualObject;
 import javafx.application.Platform;
 import javafx.scene.layout.Pane;
@@ -112,15 +110,15 @@ public class VisualEngine {
                 }
             }
 
-//            else if (plantType == WallnutVisualObject.class) {
-//                String PeashooterObjectId = "Wallnut" + UUID.randomUUID();
-//                var obj = WallNutGameObject.createWallnutGameObject(this._gameEngine, PeashooterObjectId, coordinate, x, y);
-//                try {
-//                    this._gameEngine.plantObject(obj);
-//                } catch (Exception ex) {
-//                    System.out.println(ex.getMessage());
-//                }
-//            }
+            else if (plantType == WallNutVisualObject.class) {
+                String WalnutObjectId = "Walnut" + UUID.randomUUID();
+                var obj = WallNutGameObject.createWallNutGameObject(this._gameEngine, WalnutObjectId, coordinate, x, y);
+                try {
+                    this._gameEngine.plantObject(obj);
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
             //            else if (plantType == TallnutVisualObject) {
 //                String PeashooterObjectId = "Tallnut" + UUID.randomUUID();
 //                var obj = TallNutGameObject.createTallnutGameObject(this._gameEngine, PeashooterObjectId, coordinate, x, y);

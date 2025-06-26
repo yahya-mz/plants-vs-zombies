@@ -5,9 +5,11 @@ import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.WallNutVisualObject;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -17,6 +19,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 
@@ -287,6 +290,7 @@ public class MapVisualObject extends AbstractVisualObject {
                 final int r = row;
                 final int c = col;
                 cellButton.setOnMouseClicked(e -> {
+                    System.out.println("demo");
                     if (e.getButton().equals(MouseButton.PRIMARY)) {
                         if (_engine.getSelectedPlantType() != null) {
                             _engine.plant(_engine.getSelectedPlantType(), r, c, new Coordinate(cellButton.localToScene(cellButton.getLayoutBounds()).getCenterX(), cellButton.localToScene(cellButton.getLayoutBounds()).getCenterY()));
@@ -310,6 +314,9 @@ public class MapVisualObject extends AbstractVisualObject {
 //                });
 
                 StackPane cell = new StackPane();
+                cell.setOnMouseEntered((e)->{
+                    System.out.println(e.getScreenX()+" , "+e.getScreenY());
+                });
                 cell.getChildren().add(cellButton);
                 visualGrid[row][col] = cell;
                 rowBox.getChildren().add(cell);
@@ -324,17 +331,17 @@ public class MapVisualObject extends AbstractVisualObject {
                 final int i_final = i;
                 final int j_final = j;
                 n.needsLayoutProperty().addListener((obs2, oldVal, newVal) -> { // When needsLayout is set to false, it means everything about layout bounds is set
-                    if (!newVal) {
-                        var x = ((StackPane) n).localToScene(n.getLayoutBounds());
-                        var y = ((StackPane) n).localToScene(n.getLayoutBounds());
-                        blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxX()));
+                    if (!newVal && blocks[_mapObject.getColumns() * i_final + j_final] ==null){
+                        var x = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
+                        var y = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
+                        blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxX()), i_final, j_final);
+                        _mapObject.initBlocks(blocks);
                     }
                 });
             }
         }
 
         this._node = mainContainer;
-        _mapObject.initBlocks(blocks);
 
         _mapObject.subscribeToPlantingEvent(new IEventSubscriber() {
             @Override
@@ -347,6 +354,10 @@ public class MapVisualObject extends AbstractVisualObject {
                     var visualObject = new RepeaterVisualObject(rp, _engine);
                     plant(visualObject, rp.getRow(), rp.getColumn());
                 }
+                if (gameObject instanceof WallNutGameObject wn) {
+                    var visualObject = new WallNutVisualObject(wn, _engine);
+                    plant(visualObject, wn.getRow(), wn.getColumn());
+                }
             }
         });
 
@@ -355,7 +366,7 @@ public class MapVisualObject extends AbstractVisualObject {
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
                     if (gameObject instanceof NormalBulletGameObject bullet) {
-                        spawnByCoordinate(new NormalBulletVisualObject(bullet,engine));
+                        spawnByCoordinate(new NormalBulletVisualObject(bullet, engine));
                     }
                 });
             }
@@ -374,6 +385,8 @@ public class MapVisualObject extends AbstractVisualObject {
         });
 
         StackPane cell = visualGrid[row][column];
+        var demo = cell.getWidth();
+        ((ImageView)object.getNode()).setFitWidth(demo);
         cell.getChildren().add(object.getNode());
     }
 

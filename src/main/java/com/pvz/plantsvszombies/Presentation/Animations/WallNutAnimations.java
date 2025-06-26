@@ -1,15 +1,17 @@
 package com.pvz.plantsvszombies.Presentation.Animations;
 
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.WallnutVisualObject;
+import com.pvz.plantsvszombies.GlobalSettings;
 import javafx.scene.image.Image;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 
-public class WallnutAnimations {
+public class WallNutAnimations {
     public enum Animations implements IAnimation {
-        STANDING,
+        FULL_HEALTH,
         CRACKED1,
         CRACKED2
     }
@@ -18,9 +20,17 @@ public class WallnutAnimations {
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(WallnutVisualObject.class.getResource("graphics/Plants/WallNut").getPath());
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/WallNut"));
         for (int i = 0; i < Animations.values().length; i++) {
             var animationImages = new File(animationsDirectory.getPath() + "/" + Animations.values()[i]).listFiles();
+            Arrays.sort(animationImages, Comparator.comparingInt(f -> {
+                String name = f.getName();
+                int dotIndex = name.lastIndexOf('.');
+                if (dotIndex != -1) {
+                    name = name.substring(0, dotIndex); // remove file extension
+                }
+                return Integer.parseInt(name); // assume name is a number
+            }));
             Objects.requireNonNull(animationImages);
             Image[] animationFrames = new Image[animationImages.length];
             for (int j = 0; j < animationImages.length; j++) {
@@ -30,7 +40,7 @@ public class WallnutAnimations {
         }
     }
 
-    public static Image[] getFrames(WallnutAnimations.Animations animation){
+    public static Image[] getFrames(WallNutAnimations.Animations animation){
         return animations.get(animation.ordinal());
     }
 }

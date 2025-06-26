@@ -5,6 +5,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Presentation.Animations.GeneralFadingAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.PeashooterAnimation;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
@@ -12,6 +13,7 @@ import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.util.Duration;
 
 public class NormalBulletVisualObject extends AbstractVisualObject {
 
@@ -23,28 +25,36 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
         COLLIDE
     }
 
-    public NormalBulletVisualObject(NormalBulletGameObject gameObject,VisualEngine engine) {
+    public NormalBulletVisualObject(NormalBulletGameObject gameObject, VisualEngine engine) {
         this._gameObject = gameObject;
         this._engine = engine;
 
-        gameObject.subscribeToCollisionEvent((object) -> {
-            changeStateTo(States.COLLIDE);
-        });
         _visualCoordinate = gameObject.getCoordinate();
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Bullets/PeaNormal/PeaNormal_0.png")));
         _node.setManaged(false);
-        _node.relocate(_visualCoordinate.x(), _visualCoordinate.y() - 35);
+
+        var height = ((Image) ((ImageView) _node).getImage()).getHeight();
+        var width = ((Image) ((ImageView) _node).getImage()).getWidth();
+
+        _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
 
         _gameObject.subscribeToMovementEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
-                i++;
+                Platform.runLater(() -> {
+                    _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
+                });
 //                System.out.println(gameObject.getCoordinate().x());
-                Bounds boundsInScene = _node.localToScene(_node.getBoundsInLocal());
-//                System.out.println(i / 100);
-                _node.relocate(_visualCoordinate.x(), _visualCoordinate.y() - 35);
+
 //                _node.setLayoutY(gameObject.getCoordinate().y());
 //                _node.setTranslateX(_node.getTranslateX() + gameObject.getCoordinate().x() - old_x);
+            }
+        });
+
+        _gameObject.subscribeToCollisionEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                changeStateTo(States.COLLIDE);
             }
         });
     }
@@ -62,7 +72,12 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
 //                GeneralTransformAnimation.attach(this).transformX(10, VisualEngine.getInstance().getWidth() / 2.0);
             }
             case COLLIDE -> {
-                _engine.disposeObject(this);
+                Platform.runLater(() -> {
+                    ((ImageView) _node).setImage(new Image(GlobalSettings.getResource("graphics/Bullets/PeaNormalExplode/PeaNormalExplode_0.png")));
+                    GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(300)).setOnFinished((e) -> {
+                        _engine.disposeObject(this);
+                    });
+                });
             }
         }
         return null;

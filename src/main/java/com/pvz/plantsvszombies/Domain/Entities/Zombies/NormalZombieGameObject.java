@@ -37,8 +37,8 @@ public class NormalZombieGameObject extends AbstractZombieGameObject {
         this._row = row;
         this._column = column;
 
-        this._health = 300;
-        this._damage = 25;
+        this._health = 125;
+        this._damage = 75;
         this._speed = 0.9;
 
         this._state = State.MOVING;
@@ -66,25 +66,31 @@ public class NormalZombieGameObject extends AbstractZombieGameObject {
     @Override
     public void update() {
         if (!_isDisposed) {
-            var plant = _engine.getPlantAtBlock(this._row, this._column);
+            var zombieBlock = _engine.getBlockByCoordinate(this._coordinate);
+
+//            System.out.println(zombieBlock.getColumn());
 
             for (AbstractGameObject obj : _engine.getGameObjects()) {
                 if (obj instanceof AbstractBulletGameObject) {
                     if (((AbstractBulletGameObject) obj).getRow() == this._row
-                            && Math.abs(((AbstractBulletGameObject) obj).getCoordinate().x() - this._coordinate.x()) < (this._speed + ((AbstractBulletGameObject) obj).getSpeed()) / 2) {
+                            && Math.abs(((AbstractBulletGameObject) obj).getCoordinate().x() - this._coordinate.x()) < (this._speed + ((AbstractBulletGameObject) obj).getSpeed())) {
                         getHit((AbstractBulletGameObject) obj);
                         ((AbstractBulletGameObject) obj).collide();
                     }
                 }
             }
 //            System.out.println(this._row + "," + this._column);
-            if (plant != null) {
-                if (lastBitMillis == -1) {
+            if (zombieBlock.getPlant() != null) {
+                if (lastBitMillis == -1) { // Start eating
                     lastBitMillis = getMilliseconds();
+                    this._state = State.EATING;
+                    for (IEventSubscriber subscriber : _eatingEventSubscribers) {
+                        subscriber._notify(this);
+                    }
                 }
-                this._state = State.EATING;
-                if (getMilliseconds() - lastBitMillis % 500 == 0) {
-                    plant.getHit(this._damage);
+                if (getMilliseconds() - lastBitMillis > 1000 ) {
+                    System.out.println("hit");
+                    zombieBlock.getPlant().getHit(this._damage);
                     lastBitMillis = getMilliseconds();
                 }
 
@@ -99,6 +105,7 @@ public class NormalZombieGameObject extends AbstractZombieGameObject {
                 }
             }
         }
+        tick++;
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.pvz.plantsvszombies.Domain.Entities;
 
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 
+import java.util.Comparator;
 import java.util.List;
 
 public interface IGameEngine {
@@ -22,6 +24,7 @@ public interface IGameEngine {
     void plantObject(AbstractPlantGameObject object) throws Exception;
 
     AbstractPlantGameObject getPlantAtBlock(int row, int column);
+    MapBlock getBlockByCoordinate(Coordinate coordinate);
 
     List<AbstractGameObject> getGameObjects();
 //    void spawnObjectOnMap(AbstractGameObject object, int x, int y);

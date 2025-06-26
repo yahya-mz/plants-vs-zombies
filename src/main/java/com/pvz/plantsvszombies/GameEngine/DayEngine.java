@@ -84,6 +84,10 @@ public class DayEngine implements IGameEngine {
     @Override
     public void disposeObject(AbstractGameObject object) {
         _gameObjects.remove(object);
+        if (object instanceof AbstractPlantGameObject) {
+            _currentMap.getBlock(((AbstractPlantGameObject) object).getRow(),
+                    ((AbstractPlantGameObject) object).getColumn()).setPlant(null);
+        }
     }
 
     @Override
@@ -115,6 +119,10 @@ public class DayEngine implements IGameEngine {
         synchronized (_currentMap) {
             return this._currentMap.getPlantAtBlock(row, column);
         }
+    }
+
+    public MapBlock getBlockByCoordinate(Coordinate coordinate) {
+        return this._currentMap.getBlockByCoordinate(coordinate);
     }
 
     @Override

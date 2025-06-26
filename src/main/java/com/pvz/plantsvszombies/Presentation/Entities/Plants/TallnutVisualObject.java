@@ -2,7 +2,7 @@ package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 
 import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
-import com.pvz.plantsvszombies.Presentation.Animations.WallnutAnimations;
+import com.pvz.plantsvszombies.Presentation.Animations.WallNutAnimations;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
@@ -69,20 +69,20 @@ public class TallnutVisualObject extends AbstractAnimatedVisualObject {
 
     @Override
     public void playAnimation(IAnimation animation) {
-        super.playAnimation(animation, WallnutAnimations.getFrames((WallnutAnimations.Animations) animation), Duration.millis(80));
+        super.playAnimation(animation, WallNutAnimations.getFrames((WallNutAnimations.Animations) animation), Duration.millis(80));
     }
 
     @Override
     public void spawn() {
         changeStateTo(States.FULLHEALTH);
-        playAnimation(WallnutAnimations.Animations.STANDING);
+        playAnimation(WallNutAnimations.Animations.FULL_HEALTH);
     }
 
     public SkySunVisualObject changeStateTo(States state) {
         switch (state) {
             case FULLHEALTH -> {
                 _currentState = States.FULLHEALTH;
-                playAnimation(WallnutAnimations.Animations.STANDING);
+                playAnimation(WallNutAnimations.Animations.FULL_HEALTH);
 
             }
             case CRACKED1 -> {
@@ -91,13 +91,13 @@ public class TallnutVisualObject extends AbstractAnimatedVisualObject {
                 }
                 if (_currentState.equals(States.FULLHEALTH)) {
                     changeStateTo(States.CRACKED1);
-                    playAnimation(WallnutAnimations.Animations.CRACKED1);
+                    playAnimation(WallNutAnimations.Animations.CRACKED1);
                 }
             }
 
             case CRACKED2 -> {
                 _currentState = States.CRACKED2;
-                playAnimation(WallnutAnimations.Animations.CRACKED2);
+                playAnimation(WallNutAnimations.Animations.CRACKED2);
 
             }
         }

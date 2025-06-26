@@ -73,7 +73,7 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
 
     private void shoot() {
         String BulletObjectId = "NormalBullet" + UUID.randomUUID();
-        var bulletObj = NormalBulletGameObject.createNormalBulletGameObject(_engine, BulletObjectId, this._coordinate.copy(),getRow());
+        var bulletObj = NormalBulletGameObject.createNormalBulletGameObject(_engine, BulletObjectId, new Coordinate(this._coordinate.x() + 30, this._coordinate.y() - 20), getRow());
         _engine.spawnObject(bulletObj);
         for (IEventSubscriber eventSubscriber : _shootingEventSubscribers) {
             eventSubscriber._notify(bulletObj);

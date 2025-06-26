@@ -77,6 +77,7 @@ import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.WallNutVisualObject;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -217,6 +218,7 @@ public class DayView extends AbstractLevelView {
                 if (e.getButton().equals(MouseButton.PRIMARY)) {
                     switch (plantType) {
                         case 1 -> _visualEngine.setSelectedPlantType(PeashooterVisualObject.class);
+                        case 3 -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
                         // سایر case ها برای گیاه‌های دیگه
                         //            if (e.getButton().equals(MouseButton.PRIMARY)) {
 //                            this._visualEngine.plant(PeashooterVisualObject.class

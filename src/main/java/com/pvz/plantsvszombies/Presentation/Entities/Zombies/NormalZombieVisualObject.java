@@ -1,5 +1,7 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 
+import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
@@ -21,7 +23,7 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
     private NormalZombieGameObject _gameObject;
     private VisualEngine _engine;
 
-    private NormalBulletVisualObject.States _currentState;
+    private States _currentState;
     private GeneralTransformAnimation _transformAnimation;
 
 
@@ -32,18 +34,33 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Zombies/NormalZombie/Zombie_0.png")));
 
         var height = ((Image) ((ImageView) _node).getImage()).getHeight();
+        var width = ((Image) ((ImageView) _node).getImage()).getWidth();
+
         _node.setManaged(false);
-        _node.relocate(_visualCoordinate.x(), _visualCoordinate.y() - height * 0.3);
+        _node.relocate(_visualCoordinate.x() - 0.3 * width , _visualCoordinate.y() - height * 0.3);
+
+        _currentState = States.MOVING;
 
         _gameObject.subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
-//            System.out.println(_visualCoordinate.x());
             Platform.runLater(() -> {
-                _node.relocate(_visualCoordinate.x(), _visualCoordinate.y() - height * 0.3);
+                _node.relocate(_visualCoordinate.x() - 0.3 * width , _visualCoordinate.y() - height * 0.3);
             });
+            if (!this._currentState.equals(States.MOVING)) {
+                changeStateTo(States.MOVING);
+            }
         });
 
-        _gameObject.subscribeToDeathEvent((zombieObj)->{
+        _gameObject.subscribeToEatingEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                Platform.runLater(() -> {
+                    changeStateTo(States.EATING);
+                });
+            }
+        });
+
+        _gameObject.subscribeToDeathEvent((zombieObj) -> {
             _engine.disposeObject(this);
         });
     }
@@ -55,27 +72,26 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
 
     @Override
     public void spawn() {
-        playAnimation(ZombieAnimations.Animations.MOVING_FORWARD);//standing
+        playAnimation(ZombieAnimations.Animations.MOVING_FORWARD);
     }
 
     public NormalZombieVisualObject changeStateTo(NormalZombieVisualObject.States state) {
         switch (state) {
             case MOVING -> {
+                _currentState = States.MOVING;
+                stopAnimation();
                 playAnimation(ZombieAnimations.Animations.MOVING_FORWARD);
             }
             case DYING -> {
+                _currentState = States.DYING;
                 stopAnimation();
                 playAnimation(ZombieAnimations.Animations.DYING);
             }
-//            case FADING_OUT -> {
-//                _currentState = SkySunVisualObject.States.FADING_OUT;
-//                _fadingAnimation = GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(2500))
-//                        .setOnFinished((e) -> {
-////                            ((Pane) this.getNode().getParent()).getChildren().remove(_node);
-//                            _engine.disposeObject(this);
-//                            _gameObject.dispose();
-//                        });
-//            }
+            case EATING -> {
+                _currentState = States.EATING;
+                stopAnimation();
+//                playAnimation(ZombieAnimations.Animations.ATTACKING);
+            }
         }
         return null;
     }
