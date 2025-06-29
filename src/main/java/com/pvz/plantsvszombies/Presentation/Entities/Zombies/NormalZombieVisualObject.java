@@ -5,8 +5,6 @@ import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Entities.NormalBulletVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.SkySunVisualObject;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -60,19 +58,19 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
             }
         });
 
-        _gameObject.subscribeToDeathEvent((zombieObj) -> {
-            _engine.disposeObject(this);
+        _gameObject.subscribeToDeathEvent((zombieObj) -> {//we have to change this
+            Platform.runLater(() -> changeStateTo(States.DYING));
         });
     }
 
     @Override
     public void playAnimation(IAnimation animation) {
-        super.playAnimation(animation, ZombieAnimations.getFrames((ZombieAnimations.Animations) animation), Duration.millis(90));
+        super.playAnimation(animation, NormalZombieAnimations.getFrames((NormalZombieAnimations.Animations) animation), Duration.millis(90));
     }
 
     @Override
     public void spawn() {
-        playAnimation(ZombieAnimations.Animations.MOVING_FORWARD);
+        playAnimation(NormalZombieAnimations.Animations.MOVING_FORWARD);
     }
 
     public NormalZombieVisualObject changeStateTo(NormalZombieVisualObject.States state) {
@@ -80,17 +78,18 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
             case MOVING -> {
                 _currentState = States.MOVING;
                 stopAnimation();
-                playAnimation(ZombieAnimations.Animations.MOVING_FORWARD);
+                playAnimation(NormalZombieAnimations.Animations.MOVING_FORWARD);
             }
             case DYING -> {
                 _currentState = States.DYING;
                 stopAnimation();
-                playAnimation(ZombieAnimations.Animations.DYING);
+                playAnimation(NormalZombieAnimations.Animations.DYING);
+                _engine.disposeObject(this);
             }
             case EATING -> {
                 _currentState = States.EATING;
                 stopAnimation();
-                playAnimation(ZombieAnimations.Animations.ATTACKING);
+                playAnimation(NormalZombieAnimations.Animations.ATTACKING);
             }
         }
         return null;

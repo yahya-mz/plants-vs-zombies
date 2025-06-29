@@ -9,8 +9,9 @@ import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.SunAnimations;
 import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.SkySunVisualObject;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -26,6 +27,9 @@ public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
         FADING_OUT
     }
 
+    double _width;
+    double _height;
+
     private SunGameObject _gameObject;
 
     private States _currentState;
@@ -37,27 +41,36 @@ public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
 
     public FlowerSunVisualObject(SunGameObject gameObject, VisualEngine engine) {
         _engine = engine;
+
+
+
+
+        _visualCoordinate = gameObject.getCoordinate();
+        _gameObject = gameObject;
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Sun/Sun_0.png")));
+        ((ImageView) _node).setFitWidth(50);
+        ((ImageView) _node).setFitHeight(50);
+        ((ImageView) _node).setPreserveRatio(true);
+
+        _node.setCursor(Cursor.HAND);
+//        _node.setTranslateY(_visualCoordinate.y());
+//        _node.setTranslateX(_visualCoordinate.x());
+        _node.setManaged(false);
+
+        _height = ((Image) ((ImageView) _node).getImage()).getHeight();
+        _width = ((Image) ((ImageView) _node).getImage()).getWidth();
+        _node.relocate(_visualCoordinate.x() - 0.5 * _width, _visualCoordinate.y() - 0.5 * _height);
+
+        _node.setOnMouseClicked((e) -> {
+            if (e.getButton().equals(MouseButton.PRIMARY)) {
+                changeStateTo(States.COLLECTING);
+            }
+        });
         gameObject.subscribeToTimeOut(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 System.out.println("Fading out");
                 changeStateTo(States.FADING_OUT);
-            }
-        });
-        _visualCoordinate = gameObject.getCoordinate();
-        _gameObject = gameObject;
-        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Sun/Sun_0.png")));
-        ((ImageView) _node).setFitWidth(80);
-        ((ImageView) _node).setFitHeight(80);
-        ((ImageView) _node).setPreserveRatio(true);
-
-        _node.setCursor(Cursor.HAND);
-        _node.setTranslateY(_visualCoordinate.y());
-        _node.setTranslateX(_visualCoordinate.x());
-
-        _node.setOnMouseClicked((e) -> {
-            if (e.getButton().equals(MouseButton.PRIMARY)) {
-                changeStateTo(States.COLLECTING);
             }
         });
     }
@@ -74,37 +87,45 @@ public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
 
     }
 
-    public SkySunVisualObject changeStateTo(States state) {
+    public FlowerSunVisualObject changeStateTo(States state) {
         switch (state) {
             case DROPPING -> {
                 _currentState = States.DROPPING;
-                //my idea--change this
-                _transformAnimation = GeneralTransformAnimation.attach(this).transform(4, 4, 20, 20)
-                        .then((event) -> {
-                            _transformAnimation = GeneralTransformAnimation.attach(this).transform(4, 4, 10, -20);
-                        });
+                Platform.runLater(() ->{
+                    _transformAnimation = GeneralTransformAnimation.attach(this).transform(5.5, 11, 20, -50)
+                            .then((event) -> {
+                                            _transformAnimation = GeneralTransformAnimation.attach(this).transform(1.65, 2, 20, 95);
+                            });
+                });
 
-                // +10 means going down
             }
+                // +10 means going down
 
             case COLLECTING -> {
-                if (_currentState == States.COLLECTING) {
-                    break;
+                if (_currentState == FlowerSunVisualObject.States.COLLECTING) {
+                    return this;
                 }
                 _gameObject.gain();
-                if (_currentState.equals(States.FADING_OUT)) {
+                if (_currentState.equals(FlowerSunVisualObject.States.FADING_OUT)) {
                     _fadingAnimation.interrupt();
                     _fadingAnimation = null;
                     _node.setOpacity(1);
                 }
-                if (_currentState.equals(States.DROPPING)) {//we may not need this
+                if (_currentState.equals(FlowerSunVisualObject.States.DROPPING)) {
                     _transformAnimation.interrupt();
                 }
-                _currentState = States.COLLECTING;
-                System.out.println(this.getNode().getTranslateY());
-                //change this
-                _transformAnimation.transform(-6, -3, 338 + this.getNode().getTranslateY(), 300 + this.getNode().getTranslateY());
-                changeStateTo(States.FADING_OUT);
+                _currentState = FlowerSunVisualObject.States.COLLECTING;
+                var demo = this._node.getTranslateX();
+                var demo2 = this._node.getTranslateY();
+
+                var verticalDistance = 9 - this._visualCoordinate.y() + 0.5 * _height;
+                var horizontalDistance = 166 - _visualCoordinate.x();
+                _transformAnimation.transform(Math.max(6 * horizontalDistance / verticalDistance, 6), Math.max(6 * verticalDistance / horizontalDistance, 6), horizontalDistance, verticalDistance);
+                _fadingAnimation = GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(4000))
+                        .setOnFinished((e) -> {
+                            _engine.disposeObject(this);
+                            _gameObject.dispose();
+                        });
 
             }
 

@@ -9,18 +9,18 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class RepeaterAnimation {
+public class CherryBombAnimations {
     public enum Animations implements IAnimation {
-        STANDING
+        BLOWING
     }
 
     private static final ArrayList<Image[]> animations;
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Repeater"));
-        for (int i = 0; i < RepeaterAnimation.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + RepeaterAnimation.Animations.values()[i].name()).listFiles();
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/CherryBomb"));
+        for (int i = 0; i < CherryBombAnimations.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + CherryBombAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
                 String name = f.getName();
                 int dotIndex = name.lastIndexOf('.');
@@ -38,7 +38,7 @@ public class RepeaterAnimation {
         }
     }
 
-    public static Image[] getFrames(RepeaterAnimation.Animations animation) {
+    public static Image[] getFrames(CherryBombAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
 }
