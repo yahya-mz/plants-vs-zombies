@@ -10,7 +10,8 @@ public abstract class AbstractPlantGameObject extends AbstractGameObject {
         JALAPENO,
         WALL_NUT,
         TALL_NUT,
-        SUNFLOWER
+        SUNFLOWER,
+        SNOW_PEA
     }
 
     protected int _row;

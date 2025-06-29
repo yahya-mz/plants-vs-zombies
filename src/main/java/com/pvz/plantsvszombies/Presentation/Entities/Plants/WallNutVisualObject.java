@@ -4,6 +4,7 @@ package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.TallNutGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
 import com.pvz.plantsvszombies.Presentation.Animations.WallNutAnimations;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
@@ -21,7 +22,7 @@ public class WallNutVisualObject extends AbstractPlantVisualObject {
         CRACKED2
     }
 
-    private TallNutGameObject _gameObject;
+    private WallNutGameObject _gameObject;
 
     private States _currentState = States.FULL_HEALTH;
 
@@ -30,7 +31,7 @@ public class WallNutVisualObject extends AbstractPlantVisualObject {
 
     private VisualEngine _engine;
 
-    public WallNutVisualObject(TallNutGameObject gameObject, VisualEngine engine) {
+    public WallNutVisualObject(WallNutGameObject gameObject, VisualEngine engine) {
         _engine = engine;
 
         var temp_this = this;
