@@ -103,19 +103,14 @@ public class MainApp extends Application {
     }
 
 
-    private void launchGame(Stage primaryStage) {//for launching game
+        private void launchGame(Stage primaryStage) {//for launching game
+            try {
+                    Stage pickingPlantStage = DayView.createPickingPlantStage(primaryStage);
+                    pickingPlantStage.show();
 
-        try {
-            DayView gameStage = DayView.createStage();
-            gameStage.show();
-            gameStage.setOnHiding(e -> {
-                primaryStage.show(); // Show main menu again
-                Mediator.getInstance().stopEngine();
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            primaryStage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                primaryStage.show();
+            }
         }
     }
-}

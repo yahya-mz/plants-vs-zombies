@@ -6,6 +6,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Plants.SunFlowerGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.AbstractPlantVisualObject;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -32,6 +33,7 @@ public class SunFlowerVisualObject extends AbstractPlantVisualObject {
                 Platform.runLater(() -> {
                     changeStateTo(States.GLOWING);
                     //
+                    System.out.println("Shooting: " + gameObject.getCoordinate().x() + "," + gameObject.getCoordinate().y());
                     var FlowerSunVisualObject = new FlowerSunVisualObject(((SunGameObject) gameObject),_engine);
                     _engine.spawnVisualObject(FlowerSunVisualObject);
                     //
@@ -48,7 +50,7 @@ public class SunFlowerVisualObject extends AbstractPlantVisualObject {
         });
 
         _visualCoordinate = gameObject.getCoordinate();
-        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/SunFlower/1.png")));
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/SunFlower/SunFlower_0.png")));
 //        _node.setTranslateY(_visualCoordinate.y());
 //        _node.setTranslateX(_visualCoordinate.x());
 
@@ -56,14 +58,14 @@ public class SunFlowerVisualObject extends AbstractPlantVisualObject {
 
     @Override
     public void playAnimation(IAnimation animation) {
-        super.playAnimation(animation, PeashooterAnimation.getFrames((PeashooterAnimation.Animations) animation), Duration.millis(90));
+        super.playAnimation(animation, SunFlowerAnimations.getFrames((SunFlowerAnimations.Animations) animation), Duration.millis(90));
     }
 
     @Override
     public void spawn() {
         Platform.runLater(() -> {
             System.out.println("demodemo");
-//            playAnimation(FlowerSunAnimations.Animations.STANDING);//standing
+            playAnimation(SunFlowerAnimations.Animations.STANDING);//standing
             changeStateTo(States.STANDING);
         });
     }

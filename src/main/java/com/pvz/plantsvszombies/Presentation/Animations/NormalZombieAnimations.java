@@ -9,18 +9,20 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class RepeaterAnimation {
+public class NormalZombieAnimations {
     public enum Animations implements IAnimation {
-        STANDING
+        MOVING_FORWARD,
+        DYING,
+        ATTACKING
     }
 
-    private static final ArrayList<Image[]> animations;
+    private final static ArrayList<Image[]> animations;
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Repeater"));
-        for (int i = 0; i < RepeaterAnimation.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + RepeaterAnimation.Animations.values()[i].name()).listFiles();
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/NormalZombie"));
+        for (int i = 0; i < NormalZombieAnimations.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + NormalZombieAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
                 String name = f.getName();
                 int dotIndex = name.lastIndexOf('.');
@@ -38,7 +40,7 @@ public class RepeaterAnimation {
         }
     }
 
-    public static Image[] getFrames(RepeaterAnimation.Animations animation) {
+    public static Image[] getFrames(NormalZombieAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
 }

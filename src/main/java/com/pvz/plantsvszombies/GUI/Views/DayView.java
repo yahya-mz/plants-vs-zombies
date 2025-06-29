@@ -72,12 +72,11 @@
 //}
 package com.pvz.plantsvszombies.GUI.Views;
 
+import com.pvz.plantsvszombies.Domain.Entities.Plants.JalopenoGameObject;
 import com.pvz.plantsvszombies.GameEngine.DayEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.WallNutVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -91,6 +90,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 public class DayView extends AbstractLevelView {
 
@@ -99,10 +100,12 @@ public class DayView extends AbstractLevelView {
     private static IntegerProperty counterValue = new SimpleIntegerProperty(0);
     private VisualEngine _visualEngine;
 
+
     private DayView() {
     }
 
     public static DayView createStage() {
+
         var dayView = new DayView();
         dayView.setupEngines();
         StackPane bottommostPlane = new StackPane();
@@ -160,9 +163,59 @@ public class DayView extends AbstractLevelView {
         dayView.setScene(scene);
         dayView.setResizable(false);
 
+
         return dayView;
 
     }
+    public static Stage createPickingPlantStage(Stage primaryStage){
+        Stage pickingStage = new Stage();
+        VBox root = new VBox(15);
+        root.setPadding(new Insets(20));
+        root.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+
+        // HBox اول با ۴ دکمه
+        HBox hbox1 = new HBox(10);
+        for (int i = 1; i <= 4; i++) {
+            Button btn = new Button("Button " + i);
+            hbox1.getChildren().add(btn);
+        }
+
+        // HBox دوم با ۴ دکمه
+        HBox hbox2 = new HBox(10);
+        for (int i = 5; i <= 8; i++) {
+            Button btn = new Button("Button " + i);
+            hbox2.getChildren().add(btn);
+        }
+        
+        // HBox سوم با ۶ دکمه
+        HBox hbox3 = new HBox(10);
+        for (int i = 9; i <= 14; i++) {
+            Button btn = new Button("Button " + i);
+            hbox3.getChildren().add(btn);
+        }
+
+        Button start = new Button("Start");
+        start.setOnAction(e -> {
+            pickingStage.close();
+            DayView gameStage = DayView.createStage();
+            gameStage.show();
+            gameStage.setOnHiding(event -> {
+                primaryStage.show();
+                Mediator.getInstance().stopEngine();
+            });
+        });
+
+        root.getChildren().addAll(hbox1, hbox2, hbox3, start);
+
+        Scene scene = new Scene(root, 500, 300);
+        pickingStage.setTitle("Picking Plant Stage");
+        pickingStage.setScene(scene);
+        pickingStage.show();
+
+        return pickingStage;
+    }
+
+
 
     private void setupEngines() {
         DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);
@@ -218,15 +271,22 @@ public class DayView extends AbstractLevelView {
                 if (e.getButton().equals(MouseButton.PRIMARY)) {
                     switch (plantType) {
                         case 1 -> _visualEngine.setSelectedPlantType(PeashooterVisualObject.class);
+                        case 2 -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
                         case 3 -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
-                        // سایر case ها برای گیاه‌های دیگه
-                        //            if (e.getButton().equals(MouseButton.PRIMARY)) {
-//                            this._visualEngine.plant(PeashooterVisualObject.class
-//                                , 4, 5);
+
+//                        case 4 -> _visualEngine.setSelectedPlantType(JalopenoVisualObject.class);
+//                        case 5 -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
+                        case 6 -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
+//                        case 7 -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
                         case 8 -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
+
+                        default -> _visualEngine.setSelectedPlantType(PeashooterVisualObject.class);
                     }
                 }
             });
+//                                    if (e.getButton().equals(MouseButton.PRIMARY)) {
+//                            this._visualEngine.plant(PeashooterVisualObject.class
+//                                , 4, 5);
 
 
 

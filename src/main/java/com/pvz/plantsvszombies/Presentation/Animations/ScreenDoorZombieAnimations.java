@@ -1,5 +1,4 @@
 package com.pvz.plantsvszombies.Presentation.Animations;
-
 import com.pvz.plantsvszombies.GlobalSettings;
 import javafx.scene.image.Image;
 
@@ -9,20 +8,22 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class ZombieAnimations {
+public class ScreenDoorZombieAnimations {
     public enum Animations implements IAnimation {
         MOVING_FORWARD,
         DYING,
+        LOSTDOOR,
         ATTACKING
     }
+
 
     private final static ArrayList<Image[]> animations;
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/NormalZombie"));
-        for (int i = 0; i < ZombieAnimations.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + ZombieAnimations.Animations.values()[i].name()).listFiles();
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/ConeHeadZombie"));
+        for (int i = 0; i < ScreenDoorZombieAnimations.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + ScreenDoorZombieAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
                 String name = f.getName();
                 int dotIndex = name.lastIndexOf('.');
@@ -40,7 +41,7 @@ public class ZombieAnimations {
         }
     }
 
-    public static Image[] getFrames(ZombieAnimations.Animations animation) {
+    public static Image[] getFrames(ScreenDoorZombieAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
 }

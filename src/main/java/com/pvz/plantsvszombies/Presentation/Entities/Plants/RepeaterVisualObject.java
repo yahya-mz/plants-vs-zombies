@@ -21,9 +21,8 @@ public class RepeaterVisualObject extends AbstractPlantVisualObject {
     public RepeaterVisualObject(RepeaterGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی
         _gameObject = gameObject;
         _engine = engine;
-
         _visualCoordinate = gameObject.getCoordinate();
-        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/RepeaterPea/Repeater_0.png")));
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Repeater/Repeater_0.png")));
 
         gameObject.subscribeToShootingEvent(new IEventSubscriber() {//notify
             @Override

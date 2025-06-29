@@ -73,7 +73,8 @@ public class WallNutVisualObject extends AbstractPlantVisualObject {
 
     @Override
     public void spawn() {
-        playAnimation(WallNutAnimations.Animations.FULL_HEALTH);
+//        playAnimation(WallNutAnimations.Animations.FULL_HEALTH);
+        changeStateTo(States.FULL_HEALTH);
     }
 
     public WallNutVisualObject changeStateTo(States state) {

@@ -1,27 +1,3 @@
-package com.pvz.plantsvszombies.Presentation.Entities;
-
-import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.*;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
-import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Plants.WallNutVisualObject;
-import com.pvz.plantsvszombies.Presentation.VisualEngine;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.layout.*;
 
 //public class MapVisualObject extends AbstractVisualObject {
 //    MapGameObject _mapObject;
@@ -195,9 +171,34 @@ import javafx.scene.layout.*;
 //    }
 //}
 
+package com.pvz.plantsvszombies.Presentation.Entities;
+
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.*;
+import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.SunFlowerGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
+import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
+import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import javafx.animation.FadeTransition;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.*;
 import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -294,12 +295,69 @@ public class MapVisualObject extends AbstractVisualObject {
                     if (e.getButton().equals(MouseButton.PRIMARY)) {
                         if (_engine.getSelectedPlantType() != null) {
                             _engine.plant(_engine.getSelectedPlantType(), r, c, new Coordinate(cellButton.localToScene(cellButton.getLayoutBounds()).getCenterX(), cellButton.localToScene(cellButton.getLayoutBounds()).getCenterY()));
+                            cellButton.setGraphic(null);
                             _engine.clearSelectedPlantType();
                         } else {
                             System.out.println("no plant have been selected!!!");
                         }
                     }
                 });
+
+                //
+                cellButton.setOnMouseEntered(event -> {
+                    var selectedType = _engine.getSelectedPlantType();
+                    if (selectedType == PeashooterVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("Peashooter", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
+                    } else if (selectedType == WallNutVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("WallNut", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
+                    } else if (selectedType == SunFlowerVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("SunFlower", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
+//                    } else if (selectedType == SnowPeaVisualObject.class) {
+//                        Platform.runLater(() -> {
+//                            ImageView preview = createPlantImageView("SnowPea", cellButton);
+//                            cellButton.setGraphic(preview);
+//                        });
+//                    } else if (selectedType == JalapenoVisualObject.class) {
+//                        Platform.runLater(() -> {
+//                            ImageView preview = createPlantImageView("Jalapeno", cellButton);
+//                            cellButton.setGraphic(preview);
+//                        });
+                    } else if (selectedType == RepeaterVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("Repeater", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
+                    }
+//                    } else if (selectedType == TallnutVisualObject.class) {
+//                        Platform.runLater(() -> {
+//                            ImageView preview = createPlantImageView("Tallnut", cellButton);
+//                            cellButton.setGraphic(preview);
+//                        });
+                    else if (selectedType == CherryBombVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("CherryBomb", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
+                    }
+                });
+
+                cellButton.setOnMouseExited(e -> {
+                    FadeTransition fade = new FadeTransition(Duration.millis(150), cellButton.getGraphic());
+                    fade.setFromValue(0.4);
+                    fade.setToValue(0.0);
+                    fade.setOnFinished(ev -> cellButton.setGraphic(null));
+                    fade.play();
+                });
+                //
 //                cellButton.setOnMouseEntered((event) -> {
 //                    var demo = pick(mainContainer, event.getSceneX(), event.getSceneY());
 //                    System.out.println( event.getSceneX());
@@ -312,9 +370,9 @@ public class MapVisualObject extends AbstractVisualObject {
 //                        }
 //                    }
 //                });
-
                 StackPane cell = new StackPane();
-                cell.setOnMouseEntered((e)->{
+
+                cell.setOnMouseEntered((e)->{//debug
                     System.out.println(e.getScreenX()+" , "+e.getScreenY());
                 });
                 cell.getChildren().add(cellButton);
@@ -331,10 +389,10 @@ public class MapVisualObject extends AbstractVisualObject {
                 final int i_final = i;
                 final int j_final = j;
                 n.needsLayoutProperty().addListener((obs2, oldVal, newVal) -> { // When needsLayout is set to false, it means everything about layout bounds is set
-                    if (!newVal && blocks[_mapObject.getColumns() * i_final + j_final] ==null){
+                    if (!newVal && blocks[_mapObject.getColumns() * i_final + j_final] ==null){//need layout is false and also we havent created a mapblock
                         var x = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
                         var y = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
-                        blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxX()), i_final, j_final);
+                        blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxX()), i_final, j_final);//putting that block in the blocks array with the upper left cor and the dowen right cor and also with i and j in the grid
                         _mapObject.initBlocks(blocks);
                     }
                 });
@@ -358,6 +416,10 @@ public class MapVisualObject extends AbstractVisualObject {
                     var visualObject = new WallNutVisualObject(wn, _engine);
                     plant(visualObject, wn.getRow(), wn.getColumn());
                 }
+                if (gameObject instanceof SunFlowerGameObject sn) {
+                    var visualObject = new SunFlowerVisualObject(sn, _engine);
+                    plant(visualObject, sn.getRow(), sn.getColumn());
+                }
             }
         });
 
@@ -371,6 +433,26 @@ public class MapVisualObject extends AbstractVisualObject {
                 });
             }
         });
+    }
+
+    public ImageView createPlantImageView(String plantName, Button referenceButton) {
+        String imagePath = String.format("graphics/Plants/%s/%s_0.png", plantName, plantName);
+        Image image = new Image(GlobalSettings.getResource(imagePath));
+        ImageView imageView = new ImageView(image);
+
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+        imageView.setCache(true);
+
+        double width = referenceButton.getWidth();
+        double height = referenceButton.getHeight();
+
+        imageView.setFitWidth(width - 20);
+        imageView.setFitHeight(height - 10);
+
+        imageView.setOpacity(0.4);
+
+        return imageView;
     }
 
     @Override
@@ -389,6 +471,8 @@ public class MapVisualObject extends AbstractVisualObject {
         ((ImageView)object.getNode()).setFitWidth(demo);
         cell.getChildren().add(object.getNode());
     }
+
+
 
     public void spawnByCoordinate(AbstractVisualObject object) {
         _engine.spawnVisualObject(object);

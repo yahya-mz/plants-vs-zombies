@@ -4,7 +4,7 @@ import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 
-public class CloneheadZombieGameObject extends AbstractGameObject {
+public class ConeHeadZombieGameObject extends AbstractGameObject {
     @Override
     public String getId() {
         return "";
