@@ -11,10 +11,10 @@ public class MapBlock {
     private final Coordinate _top_left;
     private final Coordinate _bottom_right;
 
-    public AbstractPlantGameObject _plant;
+    private AbstractPlantGameObject _plant;
 
     public MapBlock(Coordinate top_left, Coordinate bottom_right, int row, int _column) {
-            this._top_left = top_left;
+        this._top_left = top_left;
         this._bottom_right = bottom_right;
         this._row = row;
         this._column = _column;

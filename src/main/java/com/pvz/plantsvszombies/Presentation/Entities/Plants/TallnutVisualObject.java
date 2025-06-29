@@ -1,7 +1,7 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 
-import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.TallNutGameObject;
 import com.pvz.plantsvszombies.Presentation.Animations.WallNutAnimations;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
@@ -22,7 +22,7 @@ public class TallnutVisualObject extends AbstractAnimatedVisualObject {
         CRACKED2
     }
 
-    private WallNutGameObject _gameObject;
+    private TallNutGameObject _gameObject;
 
     private States _currentState;
 
@@ -31,7 +31,7 @@ public class TallnutVisualObject extends AbstractAnimatedVisualObject {
 
     private VisualEngine _engine;
 
-    public TallnutVisualObject(WallNutGameObject gameObject, VisualEngine engine) {
+    public TallnutVisualObject(TallNutGameObject gameObject, VisualEngine engine) {
         _engine = engine;
 //
 //        gameObject.subscribeToFullHealthEvent(new IEventSubscriber() {
@@ -83,7 +83,6 @@ public class TallnutVisualObject extends AbstractAnimatedVisualObject {
             case FULLHEALTH -> {
                 _currentState = States.FULLHEALTH;
                 playAnimation(WallNutAnimations.Animations.FULL_HEALTH);
-
             }
             case CRACKED1 -> {
                 if (_currentState == States.CRACKED1) {
@@ -98,7 +97,6 @@ public class TallnutVisualObject extends AbstractAnimatedVisualObject {
             case CRACKED2 -> {
                 _currentState = States.CRACKED2;
                 playAnimation(WallNutAnimations.Animations.CRACKED2);
-
             }
         }
         return null;

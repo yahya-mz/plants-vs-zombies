@@ -34,7 +34,6 @@ public class SunFlowerGameObject extends AbstractPlantGameObject {
         this._column = column;
 
         this._cost = 50;
-        this._health = 50;
     }
 
     public void subscribeToGlowingEvent(IEventSubscriber event) {

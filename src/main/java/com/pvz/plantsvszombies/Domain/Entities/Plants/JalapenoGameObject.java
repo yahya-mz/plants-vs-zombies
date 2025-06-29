@@ -3,13 +3,14 @@ package com.pvz.plantsvszombies.Domain.Entities.Plants;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class CherryBombGameObject extends AbstractPlantGameObject {
+public class JalapenoGameObject extends AbstractPlantGameObject {
     private final static Duration EXPLOSION_TIME = Duration.ofMillis(4000);
     private IGameEngine _engine;
     private int tick = 1;
@@ -17,11 +18,11 @@ public class CherryBombGameObject extends AbstractPlantGameObject {
 
     private final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
 
-    public static CherryBombGameObject createCherryBombGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
-        return new CherryBombGameObject(gameEngine, id, coordinate, row, column);
+    public static JalapenoGameObject createJalapenoGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+        return new JalapenoGameObject(gameEngine, id, coordinate, row, column);
     }
 
-    private CherryBombGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    private JalapenoGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._engine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
@@ -60,15 +61,9 @@ public class CherryBombGameObject extends AbstractPlantGameObject {
     }
 
     private void explode() {
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                final int final_i = i;
-                final int final_j = j;
-                var zombie = _engine.queryZombie(z -> z.getRow() == _row + final_i && z.getColumn() == _column + final_j);
-                if (zombie != null) {
-                    zombie.getBurned();
-                }
-            }
+        var zombies = _engine.queryZombies(z -> z.getRow() == _row);
+        for (AbstractZombieGameObject zombie:zombies){
+            zombie.getBurned();
         }
     }
 }

@@ -71,8 +71,8 @@ public class Mediator {
                         _gameEngine.update();
                         Thread.sleep(Duration.ofMillis(1000 / GlobalSettings.FPS));
                     } catch (Exception ex) {
-                        System.out.println("Exception in MainApp " + ex
-                                .getMessage());
+                        System.out.println("Exception in MainApp");
+                        ex.printStackTrace();
                     }
                 }
             } catch (Exception ex) {

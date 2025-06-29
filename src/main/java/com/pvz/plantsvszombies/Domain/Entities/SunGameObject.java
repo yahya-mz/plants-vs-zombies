@@ -28,8 +28,6 @@ public class SunGameObject extends AbstractGameObject {
     }
     @Override
     public void spawn() {
-//        SkySunSpawnEvent.emit(this);
-
         var temp_this = this;
         Timer timer = new Timer();
         timer.schedule(

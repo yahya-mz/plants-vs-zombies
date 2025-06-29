@@ -3,11 +3,21 @@ package com.pvz.plantsvszombies.Domain.Entities.Plants;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 
 public abstract class AbstractPlantGameObject extends AbstractGameObject {
+    public enum PlantType{
+        PEASHOOTER,
+        REPEATER,
+        CHERRY_BOMB,
+        JALAPENO,
+        WALL_NUT,
+        TALL_NUT,
+        SUNFLOWER
+    }
+
     protected int _row;
     protected int _column;
 
     protected int _cost;
-    protected int _health;
+    protected int _health = 100;
 
     public int getHealth() {
         return _health;

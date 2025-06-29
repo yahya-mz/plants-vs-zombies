@@ -35,7 +35,6 @@ public class RepeaterGameObject extends AbstractPlantGameObject {
         this._column = column;
 
         this._cost = 200;
-        this._health = 50;
     }
 
     public void subscribeToShootingEvent(IEventSubscriber event) {

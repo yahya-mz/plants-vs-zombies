@@ -16,15 +16,15 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
     private int tick = 1;
     private boolean isDisposed = false;
 
-    private ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
-    private ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
+    private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
 
     public static PeashooterGameObject createPeashooterGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new PeashooterGameObject(gameEngine, id, coordinate, row, column);
     }
 
-    PeashooterGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    private PeashooterGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._engine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
@@ -32,7 +32,6 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
         this._column = column;
 
         this._cost = 100;
-        this._health = 50;
     }
 
     public void subscribeToShootingEvent(IEventSubscriber event) {

@@ -5,7 +5,7 @@ import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.TallNutGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
@@ -290,7 +290,6 @@ public class MapVisualObject extends AbstractVisualObject {
                 final int r = row;
                 final int c = col;
                 cellButton.setOnMouseClicked(e -> {
-                    System.out.println("demo");
                     if (e.getButton().equals(MouseButton.PRIMARY)) {
                         if (_engine.getSelectedPlantType() != null) {
                             _engine.plant(_engine.getSelectedPlantType(), r, c, new Coordinate(cellButton.localToScene(cellButton.getLayoutBounds()).getCenterX(), cellButton.localToScene(cellButton.getLayoutBounds()).getCenterY()));
@@ -314,9 +313,9 @@ public class MapVisualObject extends AbstractVisualObject {
 //                });
 
                 StackPane cell = new StackPane();
-                cell.setOnMouseEntered((e)->{
-                    System.out.println(e.getScreenX()+" , "+e.getScreenY());
-                });
+//                cell.setOnMouseEntered((e)->{
+//                    System.out.println(e.getScreenX()+" , "+e.getScreenY());
+//                });
                 cell.getChildren().add(cellButton);
                 visualGrid[row][col] = cell;
                 rowBox.getChildren().add(cell);
@@ -334,7 +333,7 @@ public class MapVisualObject extends AbstractVisualObject {
                     if (!newVal && blocks[_mapObject.getColumns() * i_final + j_final] ==null){
                         var x = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
                         var y = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
-                        blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxX()), i_final, j_final);
+                        blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxY()), i_final, j_final);
                         _mapObject.initBlocks(blocks);
                     }
                 });
@@ -354,7 +353,7 @@ public class MapVisualObject extends AbstractVisualObject {
                     var visualObject = new RepeaterVisualObject(rp, _engine);
                     plant(visualObject, rp.getRow(), rp.getColumn());
                 }
-                if (gameObject instanceof WallNutGameObject wn) {
+                if (gameObject instanceof TallNutGameObject wn) {
                     var visualObject = new WallNutVisualObject(wn, _engine);
                     plant(visualObject, wn.getRow(), wn.getColumn());
                 }

@@ -16,24 +16,23 @@ public class MapGameObject extends AbstractGameObject {
 
     private MapBlock[] _blocks;
 
-    private IGameEngine _engine;
+    private final IGameEngine _engine;
 
     ArrayList<IEventSubscriber> _plantingEventSubscribers = new ArrayList<>();
     ArrayList<IEventSubscriber> _spawningObjectEventSubscribers = new ArrayList<>();
 
-    public static MapGameObject createMapGameObject(int rows, int columns, String id, Coordinate coordinate, IGameEngine engine) {
-        return new MapGameObject(rows, columns, id, coordinate, engine);
+    public static MapGameObject createMapGameObject(String id, Coordinate coordinate, IGameEngine engine) {
+        return new MapGameObject(id, coordinate, engine);
     }
 
-    private MapGameObject(int rows, int columns, String id, Coordinate coordinate, IGameEngine engine) {
+    private MapGameObject(String id, Coordinate coordinate, IGameEngine engine) {
 //        this._plants = new AbstractPlantGameObject[_rows * _columns]; Error, might not have been initialized
-        this._columns = columns;
-        this._rows = rows;
-//        this._plants = new AbstractPlantGameObject[_rows * _columns];
+        this._engine = engine;
+        this._columns = _engine.getColumnsCount();
+        this._rows = _engine.getRowsCount();
         this._blocks = new MapBlock[_rows * _columns];
         this._ID = id;
         this._coordinate = coordinate;
-        this._engine = engine;
     }
 
     public int getRows() {
@@ -80,7 +79,7 @@ public class MapGameObject extends AbstractGameObject {
 
     public void plant(AbstractPlantGameObject plant) {//calling visual
         System.out.println("Planting");
-        this._blocks[plant.getRow() * _columns + plant.getColumn()]._plant = plant;
+        this._blocks[plant.getRow() * _columns + plant.getColumn()].setPlant(plant);
         for (IEventSubscriber eventSubscriber : _plantingEventSubscribers) {
             eventSubscriber._notify(plant);
         }

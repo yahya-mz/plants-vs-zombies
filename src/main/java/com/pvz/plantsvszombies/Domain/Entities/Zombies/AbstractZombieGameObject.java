@@ -6,11 +6,18 @@ import com.pvz.plantsvszombies.Domain.Entities.Bullets.AbstractBulletGameObject;
 
 public abstract class AbstractZombieGameObject extends AbstractGameObject {
 
+    public enum ZombieType{
+        NORMAL_ZOMBIE,
+        CONE_HEAD_ZOMBIE,
+        SCREEN_DOOR_ZOMBIE,
+        IMP_ZOMBIE
+    }
+
     protected int _row;
     protected int _column;
 
     protected double _health;
-    protected int _damage;
+    protected int _damage = 25;
     protected double _speed;
 
     public int getRow() {
@@ -21,9 +28,13 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
         return this._column;
     }
 
-    public abstract double getHealth();
+    public double getHealth() {
+        return this._health;
+    }
 
     public abstract void getHit(AbstractBulletGameObject bullet);
+
+    public abstract void getBurned();
 
     public abstract double getSpeed();
 }

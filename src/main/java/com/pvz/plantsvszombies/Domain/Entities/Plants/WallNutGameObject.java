@@ -17,8 +17,8 @@ public class WallNutGameObject extends AbstractPlantGameObject {
     private ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
 
-    public static WallNutGameObject createWallNutGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
-        return new WallNutGameObject(gameEngine, id, coordinate, row, column);
+    public static TallNutGameObject createWallNutGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+        return new TallNutGameObject(gameEngine, id, coordinate, row, column);
     }
 
     WallNutGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
@@ -29,7 +29,7 @@ public class WallNutGameObject extends AbstractPlantGameObject {
         this._column = column;
 
         this._cost = 50;
-        this._health = 750;
+        this._health = 250;
     }
 
     public void subscribeToCracked_1_Event(IEventSubscriber event) {
@@ -57,18 +57,16 @@ public class WallNutGameObject extends AbstractPlantGameObject {
     @Override
     public void getHit(int damage) {
         _health -= damage;
-        if (_health > 0) {
-            if (_health < 500 && _health > 250) {
-                for (IEventSubscriber eventSubscriber : _cracked_1_EventSubscribers) {
-                    eventSubscriber._notify(this);
-                }
-            } else if (_health < 250) {
-                for (IEventSubscriber eventSubscriber : _cracked_2_EventSubscribers) {
-                    eventSubscriber._notify(this);
-                }
+        if (_health == 150) {
+            for (IEventSubscriber eventSubscriber : _cracked_1_EventSubscribers) {
+                eventSubscriber._notify(this);
             }
-        } else {
-            this.eaten();
+        } else if (_health == 75) {
+            for (IEventSubscriber eventSubscriber : _cracked_2_EventSubscribers) {
+                eventSubscriber._notify(this);
+            }
+        } else if (_health <= 0) {
+            eaten();
         }
     }
 

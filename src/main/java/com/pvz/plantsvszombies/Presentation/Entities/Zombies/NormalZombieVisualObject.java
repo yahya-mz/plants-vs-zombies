@@ -20,8 +20,8 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
         DYING
     }
 
-    private NormalZombieGameObject _gameObject;
-    private VisualEngine _engine;
+    private final NormalZombieGameObject _gameObject;
+    private final VisualEngine _engine;
 
     private States _currentState;
     private GeneralTransformAnimation _transformAnimation;
@@ -90,7 +90,7 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
             case EATING -> {
                 _currentState = States.EATING;
                 stopAnimation();
-//                playAnimation(ZombieAnimations.Animations.ATTACKING);
+                playAnimation(ZombieAnimations.Animations.ATTACKING);
             }
         }
         return null;

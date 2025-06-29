@@ -3,17 +3,36 @@ package com.pvz.plantsvszombies.GameEngine;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
+import javafx.scene.control.ButtonType;
+import javafx.scene.input.MouseButton;
 
+import java.time.Duration;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class DayEngine implements IGameEngine {
 
     private final double _windowWidth;
     private final double _windowHeight;
 
-    private final Random _random = new Random();
+    private final int _rows = 5;
+    private final int _columns = 9;
+
+
+    private final Duration _skySunDroppingInterval = Duration.ofSeconds(7);
+    private Duration _zombieSpawnInterval = Duration.ofSeconds(3);
+    private final Duration _wave_2_Start = Duration.ofSeconds(15);
+    private final Duration _wave_3_Start = Duration.ofSeconds(30);
+    private final Duration _wave_4_Start = Duration.ofSeconds(45);
+    private final Duration _gameInterval = Duration.ofSeconds(60);
+
+    private final Random _zombieSpawnRandom = new Random(System.currentTimeMillis());
+    private final Random _skyDroppingRandom = new Random(System.currentTimeMillis() * 100);
+    private final Random _zombieTypeRandom = new Random(System.currentTimeMillis() / 1000);
+
 
     private final ArrayList<AbstractGameObject> _gameObjects;
     private MapGameObject _currentMap;
@@ -31,6 +50,17 @@ public class DayEngine implements IGameEngine {
 
     private int tick = 1;
     private double _point;
+    private int _currentWave = 1;
+
+    @Override
+    public int getRowsCount() {
+        return this._rows;
+    }
+
+    @Override
+    public int getColumnsCount() {
+        return this._columns;
+    }
 
     @Override
     public double getPoint() {
@@ -56,15 +86,59 @@ public class DayEngine implements IGameEngine {
 
     @Override
     public void update() {  //updates every object
-        //System.out.println("frame: " + tick);
-        if (getMilliseconds() % 3000.0 == 0) {
-            System.out.println("Droppig");
+
+        // Checking wave changes:
+        if (getMilliseconds() % _gameInterval.toMillis() == 0) {
+            System.out.println("GameOver !");
+        } else if (getMilliseconds() % _wave_4_Start.toMillis() == 0) {
+            _currentWave = 3;
+            System.out.println("Wave 3");
+        } else if (getMilliseconds() % _wave_3_Start.toMillis() == 0) {
+            _currentWave = 3;
+            System.out.println("Wave 3");
+        } else if (getMilliseconds() % _wave_2_Start.toMillis() == 0) {
+            _currentWave = 2;
+            System.out.println("Wave 2");
+        }
+
+        // Sun dropping:
+        if (getMilliseconds() % _skySunDroppingInterval.toMillis() == 0) {
             dropSunFromSky();
-            if (demo) {
-                spawnZombie();
-                demo = false;
+        }
+
+        // Zombie
+        switch (_currentWave) {
+            case 1 -> {
+                if (getMilliseconds() % 3000.0 == 0) {
+                    System.out.println("demo");
+                    var row = _zombieSpawnRandom.nextInt(0, _rows);
+                    spawnZombie(row, _columns - 1, AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE);
+                }
+            }
+            case 2 -> {
+                if (getMilliseconds() % 2000.0 == 0) {
+                    var row = _zombieSpawnRandom.nextInt(0, _rows);
+                    var zombieTypes = new AbstractZombieGameObject.ZombieType[]{AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE,
+                            AbstractZombieGameObject.ZombieType.CONE_HEAD_ZOMBIE};
+                    spawnZombie(row, _columns - 1, zombieTypes[_zombieTypeRandom.nextInt(zombieTypes.length)]);
+                }
+            }
+            case 3 -> {
+                if (getMilliseconds() % 2000.0 == 0) {
+                    var row = _zombieSpawnRandom.nextInt(0, _rows);
+                    var zombieTypes = new AbstractZombieGameObject.ZombieType[]{AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE,
+                            AbstractZombieGameObject.ZombieType.CONE_HEAD_ZOMBIE, AbstractZombieGameObject.ZombieType.SCREEN_DOOR_ZOMBIE};
+                    spawnZombie(row, _columns - 1, zombieTypes[_zombieTypeRandom.nextInt(zombieTypes.length)]);
+                }
+            }
+            case 4 -> {
+                if (getMilliseconds() % 2000.0 == 0) {
+                    var row = _zombieSpawnRandom.nextInt(0, _rows);
+                    spawnZombie(row, _columns - 1, AbstractZombieGameObject.ZombieType.values()[_zombieTypeRandom.nextInt(AbstractZombieGameObject.ZombieType.values().length)]);
+                }
             }
         }
+
         Iterator<AbstractGameObject> iter = _gameObjects.iterator();
         while (iter.hasNext()) {
             AbstractGameObject gameObject = iter.next();
@@ -92,13 +166,6 @@ public class DayEngine implements IGameEngine {
 
     @Override
     public void spawnObject(AbstractGameObject object) {
-//        if (object instanceof AbstractPlantGameObject) {
-//
-//        } else {
-//            for (IEventSubscriber subscriber : _objectSpawnSubscribers) {
-//                subscriber._notify(object);
-//            }
-//        }
         this._gameObjects.add(object);
     }
 
@@ -116,13 +183,25 @@ public class DayEngine implements IGameEngine {
 
     @Override
     public AbstractPlantGameObject getPlantAtBlock(int row, int column) {
-        synchronized (_currentMap) {
-            return this._currentMap.getPlantAtBlock(row, column);
-        }
+        return this._currentMap.getPlantAtBlock(row, column);
     }
 
+    @Override
     public MapBlock getBlockByCoordinate(Coordinate coordinate) {
         return this._currentMap.getBlockByCoordinate(coordinate);
+    }
+
+    @Override
+    public List<AbstractZombieGameObject> queryZombies(Predicate<AbstractZombieGameObject> predicate) {
+        return _gameObjects.stream().filter(obj -> obj instanceof AbstractZombieGameObject &&
+                        (predicate.test((AbstractZombieGameObject) obj))).map(obj -> (AbstractZombieGameObject) obj)
+                .toList();
+    }
+
+    public AbstractZombieGameObject queryZombie(Predicate<AbstractZombieGameObject> predicate) {
+        return _gameObjects.stream().filter(obj -> obj instanceof AbstractZombieGameObject &&
+                        (predicate.test((AbstractZombieGameObject) obj))).map(obj -> (AbstractZombieGameObject) obj)
+                .findFirst().orElse(null);
     }
 
     @Override
@@ -141,7 +220,7 @@ public class DayEngine implements IGameEngine {
     private void dropSunFromSky() {
         String sunObjectId = "SKY-SUN_" + UUID.randomUUID();
         Coordinate coordinate = new Coordinate(
-                _random.nextDouble(0.2 * _windowWidth, 0.8 * _windowWidth),
+                _skyDroppingRandom.nextDouble(0.2 * _windowWidth, 0.8 * _windowWidth),
                 0
         );
         var sun = SunGameObject.createSunGameObject(this, sunObjectId, coordinate);
@@ -151,11 +230,17 @@ public class DayEngine implements IGameEngine {
         }
     }
 
-    private void spawnZombie() {
+    private void spawnZombie(int row, int col, AbstractZombieGameObject.ZombieType zombieType) {
         String zombieObjectId = "Zombie" + UUID.randomUUID();
-        var lastBlock = _currentMap.getBlock(0, 8);
-        Coordinate coordinate = lastBlock.getTopLeftCoordinate();
-        var zombie = NormalZombieGameObject.createNormalZombieGameObject(this, zombieObjectId, coordinate, 0, 8);
+        var block = _currentMap.getBlock(row, col);
+        Coordinate coordinate = block.getTopLeftCoordinate();
+        AbstractZombieGameObject zombie = switch (zombieType) {
+            case NORMAL_ZOMBIE -> NormalZombieGameObject.createNormalZombieGameObject(this, zombieObjectId,
+                    coordinate.copy(), row, col); // Here if you pass 'coordinate' as coordinate.copy(), all zombies will share a same coordinate
+            default -> NormalZombieGameObject.createNormalZombieGameObject(this, zombieObjectId,
+                    coordinate.copy(), row, col);
+        };
+
         this._gameObjects.add(zombie);
         for (IEventSubscriber eventSubscriber : _gameObjectSpawnEventSubscribers) {
             eventSubscriber._notify(zombie);
@@ -167,7 +252,7 @@ public class DayEngine implements IGameEngine {
         Coordinate coordinate = new Coordinate(
                 0, 0
         );
-        MapGameObject map = MapGameObject.createMapGameObject(5, 9, objectId, coordinate, this);
+        MapGameObject map = MapGameObject.createMapGameObject(objectId, coordinate, this);
         _currentMap = map;
 
         for (IEventSubscriber subscriber : _mapSpawnEventSubscribers) {

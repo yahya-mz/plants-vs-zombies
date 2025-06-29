@@ -5,7 +5,7 @@ import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.SunFlowerGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.TallNutGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.GameEngine.DayEngine;
@@ -72,7 +72,11 @@ public class VisualEngine {
 
     public void disposeObject(AbstractVisualObject obj) {
         Platform.runLater(()->{
-            ((Pane) obj.getNode().getParent()).getChildren().remove(obj.getNode());
+            try{
+                ((Pane) obj.getNode().getParent()).getChildren().remove(obj.getNode());
+            }catch (Exception e){
+                System.out.println("Exception in VisualEngine.java disposeObject()");
+            }
         });
         _visualObjects.remove(obj);
 //        _levelStage.getScene().getRoot().getChildrenUnmodifiable().remove(obj.getNode());
@@ -112,7 +116,7 @@ public class VisualEngine {
 
             else if (plantType == WallNutVisualObject.class) {
                 String WalnutObjectId = "Walnut" + UUID.randomUUID();
-                var obj = WallNutGameObject.createWallNutGameObject(this._gameEngine, WalnutObjectId, coordinate, x, y);
+                var obj = TallNutGameObject.createWallNutGameObject(this._gameEngine, WalnutObjectId, coordinate, x, y);
                 try {
                     this._gameEngine.plantObject(obj);
                 } catch (Exception ex) {
