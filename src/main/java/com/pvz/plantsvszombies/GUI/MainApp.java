@@ -1,6 +1,7 @@
 //}
 package com.pvz.plantsvszombies.GUI;
 
+import com.pvz.plantsvszombies.GUI.Views.DayPickingPlantStage;
 import com.pvz.plantsvszombies.GameEngine.DayEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.GUI.Views.DayView;
@@ -66,7 +67,7 @@ public class MainApp extends Application {
         StackPane.setAlignment(buttonContainer, Pos.CENTER);
 
 
-        Scene scene = new Scene(root, 800, 533);
+        Scene scene = new Scene(root, 799, 532);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Plants vs Zombies");
         primaryStage.setResizable(false);
@@ -105,8 +106,11 @@ public class MainApp extends Application {
 
         private void launchGame(Stage primaryStage) {//for launching game
             try {
-                    Stage pickingPlantStage = DayView.createPickingPlantStage(primaryStage);
-                    pickingPlantStage.show();
+                DayPickingPlantStage pickingStageBuilder = new DayPickingPlantStage();
+                Stage pickingPlantStage = pickingStageBuilder.createStage(primaryStage);
+                pickingPlantStage.show();
+                pickingPlantStage.setOnCloseRequest(e -> primaryStage.show());
+                primaryStage.hide();
 
             } catch (Exception e) {
                 e.printStackTrace();

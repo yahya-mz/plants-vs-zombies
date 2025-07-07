@@ -2,10 +2,7 @@ package com.pvz.plantsvszombies.Presentation;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.*;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.SunFlowerGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.TallNutGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.*;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.GameEngine.DayEngine;
@@ -116,7 +113,7 @@ public class VisualEngine {
 
             else if (plantType == WallNutVisualObject.class) {
                 String WalnutObjectId = "Walnut" + UUID.randomUUID();
-                var obj = TallNutGameObject.createWallNutGameObject(this._gameEngine, WalnutObjectId, coordinate, x, y);
+                var obj = WallNutGameObject.createWallNutGameObject(this._gameEngine, WalnutObjectId, coordinate, x, y);
                 try {
                     this._gameEngine.plantObject(obj);
                 } catch (Exception ex) {

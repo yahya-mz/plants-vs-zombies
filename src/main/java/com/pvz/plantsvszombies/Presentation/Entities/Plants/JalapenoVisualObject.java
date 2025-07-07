@@ -1,6 +1,7 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Entities.Plants.CherryBombGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.JalapenoGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
@@ -14,13 +15,13 @@ public class JalapenoVisualObject extends AbstractPlantVisualObject {
         BLOWING
     }
 
-    private CherryBombGameObject _gameObject;
+    private JalapenoGameObject _gameObject;
 
     private States _currentState;
 
     private VisualEngine _engine;
 
-    public JalapenoVisualObject(CherryBombGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی  change object
+    public JalapenoVisualObject(JalapenoGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی  change object
         _gameObject = gameObject;
         _engine = engine;
 

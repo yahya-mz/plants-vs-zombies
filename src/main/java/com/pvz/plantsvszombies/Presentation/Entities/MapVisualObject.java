@@ -6,6 +6,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
+import com.pvz.plantsvszombies.GUI.Views.DayMenu;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
@@ -208,6 +209,8 @@ import javafx.scene.layout.*;
 import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.util.List;
@@ -409,6 +412,22 @@ public class MapVisualObject extends AbstractVisualObject {
             }
         }
 
+        Button pauseButton = new Button("Pause");
+        pauseButton.setStyle("-fx-background-color: red; -fx-text-fill: white;");
+        VBox.setMargin(pauseButton, new Insets(50, 0, 0, 0));
+        pauseButton.setOnAction(e -> {
+            DayMenu dayMenu = new DayMenu();
+            Stage stage = new Stage();
+            stage.setScene(dayMenu.getScene());
+            stage.setResizable(false);
+            dayMenu.applyState("win");
+            stage.show();
+            System.out.println("Pause button clicked");
+        });
+
+        mainContainer.getChildren().add(pauseButton);
+
+
         this._node = mainContainer;
 
         _mapObject.subscribeToPlantingEvent(new IEventSubscriber() {
@@ -443,6 +462,23 @@ public class MapVisualObject extends AbstractVisualObject {
                 });
             }
         });
+    }
+
+    public Button createImageButton(String imagePath) {
+        Image image = new Image(imagePath);
+        ImageView imageView = new ImageView(image);
+
+        // تنظیم اندازه دکمه مطابق با عکس
+        Button button = new Button();
+        button.setGraphic(imageView);
+        button.setPrefSize(image.getWidth(), image.getHeight());
+        button.setMinSize(image.getWidth(), image.getHeight());
+        button.setMaxSize(image.getWidth(), image.getHeight());
+
+        // حذف padding و background پیش‌فرض دکمه
+        button.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
+        return button;
     }
 
     public ImageView createPlantImageView(String plantName, Button referenceButton) {

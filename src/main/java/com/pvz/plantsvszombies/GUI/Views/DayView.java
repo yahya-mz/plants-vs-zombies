@@ -73,17 +73,13 @@
 package com.pvz.plantsvszombies.GUI.Views;
 
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.JalapenoGameObject;
 import com.pvz.plantsvszombies.GameEngine.DayEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
-import com.pvz.plantsvszombies.Presentation.Animations.NormalZombieAnimations;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.beans.value.ObservableValueBase;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -95,10 +91,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 
-import java.io.File;
 import java.util.*;
 
 public class DayView extends AbstractLevelView {
@@ -138,7 +131,8 @@ public class DayView extends AbstractLevelView {
 
         //bar
         VBox suncounter = createCounter();
-        HBox plantbar = dayView.createButtonBar(selectedPlants);
+        HBox plantbar = dayView.createTopPlantSelectionBar(selectedPlants);
+        addHoverEffectToImages(plantbar);
         Button shuveltool = createShovelToolButton();
 
         HBox mainbar = new HBox(24);
@@ -162,7 +156,7 @@ public class DayView extends AbstractLevelView {
 
         //StackPane.setMargin(mainbar, new Insets(20, -40, 200, 60));//dont change this
         StackPane.setAlignment(mainbar, Pos.TOP_CENTER);
-        StackPane.setMargin(mainbar, new Insets(20, -40, 200, 65));
+        StackPane.setMargin(mainbar, new Insets(15, 60, 185, 65));
 
 
         var scene = new Scene(bottommostPlane, Width, Height);
@@ -175,143 +169,6 @@ public class DayView extends AbstractLevelView {
         return dayView;
 
     }
-
-    public static Stage createPickingPlantStage(Stage primaryStage) {
-
-        ArrayList<AbstractPlantGameObject.PlantType> _selectedPlants = new ArrayList<>();
-        Button startBtn = new Button("Start");
-        startBtn.setDisable(true);
-
-        HBox selectedPlantHBox = new HBox(10);
-        for (int i = 9; i <= 14; i++) {
-            Button btn = new Button("Button " + i);
-//            selectedPlantHBox.getChildren().add(btn);
-        }
-
-        Stage pickingStage = new Stage();
-        VBox root = new VBox(15);
-        root.setPadding(new Insets(20));
-        root.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-
-        var plantsCardsDirectory = new File(GlobalSettings.getDir("graphics/Cards/Day"));
-        var cards = plantsCardsDirectory.listFiles();
-        Image[] cardImages = new Image[cards.length];
-        for (int j = 0; j < cardImages.length; j++) {
-            cardImages[j] = new Image(cards[j].getPath());
-        }
-
-        // HBox اول با ۴ دکمه
-        HBox firstRow = new HBox(10);
-        for (int i = 0; i <= 3; i++) {
-            var card = new ImageView(cardImages[i]);
-            card.setFitWidth(60);
-            card.setPreserveRatio(true);
-
-            card.setCursor(Cursor.HAND);
-            final int final_i = i;
-            card.setOnMouseClicked((e) -> {
-                if (_selectedPlants.size() < 6) {
-                    var imgPath = cardImages[final_i].getUrl();
-                    var imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1);
-                    imgName = imgName.substring(0, imgName.lastIndexOf('.'));
-
-                    _selectedPlants.add(AbstractPlantGameObject.PlantType.valueOf(imgName));
-
-                    var clonedCard = new ImageView(cardImages[final_i]);
-                    clonedCard.setFitWidth(60);
-                    clonedCard.setPreserveRatio(true);
-                    clonedCard.setCursor(Cursor.HAND);
-
-                    var final_imgName = imgName;
-                    clonedCard.setOnMouseClicked((event -> {
-                        if (event.getButton().equals(MouseButton.PRIMARY)) {
-                            selectedPlantHBox.getChildren().remove(_selectedPlants.indexOf(AbstractPlantGameObject.PlantType.valueOf(final_imgName)));
-                            _selectedPlants.remove(AbstractPlantGameObject.PlantType.valueOf(final_imgName));
-                            card.setOpacity(1);
-                            card.setDisable(false);
-
-                            startBtn.setDisable(_selectedPlants.size() != 6);
-
-                        }
-                    }
-                    ));
-
-                    startBtn.setDisable(_selectedPlants.size() != 6);
-
-                    selectedPlantHBox.getChildren().add(clonedCard);
-                    card.setDisable(true);
-                    card.setOpacity(0.5);
-                }
-            });
-            firstRow.getChildren().add(card);
-        }
-
-        // HBox دوم با ۴ دکمه
-        HBox secondRow = new HBox(10);
-        for (int i = 4; i <= 7; i++) {
-            var card = new ImageView(cardImages[i]);
-            card.setFitWidth(60);
-            card.setPreserveRatio(true);
-
-            card.setCursor(Cursor.HAND);
-            final int final_i = i;
-            card.setOnMouseClicked((e) -> {
-                if (_selectedPlants.size() < 6) {
-                    var imgPath = cardImages[final_i].getUrl();
-                    var imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1);
-                    imgName = imgName.substring(0, imgName.lastIndexOf('.'));
-
-                    _selectedPlants.add(AbstractPlantGameObject.PlantType.valueOf(imgName));
-
-                    var clonedCard = new ImageView(cardImages[final_i]);
-                    clonedCard.setFitWidth(60);
-                    clonedCard.setPreserveRatio(true);
-                    clonedCard.setCursor(Cursor.HAND);
-
-                    var final_imgName = imgName;
-                    clonedCard.setOnMouseClicked((event -> {
-                        if (event.getButton().equals(MouseButton.PRIMARY)) {
-                            selectedPlantHBox.getChildren().remove(_selectedPlants.indexOf(AbstractPlantGameObject.PlantType.valueOf(final_imgName)));
-                            _selectedPlants.remove(AbstractPlantGameObject.PlantType.valueOf(final_imgName));
-                            card.setOpacity(1);
-                            card.setDisable(false);
-
-                            startBtn.setDisable(_selectedPlants.size() != 6);
-
-                        }
-                    }
-                    ));
-
-                    startBtn.setDisable(_selectedPlants.size() != 6);
-
-                    selectedPlantHBox.getChildren().add(clonedCard);
-                    card.setDisable(true);
-                    card.setOpacity(0.5);
-                }
-            });
-            secondRow.getChildren().add(card);
-        }
-
-        startBtn.setOnAction(e -> {
-            pickingStage.close();
-            DayView gameStage = DayView.createStage(_selectedPlants);
-            gameStage.show();
-            gameStage.setOnHiding(event -> {
-                primaryStage.show();
-                Mediator.getInstance().stopEngine();
-            });
-        });
-
-        root.getChildren().addAll(firstRow, secondRow, selectedPlantHBox, startBtn);
-
-        Scene scene = new Scene(root, 500, 300);
-        pickingStage.setTitle("Picking Plant Stage");
-        pickingStage.setScene(scene);
-        pickingStage.show();
-
-        return pickingStage;
-    }
-
 
     private void setupEngines() {
         DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);
@@ -344,12 +201,12 @@ public class DayView extends AbstractLevelView {
         return counterValue.get(); //mainenginevalue
     }
 
-    public HBox createButtonBar(List<AbstractPlantGameObject.PlantType> selectedPlants) {
+    public HBox createTopPlantSelectionBar(List<AbstractPlantGameObject.PlantType> selectedPlants) {
 
 
-        HBox buttonBar = new HBox(3);
+        HBox buttonBar = new HBox(10);
         buttonBar.setAlignment(Pos.TOP_CENTER);
-        buttonBar.setPrefHeight(90);
+        buttonBar.setPrefHeight(86);
 
         for (int i = 0; i < selectedPlants.size(); i++) {
             Button btn = new Button("Item " + i);
@@ -359,7 +216,18 @@ public class DayView extends AbstractLevelView {
 
             cardpic.setPreserveRatio(true);
             cardpic.setSmooth(true);
-            cardpic.setFitWidth(70);
+            cardpic.setFitWidth(95);
+
+            Insets margin;
+            switch (i) {
+                case 0 -> margin = new Insets(0, 10, 0, 0);
+                case 1 -> margin = new Insets(0, 4, 0, 0);
+                case 2 -> margin = new Insets(0, 5, 0, 0);
+                case 3 -> margin = new Insets(0, 6, 0, 0);
+                case 4 -> margin = new Insets(0, 8, 0, 0);
+                default -> margin = new Insets(0, 0, 0, 0);
+            }
+            HBox.setMargin(btn, margin);
 
 
             final AbstractPlantGameObject.PlantType final_plantType = selectedPlants.get(i);
@@ -396,6 +264,25 @@ public class DayView extends AbstractLevelView {
         return buttonBar;
     }
 
+    public static void addHoverEffectToImages(HBox hbox) {//fixing
+        for (Node node : hbox.getChildren()) {
+            if (node instanceof ImageView) {
+                ImageView imageView = (ImageView) node;
+
+                imageView.setOnMouseEntered(e -> {
+                    imageView.setTranslateY(-9); // 10 پیکسل بالا بره
+                    imageView.setScaleX(1.02);    // بزرگنمایی ۵٪
+                    imageView.setScaleY(1.02);
+                });
+
+                imageView.setOnMouseExited(e -> {
+                    imageView.setTranslateY(0);   // بازگشت به جای قبلی
+                    imageView.setScaleX(1);
+                    imageView.setScaleY(1);
+                });
+            }
+        }
+    }
 
     public static Button createShovelToolButton() {
         Button shovelButton = new Button("Shovel");
