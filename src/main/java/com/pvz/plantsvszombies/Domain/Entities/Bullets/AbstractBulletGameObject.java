@@ -5,7 +5,7 @@ import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 public abstract class AbstractBulletGameObject extends AbstractGameObject {
     public enum BulletType {
         NORMAL_BULLET,
-        SNOW_BULLET
+        ICED_BULLET
     }
 
     protected BulletType _bulletType;
@@ -26,5 +26,5 @@ public abstract class AbstractBulletGameObject extends AbstractGameObject {
         return _bulletType;
     }
 
-    public abstract void collide(AbstractGameObject collidedWith);
+    public abstract void collide();
 }

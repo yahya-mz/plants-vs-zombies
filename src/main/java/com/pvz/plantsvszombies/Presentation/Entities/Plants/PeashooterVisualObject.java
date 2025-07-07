@@ -1,23 +1,24 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Entities.Bullets.NormalBulletVisualObject;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Entities.NormalBulletVisualObject;
+import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
 public class PeashooterVisualObject extends AbstractPlantVisualObject {
-    private final IVisualEngine _engine;
+    private PeashooterGameObject _gameObject;
+    private VisualEngine _engine;
 
-    public PeashooterVisualObject(PeashooterGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
-        super._gameObject = gameObject;
+    public PeashooterVisualObject(PeashooterGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی
+        _gameObject = gameObject;
         _engine = engine;
 
         _visualCoordinate = gameObject.getCoordinate();
@@ -28,7 +29,7 @@ public class PeashooterVisualObject extends AbstractPlantVisualObject {
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
                     System.out.println("Shooting: " + gameObject.getCoordinate().x() + "," + gameObject.getCoordinate().y());
-                    var bulletVisualObject = new NormalBulletVisualObject((NormalBulletGameObject) gameObject, engine);
+                    var bulletVisualObject = new NormalBulletVisualObject((NormalBulletGameObject) gameObject,engine);
                     _engine.spawnVisualObject(bulletVisualObject);
                 });
             }
@@ -44,12 +45,12 @@ public class PeashooterVisualObject extends AbstractPlantVisualObject {
     }
 
     @Override
-    public void playAnimation(IAnimation animation, Duration frameDuration) {
-        super.playAnimation(PeashooterAnimation.getFrames((PeashooterAnimation.Animations) animation), frameDuration);
+    public void playAnimation(IAnimation animation) {
+        super.playAnimation(animation, PeashooterAnimation.getFrames((PeashooterAnimation.Animations) animation), Duration.millis(90));
     }
 
     @Override
     public void spawn() {
-        playAnimation(PeashooterAnimation.Animations.STANDING, Duration.millis(20));//standing
+        playAnimation(PeashooterAnimation.Animations.STANDING);//standing
     }
 }

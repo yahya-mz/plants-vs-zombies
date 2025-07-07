@@ -1,22 +1,25 @@
 package com.pvz.plantsvszombies.Domain.Entities.Bullets;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
 
 import java.util.ArrayList;
 
 public class NormalBulletGameObject extends AbstractBulletGameObject {
+    private final IGameEngine _engine;
+
+    private boolean _isDisposed = false;
+
     private final ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
     private final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
     public static NormalBulletGameObject createNormalBulletGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row) {
-        return new NormalBulletGameObject(gameEngine, id, coordinate, row);
+        return new NormalBulletGameObject(gameEngine, id, coordinate,row);
     }
 
     NormalBulletGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row) {
-        this._gameEngine = gameEngine;
+        this._engine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
         this._row = row;
@@ -33,21 +36,21 @@ public class NormalBulletGameObject extends AbstractBulletGameObject {
 
     @Override
     public void update() {
-        if (!_isDisposed) {
+        if (!_isDisposed){
             this._coordinate.traverse(_speed, 0);
             for (IEventSubscriber subscriber : _movementEventSubscribers) {
                 subscriber._notify(this);
             }
         }
     }
-
     @Override
-    public void collide(AbstractGameObject collidedWith) {
+    public void collide() {
         if (!_isDisposed) {
             for (IEventSubscriber subscriber : _collisionEventSubscribers) {
                 subscriber._notify(this);
+                _isDisposed = true;
+                _engine.disposeObject(this);
             }
-            super.dispose();
         }
     }
 
@@ -58,4 +61,5 @@ public class NormalBulletGameObject extends AbstractBulletGameObject {
     public void subscribeToMovementEvent(IEventSubscriber subscriber) {
         _movementEventSubscribers.add(subscriber);
     }
+
 }

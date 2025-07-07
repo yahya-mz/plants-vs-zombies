@@ -1,16 +1,16 @@
 package com.pvz.plantsvszombies.Domain.Common;
 
 public class Coordinate {
-    private double _x;
+    private double x;
     private double _y;
 
     public Coordinate(double x, double y) {
-        this._x = x;
+        this.x = x;
         this._y = y;
     }
 
     public double x() {
-        return this._x;
+        return this.x;
     }
 
     public double y() {
@@ -18,19 +18,19 @@ public class Coordinate {
     }
 
     public boolean equals(Coordinate coordinate) {
-        return (coordinate._x == this._x && coordinate._y == this._y);
+        return (coordinate.x == this.x && coordinate._y == this._y);
     }
 
     public static double calculateDistance(Coordinate c1, Coordinate c2) {
-        return Math.sqrt(Math.pow(c1._x - c2._x, 2) + Math.pow(c1._y - c2._y, 2));
+        return Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1._y - c2._y, 2));
     }
 
     public void traverse(double x, double y) {
-        this._x += x;
+        this.x += x;
         this._y += y;
     }
 
     public Coordinate copy() {
-        return new Coordinate(_x, _y);
+        return new Coordinate(x, _y);
     }
 }

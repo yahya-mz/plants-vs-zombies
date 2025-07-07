@@ -1,9 +1,9 @@
-//package com.pvz.plantsvszombies.Presentation.GUI.Views;
+//package com.pvz.plantsvszombies.GUI.Views;
 //
 //import com.pvz.plantsvszombies.GameEngine.DayEngine;
 //import com.pvz.plantsvszombies.Mediator.Mediator;
 //import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
-//import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
+//import com.pvz.plantsvszombies.Presentation.VisualEngine;
 //import javafx.geometry.Insets;
 //import javafx.scene.Scene;
 //import javafx.scene.control.Button;
@@ -70,19 +70,24 @@
 //        });
 //    }
 //}
-package com.pvz.plantsvszombies.Presentation.GUI.Views;
+package com.pvz.plantsvszombies.GUI.Views;
 
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
-import com.pvz.plantsvszombies.Engines.DayEngine;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.JalapenoGameObject;
+import com.pvz.plantsvszombies.GameEngine.DayEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
+import com.pvz.plantsvszombies.Presentation.Animations.NormalZombieAnimations;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
-import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
+import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.ObservableValueBase;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -101,7 +106,7 @@ public class DayView extends AbstractLevelView {
     public static final double Width = 1088;
     public static final double Height = 728;
     private static IntegerProperty counterValue = new SimpleIntegerProperty(0);
-    private VisualDayEngine _visualEngine;
+    private VisualEngine _visualEngine;
 
 
     private DayView() {
@@ -310,7 +315,7 @@ public class DayView extends AbstractLevelView {
 
     private void setupEngines() {
         DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);
-        _visualEngine = new VisualDayEngine(this, dayEngine);
+        _visualEngine = new VisualEngine(this, dayEngine);
         Mediator.init(dayEngine, _visualEngine);
         Mediator.getInstance().startEngine();
 
@@ -319,6 +324,7 @@ public class DayView extends AbstractLevelView {
             Mediator.getInstance().stopEngine();
         });
     }
+
 
     public static VBox createCounter() {
         Label counterLabel = new Label();
@@ -363,11 +369,13 @@ public class DayView extends AbstractLevelView {
                         case PEASHOOTER -> _visualEngine.setSelectedPlantType(PeashooterVisualObject.class);
                         case SUNFLOWER -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
                         case WALL_NUT -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
-                        case JALAPENO -> _visualEngine.setSelectedPlantType(JalapenoVisualObject.class);
-                        case TALL_NUT -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
+//                        case 4 -> _visualEngine.setSelectedPlantType(JalopenoVisualObject.class);
+//                        case 5 -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
                         case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
 //                        case 7 -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
                         case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
+
+                        default -> _visualEngine.setSelectedPlantType(PeashooterVisualObject.class);
                     }
                 }
             });

@@ -10,8 +10,7 @@ import java.util.Objects;
 
 public class JalapenoAnimations {
     public enum Animations implements IAnimation {
-        EXPLODING,
-        FIRING
+        BLOWING
     }
 
     private static final ArrayList<Image[]> animations;

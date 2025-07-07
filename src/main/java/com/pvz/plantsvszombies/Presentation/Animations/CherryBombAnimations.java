@@ -11,8 +11,7 @@ import java.util.Objects;
 
 public class CherryBombAnimations {
     public enum Animations implements IAnimation {
-        EXPLODING,
-        EXPLODED
+        BLOWING
     }
 
     private static final ArrayList<Image[]> animations;

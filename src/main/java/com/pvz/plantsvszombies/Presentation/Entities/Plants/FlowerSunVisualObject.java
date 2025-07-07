@@ -1,6 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
@@ -9,7 +9,8 @@ import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.SunAnimations;
 import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
@@ -18,26 +19,34 @@ import javafx.scene.input.MouseButton;
 import javafx.util.Duration;
 
 public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
+
+
     public enum States {
         DROPPING,
         COLLECTING,
         FADING_OUT
     }
 
-    private final double _width;
-    private final double _height;
+    double _width;
+    double _height;
+
+    private SunGameObject _gameObject;
 
     private States _currentState;
 
     private GeneralFadingAnimation _fadingAnimation;
     private GeneralTransformAnimation _transformAnimation;
 
-    private final IVisualEngine _engine;
+    private VisualEngine _engine;
 
-    public FlowerSunVisualObject(SunGameObject gameObject, IVisualEngine engine) {
-        super._gameObject = gameObject;
+    public FlowerSunVisualObject(SunGameObject gameObject, VisualEngine engine) {
         _engine = engine;
+
+
+
+
         _visualCoordinate = gameObject.getCoordinate();
+        _gameObject = gameObject;
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Sun/Sun_0.png")));
         ((ImageView) _node).setFitWidth(50);
         ((ImageView) _node).setFitHeight(50);
@@ -67,14 +76,14 @@ public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
     }
 
     @Override
-    public void playAnimation(IAnimation animation, Duration frameDuration) {
-        super.playAnimation(SunAnimations.getFrames((SunAnimations.Animations) animation), frameDuration);
+    public void playAnimation(IAnimation animation) {
+        super.playAnimation(animation, SunAnimations.getFrames((SunAnimations.Animations) animation), Duration.millis(80));
     }
 
     @Override
     public void spawn() {
         changeStateTo(States.DROPPING);
-        playAnimation(SunAnimations.Animations.SHINING, Duration.millis(80));
+        playAnimation(SunAnimations.Animations.SHINING);
 
     }
 
@@ -82,21 +91,21 @@ public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
         switch (state) {
             case DROPPING -> {
                 _currentState = States.DROPPING;
-                Platform.runLater(() -> {
+                Platform.runLater(() ->{
                     _transformAnimation = GeneralTransformAnimation.attach(this).transform(5.5, 11, 20, -50)
                             .then((event) -> {
-                                _transformAnimation = GeneralTransformAnimation.attach(this).transform(1.65, 2, 20, 95);
+                                            _transformAnimation = GeneralTransformAnimation.attach(this).transform(1.65, 2, 20, 95);
                             });
                 });
 
             }
-            // +10 means going down
+                // +10 means going down
 
             case COLLECTING -> {
                 if (_currentState == FlowerSunVisualObject.States.COLLECTING) {
                     return this;
                 }
-                ((SunGameObject) _gameObject).gain();
+                _gameObject.gain();
                 if (_currentState.equals(FlowerSunVisualObject.States.FADING_OUT)) {
                     _fadingAnimation.interrupt();
                     _fadingAnimation = null;

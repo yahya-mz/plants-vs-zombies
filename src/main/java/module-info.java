@@ -7,6 +7,6 @@ module com.pvz.plantsvszombies {
     requires org.kordamp.bootstrapfx.core;
     requires java.desktop;
 
-    opens com.pvz.plantsvszombies.Presentation.GUI to javafx.fxml;
-    exports com.pvz.plantsvszombies.Presentation.GUI;
+    opens com.pvz.plantsvszombies.GUI to javafx.fxml;
+    exports com.pvz.plantsvszombies.GUI;
 }

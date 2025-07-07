@@ -5,8 +5,6 @@ import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 
 public class MapBlock {
 
-    public final static int BLOCK_SIZE = 90;
-
     private final int _row;
     private final int _column;
 
@@ -33,14 +31,8 @@ public class MapBlock {
     public Coordinate getCenterCoordinate() {
         return new Coordinate((_top_left.x() + _bottom_right.x()) / 2.0, (_top_left.y() + _bottom_right.y()) / 2.0);
     }
-
-    public int getRow() {
-        return this._row;
-    }
-
-    public int getColumn() {
-        return this._column;
-    }
+    public int getRow() {return this._row;}
+    public int getColumn() {return this._column;}
 
     public boolean contains(Coordinate coordinate) {
         return

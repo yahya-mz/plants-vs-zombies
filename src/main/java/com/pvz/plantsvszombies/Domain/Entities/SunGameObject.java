@@ -1,8 +1,7 @@
 package com.pvz.plantsvszombies.Domain.Entities;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Entities.Events.SkySunSpawnEvent;
 
 import java.util.ArrayList;
 import java.util.Timer;

@@ -1,15 +1,19 @@
 package com.pvz.plantsvszombies.Presentation.Entities;
 
+import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
+
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public abstract class AbstractAnimatedVisualObject extends AbstractVisualObject {
     private final Timeline _animationTimeLine;
@@ -19,10 +23,11 @@ public abstract class AbstractAnimatedVisualObject extends AbstractVisualObject 
         this._animationTimeLine = new Timeline();
     }
 
-    protected void playAnimation(Image[] frames, Duration frameDuration, int cycleCount) {
+    public abstract void playAnimation(IAnimation animation);
+
+    protected void playAnimation(IAnimation animation, Image[] frames, Duration frameDuration) {
         if (_animationTimeLine.getStatus().equals(Animation.Status.RUNNING)) {
             stopAnimation();
-            _animationTimeLine.getKeyFrames().clear();
         }
 //        var keyFrames = Arrays.stream(frames)
 //                .map(image -> {
@@ -31,7 +36,7 @@ public abstract class AbstractAnimatedVisualObject extends AbstractVisualObject 
 //                    });
 //                });
 
-//        var keyFrames = new KeyFrame[frames.length];
+        var keyFrames = new KeyFrame[frames.length];
 //        for (int i = 0; i < frames.length; i++) {
 //            System.out.println(i);
 //            final int index = i;
@@ -84,15 +89,9 @@ public abstract class AbstractAnimatedVisualObject extends AbstractVisualObject 
                         }
                 )
         );
-        _animationTimeLine.setCycleCount(cycleCount == Timeline.INDEFINITE ? Timeline.INDEFINITE : cycleCount * frames.length);
+        _animationTimeLine.setCycleCount(Timeline.INDEFINITE);
         _animationTimeLine.play();
     }
-
-    protected void playAnimation(Image[] frames, Duration frameDuration) {
-        playAnimation(frames, frameDuration, Timeline.INDEFINITE);
-    }
-
-    public abstract void playAnimation(IAnimation animation, Duration frameDuration);
 
     public void resumeAnimation() {
         if (_animationTimeLine.getStatus().equals(Animation.Status.PAUSED)) {
@@ -102,30 +101,5 @@ public abstract class AbstractAnimatedVisualObject extends AbstractVisualObject 
 
     public void stopAnimation() {
         _animationTimeLine.stop();
-    }
-
-    public void setOnAnimationFinished(EventHandler<ActionEvent> eventHandler) {
-        _animationTimeLine.setOnFinished(eventHandler);
-    }
-
-    protected void addFrames(Image[] frames, Duration frameDuration) {
-
-        var node = (ImageView) super.getNode();
-
-        int[] index = {0}; // Using array to allow modification in lambda
-        _animationTimeLine.getKeyFrames().add(
-                new KeyFrame(
-                        Duration.millis(frameDuration.toMillis()),
-                        event -> {
-                            Platform.runLater(() -> {
-                                node.setImage(frames[index[0]]);
-                            });
-                            index[0]++;
-                            if (index[0] == frames.length) {
-                                index[0] = 1;
-                            }
-                        }
-                )
-        );
     }
 }

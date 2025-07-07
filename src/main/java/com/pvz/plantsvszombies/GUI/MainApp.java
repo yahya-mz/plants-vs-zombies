@@ -1,16 +1,23 @@
 //}
-package com.pvz.plantsvszombies.Presentation.GUI;
+package com.pvz.plantsvszombies.GUI;
 
+import com.pvz.plantsvszombies.GameEngine.DayEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.GUI.Views.DayView;
+import com.pvz.plantsvszombies.GUI.Views.DayView;
+import com.pvz.plantsvszombies.Mediator.Mediator;
+import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
+import java.time.Duration;
 
 public class MainApp extends Application {
 

@@ -1,6 +1,9 @@
 package com.pvz.plantsvszombies.Presentation.EventHandlers;
 
 import com.pvz.plantsvszombies.Domain.Entities.Events.SkySunSpawnEvent;
+import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
+import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import com.pvz.plantsvszombies.Presentation.Entities.SkySunVisualObject;
 
 public class SkySunSpawnEventHandler implements EventHandler<SkySunSpawnEvent> {
     @Override

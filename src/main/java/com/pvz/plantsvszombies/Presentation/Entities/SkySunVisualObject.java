@@ -1,6 +1,7 @@
 package com.pvz.plantsvszombies.Presentation.Entities;
 
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
@@ -8,7 +9,7 @@ import com.pvz.plantsvszombies.Presentation.Animations.GeneralFadingAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.SunAnimations;
-import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
+import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,9 +32,9 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
     private GeneralFadingAnimation _fadingAnimation;
     private GeneralTransformAnimation _transformAnimation;
 
-    private VisualDayEngine _engine;
+    private VisualEngine _engine;
 
-    public SkySunVisualObject(SunGameObject gameObject, VisualDayEngine engine) {
+    public SkySunVisualObject(SunGameObject gameObject, VisualEngine engine) {
         _engine = engine;
         gameObject.subscribeToTimeOut(new IEventSubscriber() {
             @Override
@@ -63,15 +64,14 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
     }
 
     @Override
-    public void playAnimation(IAnimation animation, Duration frameDuration) {
-        super.playAnimation(SunAnimations.getFrames((SunAnimations.Animations) animation), frameDuration);
+    public void playAnimation(IAnimation animation) {
+        super.playAnimation(animation, SunAnimations.getFrames((SunAnimations.Animations) animation), Duration.millis(80));
     }
 
     @Override
     public void spawn() {
-        _gameObject.spawn();
         changeStateTo(States.DROPPING);
-        playAnimation(SunAnimations.Animations.SHINING,Duration.millis(80));
+        playAnimation(SunAnimations.Animations.SHINING);
     }
 
     public SkySunVisualObject changeStateTo(States state) {

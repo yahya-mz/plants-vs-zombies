@@ -1,4 +1,4 @@
-package com.pvz.plantsvszombies.Presentation.GUI.Views;
+package com.pvz.plantsvszombies.GUI.Views;
 
 import javafx.scene.layout.*;
 import javafx.stage.Stage;

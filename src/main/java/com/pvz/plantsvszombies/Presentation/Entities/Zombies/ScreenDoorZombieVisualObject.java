@@ -3,7 +3,7 @@ package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.ScreenDoorZombieGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
@@ -17,13 +17,13 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
     }
 
     private ScreenDoorZombieGameObject _gameObject;
-    private IVisualEngine _engine;
+    private VisualEngine _engine;
 
     private States _currentState;
     private GeneralTransformAnimation _transformAnimation;
 
 
-    public ScreenDoorZombieVisualObject(ScreenDoorZombieGameObject gameObject, IVisualEngine engine) {
+    public ScreenDoorZombieVisualObject(ScreenDoorZombieGameObject gameObject, VisualEngine engine) {
         _gameObject = gameObject;
         _engine = engine;
         _visualCoordinate = gameObject.getCoordinate();
@@ -33,7 +33,7 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
         var width = ((Image) ((ImageView) _node).getImage()).getWidth();
 
         _node.setManaged(false);
-        _node.relocate(_visualCoordinate.x() - 0.3 * width, _visualCoordinate.y() - height * 0.3);
+        _node.relocate(_visualCoordinate.x() - 0.3 * width , _visualCoordinate.y() - height * 0.3);
 
         _currentState = States.MOVING;
 
@@ -62,13 +62,13 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
     }
 
     @Override
-    public void playAnimation(IAnimation animation, Duration frameDuration) {
-        super.playAnimation(ScreenDoorZombieAnimations.getFrames((ScreenDoorZombieAnimations.Animations) animation), frameDuration);
+    public void playAnimation(IAnimation animation) {
+        super.playAnimation(animation, ScreenDoorZombieAnimations.getFrames((ScreenDoorZombieAnimations.Animations) animation), Duration.millis(90));
     }
 
     @Override
     public void spawn() {
-        playAnimation(ScreenDoorZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(90));
+        playAnimation(ScreenDoorZombieAnimations.Animations.MOVING_FORWARD);
     }
 
     public ScreenDoorZombieVisualObject changeStateTo(ScreenDoorZombieVisualObject.States state) {
@@ -76,22 +76,22 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
             case MOVING -> {
                 _currentState = States.MOVING;
                 stopAnimation();
-                playAnimation(ScreenDoorZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(90));
+                playAnimation(ScreenDoorZombieAnimations.Animations.MOVING_FORWARD);
             }
             case DYING -> {
                 _currentState = States.DYING;
                 stopAnimation();
-                playAnimation(ScreenDoorZombieAnimations.Animations.DYING, Duration.millis(90));
+                playAnimation(ScreenDoorZombieAnimations.Animations.DYING);
             }
             case LOSTDOOR -> {
                 _currentState = States.LOSTDOOR;
                 stopAnimation();
-                playAnimation(ScreenDoorZombieAnimations.Animations.LOSTDOOR, Duration.millis(90));
+                playAnimation(ScreenDoorZombieAnimations.Animations.LOSTDOOR);
             }
             case EATING -> {
                 _currentState = States.EATING;
                 stopAnimation();
-                playAnimation(ScreenDoorZombieAnimations.Animations.ATTACKING, Duration.millis(90));
+                playAnimation(ScreenDoorZombieAnimations.Animations.ATTACKING);
             }
         }
         return null;

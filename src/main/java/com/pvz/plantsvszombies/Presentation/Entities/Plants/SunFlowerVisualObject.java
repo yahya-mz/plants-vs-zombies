@@ -1,12 +1,13 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.SunFlowerGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.AbstractPlantVisualObject;
+import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,11 +19,12 @@ public class SunFlowerVisualObject extends AbstractPlantVisualObject {
         GLOWING
     }
 
+    private SunFlowerGameObject _gameObject;
     private States _currentState;
-    private final IVisualEngine _engine;
+    private VisualEngine _engine;
 
-    public SunFlowerVisualObject(SunFlowerGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
-        super._gameObject = gameObject;
+    public SunFlowerVisualObject(SunFlowerGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی
+        _gameObject = gameObject;
         _engine = engine;
 
         gameObject.subscribeToGlowingEvent(new IEventSubscriber() {//notify
@@ -55,15 +57,15 @@ public class SunFlowerVisualObject extends AbstractPlantVisualObject {
     }
 
     @Override
-    public void playAnimation(IAnimation animation, Duration frameDuration) {
-        super.playAnimation(SunFlowerAnimations.getFrames((SunFlowerAnimations.Animations) animation), frameDuration);
+    public void playAnimation(IAnimation animation) {
+        super.playAnimation(animation, SunFlowerAnimations.getFrames((SunFlowerAnimations.Animations) animation), Duration.millis(90));
     }
 
     @Override
     public void spawn() {
         Platform.runLater(() -> {
             System.out.println("demodemo");
-            playAnimation(SunFlowerAnimations.Animations.STANDING,Duration.millis(90));//standing
+            playAnimation(SunFlowerAnimations.Animations.STANDING);//standing
             changeStateTo(States.STANDING);
         });
     }

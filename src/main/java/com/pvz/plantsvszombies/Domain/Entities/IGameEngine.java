@@ -1,11 +1,10 @@
-package com.pvz.plantsvszombies.Domain.Interfaces;
+package com.pvz.plantsvszombies.Domain.Entities;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.MapBlock;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 
