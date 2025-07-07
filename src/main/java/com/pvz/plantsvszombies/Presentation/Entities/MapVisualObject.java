@@ -3,14 +3,13 @@ package com.pvz.plantsvszombies.Presentation.Entities;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.*;
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Presentation.Entities.Bullets.NormalBulletVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.WallNutVisualObject;
-import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -195,17 +194,11 @@ import javafx.scene.layout.*;
 //    }
 //}
 
-import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.*;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.SunFlowerGameObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
-import com.pvz.plantsvszombies.Presentation.VisualEngine;
 import javafx.animation.FadeTransition;
-import javafx.scene.layout.*;
-import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
 import javafx.util.Duration;
@@ -214,10 +207,10 @@ import java.util.List;
 
 public class MapVisualObject extends AbstractVisualObject {
     MapGameObject _mapObject;
-    private final VisualEngine _engine;
+    private final VisualDayEngine _engine;
     private final StackPane[][] visualGrid = new StackPane[5][9];
 
-    public MapVisualObject(MapGameObject object, VisualEngine engine) {
+    public MapVisualObject(MapGameObject object, VisualDayEngine engine) {
         this._mapObject = object;
         this._engine = engine;
 
@@ -241,56 +234,30 @@ public class MapVisualObject extends AbstractVisualObject {
         for (int row = 0; row < 5; row++) {
             HBox rowBox = new HBox();
 
-            double customHGap = switch (row) {//فاصله بین هر عنصر در یک ریدف
-                case 0 -> 7;
-                case 1 -> 7;
-                case 2 -> 7;
-                case 3 -> 7;
-                case 4 -> 7;
-                default -> 7;
-            };
+//            double customHGap = switch (row) {//فاصله بین هر عنصر در یک ریدف
+//                case 0 -> 7;
+//                case 1 -> 7;
+//                case 2 -> 7;
+//                case 3 -> 7;
+//                case 4 -> 7;
+//                default -> 7;
+//            };
 
-            double buttonWidth, buttonHeight;
-            switch (row) {//custom button size for each row
-                case 0 -> {
-                    buttonWidth = 84;
-                    buttonHeight = 84;
-                }
-                case 1 -> {
-                    buttonWidth = 86;
-                    buttonHeight = 86;
-                }
-                case 2 -> {
-                    buttonWidth = 88;
-                    buttonHeight = 89;
-                }
-                case 3 -> {
-                    buttonWidth = 89;
-                    buttonHeight = 88;
-                }
-                case 4 -> {
-                    buttonWidth = 91;
-                    buttonHeight = 91;
-                }
-                default -> {
-                    buttonWidth = 80;
-                    buttonHeight = 80;
-                }
-            }
+            double buttonWidth = MapBlock.BLOCK_SIZE, buttonHeight = MapBlock.BLOCK_SIZE;
 
 
-            Insets rowMargin = switch (row) {//جابه جایی هر ردیف
-                case 0 -> new Insets(-13, -10, -10, -10);
-                case 1 -> new Insets(5, -10, -10, -20);//up,right,down,left
-                case 2 -> new Insets(7, -10, -10, -30);
-                case 3 -> new Insets(7, -10, -10, -40);
-                case 4 -> new Insets(7, -10, -10, -52);
-                default -> Insets.EMPTY;
-            };
-            VBox.setMargin(rowBox, rowMargin);
+//            Insets rowMargin = switch (row) {//جابه جایی هر ردیف
+//                case 0 -> new Insets(-13, -10, -10, -10);
+//                case 1 -> new Insets(5, -10, -10, -20);//up,right,down,left
+//                case 2 -> new Insets(7, -10, -10, -30);
+//                case 3 -> new Insets(7, -10, -10, -40);
+//                case 4 -> new Insets(7, -10, -10, -52);
+//                default -> Insets.EMPTY;
+//            };
+            // VBox.setMargin(rowBox, rowMargin);
 
 
-            rowBox.setSpacing(customHGap);
+//            rowBox.setSpacing(customHGap);
             rowBox.setAlignment(Pos.CENTER_LEFT);
 
             for (int col = 0; col < 9; col++) {
@@ -335,23 +302,22 @@ public class MapVisualObject extends AbstractVisualObject {
 //                            ImageView preview = createPlantImageView("SnowPea", cellButton);
 //                            cellButton.setGraphic(preview);
 //                        });
-//                    } else if (selectedType == JalapenoVisualObject.class) {
-//                        Platform.runLater(() -> {
-//                            ImageView preview = createPlantImageView("Jalapeno", cellButton);
-//                            cellButton.setGraphic(preview);
-//                        });
+                    } else if (selectedType == JalapenoVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("Jalapeno", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
                     } else if (selectedType == RepeaterVisualObject.class) {
                         Platform.runLater(() -> {
                             ImageView preview = createPlantImageView("Repeater", cellButton);
                             cellButton.setGraphic(preview);
                         });
-                    }
-//                    } else if (selectedType == TallnutVisualObject.class) {
-//                        Platform.runLater(() -> {
-//                            ImageView preview = createPlantImageView("Tallnut", cellButton);
-//                            cellButton.setGraphic(preview);
-//                        });
-                    else if (selectedType == CherryBombVisualObject.class) {
+                    } else if (selectedType == TallnutVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("Tallnut", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
+                    } else if (selectedType == CherryBombVisualObject.class) {
                         Platform.runLater(() -> {
                             ImageView preview = createPlantImageView("CherryBomb", cellButton);
                             cellButton.setGraphic(preview);
@@ -399,10 +365,10 @@ public class MapVisualObject extends AbstractVisualObject {
                 final int i_final = i;
                 final int j_final = j;
                 n.needsLayoutProperty().addListener((obs2, oldVal, newVal) -> { // When needsLayout is set to false, it means everything about layout bounds is set
-                    if (!newVal && blocks[_mapObject.getColumns() * i_final + j_final] ==null){//need layout is false and also we havent created a mapblock
+                    if (!newVal && blocks[_mapObject.getColumns() * i_final + j_final] == null) {//need layout is false and also we havent created a mapblock
                         var x = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
                         var y = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
-                        blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxX()), i_final, j_final);//putting that block in the blocks array with the upper left cor and the dowen right cor and also with i and j in the grid
+                        blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxY()), i_final, j_final);//putting that block in the blocks array with the upper left cor and the dowen right cor and also with i and j in the grid
                         _mapObject.initBlocks(blocks);
                     }
                 });
@@ -417,18 +383,29 @@ public class MapVisualObject extends AbstractVisualObject {
                 if (gameObject instanceof PeashooterGameObject p) {
                     var visualObject = new PeashooterVisualObject(p, _engine);
                     plant(visualObject, p.getRow(), p.getColumn());
-                }
-                if (gameObject instanceof RepeaterGameObject rp) {
+                } else if (gameObject instanceof RepeaterGameObject rp) {
                     var visualObject = new RepeaterVisualObject(rp, _engine);
                     plant(visualObject, rp.getRow(), rp.getColumn());
-                }
-                if (gameObject instanceof WallNutGameObject wn) {
+                } else if (gameObject instanceof WallNutGameObject wn) {
                     var visualObject = new WallNutVisualObject(wn, _engine);
                     plant(visualObject, wn.getRow(), wn.getColumn());
-                }
-                if (gameObject instanceof SunFlowerGameObject sn) {
+                } else if (gameObject instanceof SunFlowerGameObject sn) {
                     var visualObject = new SunFlowerVisualObject(sn, _engine);
                     plant(visualObject, sn.getRow(), sn.getColumn());
+                } else if (gameObject instanceof CherryBombGameObject cb) {
+                    var visualObject = new CherryBombVisualObject(cb, _engine);
+                    plant(visualObject, cb.getRow(), cb.getColumn());
+                } else if (gameObject instanceof TallNutGameObject tl) {
+                    var visualObject = new TallnutVisualObject(tl, _engine);
+                    plant(visualObject, tl.getRow(), tl.getColumn());
+                }
+//                else if (gameObject instanceof SnowPeaGameObject sp ) {
+//                    var visualObject = new S(sp, _engine);
+//                    plant(visualObject, sp.getRow(), sp.getColumn());
+//                }
+                else if (gameObject instanceof JalapenoGameObject jl) {
+                    var visualObject = new JalapenoVisualObject(jl, _engine);
+                    plant(visualObject, jl.getRow(), jl.getColumn());
                 }
             }
         });
@@ -478,7 +455,7 @@ public class MapVisualObject extends AbstractVisualObject {
 
         StackPane cell = visualGrid[row][column];
         var demo = cell.getWidth();
-        ((ImageView)object.getNode()).setFitWidth(demo);
+        ((ImageView) object.getNode()).setFitWidth(demo);
         cell.getChildren().add(object.getNode());
     }
 
