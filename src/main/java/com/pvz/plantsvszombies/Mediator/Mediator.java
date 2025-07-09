@@ -1,13 +1,12 @@
 package com.pvz.plantsvszombies.Mediator;
 
 import com.pvz.plantsvszombies.Domain.Entities.Events.*;
-import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.EventHandlers.*;
-import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
 import javafx.application.Platform;
 
-import javax.print.attribute.standard.Media;
 import java.time.Duration;
 import java.util.Hashtable;
 
@@ -18,7 +17,7 @@ public class Mediator {
 //    }
 
     private IGameEngine _gameEngine;
-    private VisualEngine _visualEngine;
+    private VisualDayEngine _visualEngine;
 
     private boolean _engineThreadRunning = false;
 
@@ -26,7 +25,7 @@ public class Mediator {
 
     private static Mediator _instance;
 
-    public static void init(IGameEngine gameEngine, VisualEngine visualEngine) {
+    public static void init(IGameEngine gameEngine, VisualDayEngine visualEngine) {
         _instance = new Mediator(gameEngine, visualEngine);
     }
 
@@ -34,7 +33,7 @@ public class Mediator {
         return _instance;
     }
 
-    public Mediator(IGameEngine gameEngine, VisualEngine visualEngine) {
+    public Mediator(IGameEngine gameEngine, VisualDayEngine visualEngine) {
         this._gameEngine = gameEngine;
         this._visualEngine = visualEngine;
     }

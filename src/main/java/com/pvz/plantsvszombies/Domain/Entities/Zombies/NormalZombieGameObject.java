@@ -3,8 +3,9 @@ package com.pvz.plantsvszombies.Domain.Entities.Zombies;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.AbstractBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Entities.MapBlock;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 
@@ -15,13 +16,12 @@ public class NormalZombieGameObject extends AbstractZombieGameObject {
 
     public final static Duration BITE_COOL_DOWN = Duration.ofMillis(500);
 
-    private IGameEngine _engine;
     private int tick = 1;
-    private boolean _isDisposed = false;
 
     private enum State {
         MOVING,
-        EATING
+        EATING,
+        DEAD
     }
 
     private State _state;
@@ -36,14 +36,13 @@ public class NormalZombieGameObject extends AbstractZombieGameObject {
     }
 
     NormalZombieGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
-        this._engine = gameEngine;
+        this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
         this._row = row;
         this._column = column;
 
         this._health = 125;
-        this._speed = 0.9;
 
         this._state = State.MOVING;
     }
@@ -76,14 +75,21 @@ public class NormalZombieGameObject extends AbstractZombieGameObject {
     public void update() {
         if (!_isDisposed) {
             checkCollision();
-            var zombieBlock = _engine.getBlockByCoordinate(this._coordinate);
-            if (zombieBlock!= null && zombieBlock.getPlant() != null) {
-                eat(zombieBlock.getPlant());
-            } else {
-                lastBiteMillis = -1;
-                this._state = State.MOVING;
-                move();
+            if (_state.equals(State.DEAD)) {
+                return;
             }
+            var zombieBlock = _gameEngine.getBlockByCoordinate(this._coordinate);
+            if (zombieBlock != null) {
+                this._column = zombieBlock.getColumn(); // Update Current Block
+                if (zombieBlock.getPlant() != null) {
+                    eat(zombieBlock.getPlant());
+                    tick++;
+                    return;
+                }
+            }
+            lastBiteMillis = -1;
+            this._state = State.MOVING;
+            move();
         }
         tick++;
     }
@@ -96,18 +102,14 @@ public class NormalZombieGameObject extends AbstractZombieGameObject {
         if (_health <= 0) {
             die();
         }
-        System.out.println(_health);
     }
 
     @Override
     public void getBurned() {
-        _isDisposed = true;
-        _engine.disposeObject(this);
-        this._engine = null;
-
         for (IEventSubscriber eventSubscriber : _burnEventSubscribers) {
             eventSubscriber._notify(this);
         }
+        super.dispose();
     }
 
     @Override
@@ -115,7 +117,7 @@ public class NormalZombieGameObject extends AbstractZombieGameObject {
         return _speed;
     }
 
-    private void move(){
+    private void move() {
         this._coordinate.traverse(-1 * _speed, 0);
         for (IEventSubscriber subscriber : _movementEventSubscribers) {
             subscriber._notify(this);
@@ -123,18 +125,18 @@ public class NormalZombieGameObject extends AbstractZombieGameObject {
     }
 
     private void checkCollision() {
-        for (AbstractGameObject obj : _engine.getGameObjects()) {
+        for (AbstractGameObject obj : _gameEngine.getGameObjects()) {
             if (obj instanceof AbstractBulletGameObject) {
                 if (((AbstractBulletGameObject) obj).getRow() == this._row
                         && Math.abs(((AbstractBulletGameObject) obj).getCoordinate().x() - this._coordinate.x()) < (this._speed + ((AbstractBulletGameObject) obj).getSpeed())) {
                     getHit((AbstractBulletGameObject) obj);
-                    ((AbstractBulletGameObject) obj).collide();
+                    ((AbstractBulletGameObject) obj).collide(this);
                 }
             }
         }
     }
 
-    private void eat(AbstractPlantGameObject plant){
+    private void eat(AbstractPlantGameObject plant) {
         if (lastBiteMillis == -1) { // Start eating
             lastBiteMillis = getMilliseconds();
             this._state = State.EATING;
@@ -149,18 +151,16 @@ public class NormalZombieGameObject extends AbstractZombieGameObject {
     }
 
     private void die() {
-        System.out.println("dead");
-        _isDisposed = true;
-        _engine.disposeObject(this);
-//        this._engine = null; Believe it or not but this makes the _engine property null for all the existing ZombieGameObjects in the App
-
+//        this._gameEngine = null; Believe it or not but this makes the _engine property null for all the existing ZombieGameObjects in the App
+        _state = State.DEAD;
         for (IEventSubscriber eventSubscriber : _deathEventSubscribers) {
             eventSubscriber._notify(this);
         }
+        super.dispose();
+
     }
 
     private double getMilliseconds() {
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }
-
 }

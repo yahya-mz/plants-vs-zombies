@@ -1,11 +1,11 @@
 package com.pvz.plantsvszombies.Domain.Entities;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.Events.MapSpawnEvent;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MapGameObject extends AbstractGameObject {
 

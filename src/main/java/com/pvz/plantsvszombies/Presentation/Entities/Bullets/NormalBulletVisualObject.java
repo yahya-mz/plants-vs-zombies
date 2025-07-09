@@ -1,32 +1,28 @@
-package com.pvz.plantsvszombies.Presentation.Entities;
+package com.pvz.plantsvszombies.Presentation.Entities.Bullets;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralFadingAnimation;
-import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
-import com.pvz.plantsvszombies.Presentation.Animations.PeashooterAnimation;
-import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import com.pvz.plantsvszombies.Presentation.Entities.AbstractVisualObject;
+import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
 import javafx.application.Platform;
-import javafx.geometry.Bounds;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
 public class NormalBulletVisualObject extends AbstractVisualObject {
-
-    private final NormalBulletGameObject _gameObject;
-    private VisualEngine _engine;
-
     public enum States {
         MOVING,
-        COLLIDE
+        COLLIDED
     }
 
-    public NormalBulletVisualObject(NormalBulletGameObject gameObject, VisualEngine engine) {
-        this._gameObject = gameObject;
+    private final IVisualEngine _engine;
+    private States _state;
+
+    public NormalBulletVisualObject(NormalBulletGameObject gameObject, IVisualEngine engine) {
+        super._gameObject = gameObject;
         this._engine = engine;
 
         _visualCoordinate = gameObject.getCoordinate();
@@ -38,7 +34,7 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
 
         _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
 
-        _gameObject.subscribeToMovementEvent(new IEventSubscriber() {
+        ((NormalBulletGameObject) _gameObject).subscribeToMovementEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
@@ -51,10 +47,18 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
             }
         });
 
-        _gameObject.subscribeToCollisionEvent(new IEventSubscriber() {
+        ((NormalBulletGameObject) _gameObject).subscribeToCollisionEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
-                changeStateTo(States.COLLIDE);
+                changeStateTo(States.COLLIDED);
+            }
+        });
+
+        var temp_this = this;
+        ((NormalBulletGameObject) _gameObject).subscribeToDisposeEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                _engine.disposeObject(temp_this); // Needs to be edited
             }
         });
     }
@@ -69,9 +73,11 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
     public NormalBulletVisualObject changeStateTo(States state) {
         switch (state) {
             case MOVING -> {
+                _state = States.MOVING;
 //                GeneralTransformAnimation.attach(this).transformX(10, VisualEngine.getInstance().getWidth() / 2.0);
             }
-            case COLLIDE -> {
+            case COLLIDED -> {
+                _state = States.COLLIDED;
                 Platform.runLater(() -> {
                     ((ImageView) _node).setImage(new Image(GlobalSettings.getResource("graphics/Bullets/PeaNormalExplode/PeaNormalExplode_0.png")));
                     GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(300)).setOnFinished((e) -> {

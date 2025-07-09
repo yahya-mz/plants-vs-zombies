@@ -1,9 +1,10 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Entities.IGameEngine;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.GlobalSettings;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -11,11 +12,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class JalapenoGameObject extends AbstractPlantGameObject {
-    private final static Duration EXPLOSION_TIME = Duration.ofMillis(4000);
-    private IGameEngine _engine;
-    private int tick = 1;
-    private boolean isDisposed = false;
+    public final static Duration EXPLOSION_TIME = Duration.ofMillis(1000);
 
+    private int _tick;
     private final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
 
     public static JalapenoGameObject createJalapenoGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
@@ -23,7 +22,7 @@ public class JalapenoGameObject extends AbstractPlantGameObject {
     }
 
     private JalapenoGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
-        this._engine = gameEngine;
+        this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
         this._row = row;
@@ -43,6 +42,7 @@ public class JalapenoGameObject extends AbstractPlantGameObject {
                 new TimerTask() {
                     @Override
                     public void run() {
+                        System.out.println("1211111111s");
                         explode();
                     }
                 },
@@ -52,7 +52,10 @@ public class JalapenoGameObject extends AbstractPlantGameObject {
 
     @Override
     public void update() {
-
+        _tick++;
+        if (getMilliseconds() == EXPLOSION_TIME.toMillis()){
+            explode();
+        }
     }
 
     @Override
@@ -61,9 +64,19 @@ public class JalapenoGameObject extends AbstractPlantGameObject {
     }
 
     private void explode() {
-        var zombies = _engine.queryZombies(z -> z.getRow() == _row);
-        for (AbstractZombieGameObject zombie:zombies){
+        System.out.println("demo");
+        var zombies = _gameEngine.queryZombies(z -> z.getRow() == _row);
+        for (AbstractZombieGameObject zombie : zombies) {
             zombie.getBurned();
         }
+        for (IEventSubscriber _subscriber : _explosionEventSubscribers) {
+            _subscriber._notify(this);
+        }
+        super.dispose();
     }
+
+    private double getMilliseconds() {
+        return this._tick * 1000.0 / GlobalSettings.FPS;
+    }
+
 }

@@ -7,20 +7,20 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
 
 import java.util.ArrayList;
 
-public class NormalBulletGameObject extends AbstractBulletGameObject {
+public class SnowBulletGameObject extends AbstractBulletGameObject {
     private final ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
     private final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
-    public static NormalBulletGameObject createNormalBulletGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row) {
-        return new NormalBulletGameObject(gameEngine, id, coordinate, row);
+    public static SnowBulletGameObject createSnowBulletGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row) {
+        return new SnowBulletGameObject(gameEngine, id, coordinate, row);
     }
 
-    NormalBulletGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row) {
+    SnowBulletGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
         this._row = row;
-        this._bulletType = BulletType.NORMAL_BULLET;
+        this._bulletType = BulletType.SNOW_BULLET;
 
         this._speed = 7;
         this._damage = 25;
@@ -45,7 +45,7 @@ public class NormalBulletGameObject extends AbstractBulletGameObject {
     public void collide(AbstractGameObject collidedWith) {
         if (!_isDisposed) {
             for (IEventSubscriber subscriber : _collisionEventSubscribers) {
-                subscriber._notify(this);
+                subscriber._notify(collidedWith);
             }
             super.dispose();
         }

@@ -13,7 +13,8 @@ public class NormalZombieAnimations {
     public enum Animations implements IAnimation {
         MOVING_FORWARD,
         DYING,
-        ATTACKING
+        ATTACKING,
+        BURNING
     }
 
     private final static ArrayList<Image[]> animations;
