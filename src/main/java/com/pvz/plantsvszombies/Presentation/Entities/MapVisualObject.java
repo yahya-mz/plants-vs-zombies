@@ -244,7 +244,7 @@ public class MapVisualObject extends AbstractVisualObject {
         for (int row = 0; row < 5; row++) {
             HBox rowBox = new HBox();
 
-            double customHGap = switch (row) {//فاصله بین هر عنصر در یک ریدف
+            double customHGap = switch (row) {
                 case 0 -> 7;
                 case 1 -> 7;
                 case 2 -> 7;
@@ -500,6 +500,8 @@ public class MapVisualObject extends AbstractVisualObject {
 
         return imageView;
     }
+
+
 
     @Override
     public void spawn() {

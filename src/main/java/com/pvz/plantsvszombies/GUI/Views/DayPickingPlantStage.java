@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-
-
 import java.util.ArrayList;
 
 public class DayPickingPlantStage {
@@ -55,11 +53,11 @@ public class DayPickingPlantStage {
         loadCardImages();
 
         HBox firstRow = createCardRow(0, 3);
-        VBox.setMargin(firstRow, new Insets(110, 0, 0, 220)); // بالا، راست، پایین، چپ
+        VBox.setMargin(firstRow, new Insets(110, 0, 0, 220));
         addHoverEffectToImages(firstRow);
 
         HBox secondRow = createCardRow(4, 7);
-        VBox.setMargin(secondRow, new Insets(0, 0, 0, 220)); // بالا، راست، پایین، چپ
+        VBox.setMargin(secondRow, new Insets(0, 0, 0, 220));
         addHoverEffectToImages(secondRow);
 
         VBox.setMargin(selectedPlantHBox, new Insets(5, 0, 0, 125));
@@ -163,13 +161,13 @@ public class DayPickingPlantStage {
                 ImageView imageView = (ImageView) node;
 
                 imageView.setOnMouseEntered(e -> {
-                    imageView.setTranslateY(-9); // 10 پیکسل بالا بره
-                    imageView.setScaleX(1.02);    // بزرگنمایی ۵٪
+                    imageView.setTranslateY(-9);
+                    imageView.setScaleX(1.02);
                     imageView.setScaleY(1.02);
                 });
 
                 imageView.setOnMouseExited(e -> {
-                    imageView.setTranslateY(0);   // بازگشت به جای قبلی
+                    imageView.setTranslateY(0);
                     imageView.setScaleX(1);
                     imageView.setScaleY(1);
                 });

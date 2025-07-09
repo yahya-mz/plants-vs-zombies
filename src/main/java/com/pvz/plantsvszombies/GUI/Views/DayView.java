@@ -78,6 +78,9 @@ import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
+import javafx.animation.SequentialTransition;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
@@ -91,8 +94,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-
-import java.util.*;
+import javafx.util.Duration;
+import java.util.List;
 
 public class DayView extends AbstractLevelView {
 
@@ -100,36 +103,29 @@ public class DayView extends AbstractLevelView {
     public static final double Height = 728;
     private static IntegerProperty counterValue = new SimpleIntegerProperty(0);
     private VisualEngine _visualEngine;
+    private static StackPane bottommostPlane;
 
 
     private DayView() {
     }
 
     public static DayView createStage(List<AbstractPlantGameObject.PlantType> selectedPlants) {
-
+        bottommostPlane = new StackPane();//changed
         var dayView = new DayView();
         dayView.setupEngines();
-        StackPane bottommostPlane = new StackPane();
         dayView._gameBoxPane = bottommostPlane;
 
-        bottommostPlane.setPrefSize(100, 200);
+        //ready-set-plant
+        VBox animationBox = new VBox();
+        animationBox.setPrefSize(500, 500);
+        animationBox.setAlignment(Pos.CENTER);
+        bottommostPlane.getChildren().add(animationBox);
+        StackPane.setAlignment(animationBox, Pos.CENTER);
+        playImageSequenceInBox(animationBox, () -> {
+            bottommostPlane.getChildren().remove(animationBox);
+        });
+        //
 
-//        bottommostPlane.setBackground(new Background(
-//                new BackgroundImage(
-//                        new Image(GlobalSettings.getResource("graphics/Items/Background/daymap.jpg").toString(), true),
-//                        BackgroundRepeat.NO_REPEAT,
-//                        BackgroundRepeat.NO_REPEAT,
-//                        BackgroundPosition.CENTER,
-//                        new BackgroundSize(
-//                                100, 100,
-//                                true, true,
-//                                false, true
-//                        )
-//
-//                )
-//        ));
-
-        //bar
         VBox suncounter = createCounter();
         HBox plantbar = dayView.createTopPlantSelectionBar(selectedPlants);
         addHoverEffectToImages(plantbar);
@@ -270,13 +266,13 @@ public class DayView extends AbstractLevelView {
                 ImageView imageView = (ImageView) node;
 
                 imageView.setOnMouseEntered(e -> {
-                    imageView.setTranslateY(-9); // 10 پیکسل بالا بره
-                    imageView.setScaleX(1.02);    // بزرگنمایی ۵٪
+                    imageView.setTranslateY(-9);
+                    imageView.setScaleX(1.02);
                     imageView.setScaleY(1.02);
                 });
 
                 imageView.setOnMouseExited(e -> {
-                    imageView.setTranslateY(0);   // بازگشت به جای قبلی
+                    imageView.setTranslateY(0);
                     imageView.setScaleX(1);
                     imageView.setScaleY(1);
                 });
@@ -299,5 +295,110 @@ public class DayView extends AbstractLevelView {
     }
 
 
+
+    public static void playImageSequenceInBox(Pane targetBox, Runnable onFinished) {
+        String[] imagePaths = {
+                "graphics/Items/Messages/ready.png",
+                "graphics/Items/Messages/set.png",
+                "graphics/Items/Messages/plant.png"
+        };
+
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(800);
+        imageView.setFitHeight(800);
+        imageView.setPreserveRatio(true);
+
+        targetBox.getChildren().clear();
+        targetBox.getChildren().add(imageView);
+
+        SequentialTransition sequence = new SequentialTransition();
+
+        for (int i = 0; i < imagePaths.length; i++) {
+            String path = imagePaths[i];
+            Image image = new Image(GlobalSettings.getResource(path).toString(), true);
+            PauseTransition setImage = new PauseTransition(Duration.ZERO);
+            setImage.setOnFinished(e -> imageView.setImage(image));
+
+            FadeTransition fadeIn;
+            if (i==0){
+                fadeIn = new FadeTransition(Duration.seconds(1.2), imageView);
+
+            }else {
+                fadeIn = new FadeTransition(Duration.seconds(0.5), imageView);
+            }
+            fadeIn.setFromValue(0);
+            fadeIn.setToValue(1);
+            FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), imageView);
+            fadeOut.setFromValue(1);
+            fadeOut.setToValue(0);
+
+            Duration stayDuration;
+            if (i == 0 || i == 1) {
+                stayDuration = Duration.seconds(0.2);
+            } else {
+                stayDuration = Duration.seconds(0.8);
+            }
+            FadeTransition stay = new FadeTransition(stayDuration, imageView);
+            stay.setFromValue(1);
+            stay.setToValue(1);
+
+            sequence.getChildren().addAll(setImage, fadeIn, stay, fadeOut);
+        }
+
+        sequence.setOnFinished(e -> {
+            targetBox.getChildren().clear();
+            onFinished.run();
+        });
+
+        sequence.play();
+    }
+
+
+    public void showWave1(){
+        showWaveImages(bottommostPlane , "wave1");
+    }
+    public void showWave2(){
+        showWaveImages(bottommostPlane , "wave2");
+    }
+    public void showWave3(){
+        showWaveImages(bottommostPlane , "wave3");
+    }
+    public void showFinalWave(){
+        showWaveImages(bottommostPlane , "finalwave");
+    }
+    private static void showWaveImages(StackPane parentPane, String imageName) {
+
+        VBox overlayBox = new VBox();
+        overlayBox.setAlignment(Pos.CENTER);
+        overlayBox.setPrefSize(parentPane.getWidth(), parentPane.getHeight());
+
+
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(800);
+        imageView.setFitHeight(800);
+        imageView.setPreserveRatio(true);
+        String path = "graphics/Items/Messages/" + imageName + ".png";
+        Image image = new Image(GlobalSettings.getResource(path).toString(), true);
+        imageView.setImage(image);
+
+        overlayBox.getChildren().add(imageView);
+        parentPane.getChildren().add(overlayBox);
+        StackPane.setAlignment(overlayBox, Pos.CENTER);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.5), imageView);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+
+        FadeTransition stay = new FadeTransition(Duration.seconds(1.0), imageView);
+        stay.setFromValue(1);
+        stay.setToValue(1);
+        FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), imageView);
+        fadeOut.setFromValue(1);
+        fadeOut.setToValue(0);
+
+        SequentialTransition sequence = new SequentialTransition(fadeIn, stay, fadeOut);
+        sequence.setOnFinished(e -> parentPane.getChildren().remove(overlayBox));
+        sequence.play();
+    }
 }
 

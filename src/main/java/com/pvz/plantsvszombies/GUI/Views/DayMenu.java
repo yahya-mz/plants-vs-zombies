@@ -17,41 +17,9 @@ import javafx.stage.StageStyle;
 
 public class DayMenu {
 
-//    private final GameObject gameObject;
     private StackPane root;
     private VBox menuBox;
     private Scene scene;
-
-//    public DayMenu(GameObject gameObject) {
-//        this.gameObject = gameObject;
-//        setupSubscribers();
-//    }
-//
-//    private void setupSubscribers() {
-//        gameObject.subscribeToPauseingEvent(new IEventSubscriber() {
-//            @Override
-//            public void _notify(AbstractGameObject obj) {
-//                Platform.runLater(() -> applyState("pause"));
-//            Stage stage = new Stage();
-//            stage.setScene(dayMenu.getScene());
-//            stage.show();
-//            }
-//        });
-//
-//        gameObject.subscribeToWiningMassegeEvent(new IEventSubscriber() {
-//            @Override
-//            public void _notify(AbstractGameObject obj) {
-//                Platform.runLater(() -> applyState("win"));
-//            }
-//        });
-//
-//        gameObject.subscribeToLosingMassegeEvent(new IEventSubscriber() {
-//            @Override
-//            public void _notify(AbstractGameObject obj) {
-//                Platform.runLater(() -> applyState("lose"));
-//            }
-//        });
-//    }
 
     public Scene getScene() {
         if (scene == null) {
@@ -59,6 +27,7 @@ public class DayMenu {
         }
         return scene;
     }
+
     public Scene createScene() {
         double width = 700;
         double height = 500;
@@ -85,7 +54,6 @@ public class DayMenu {
 
 
     public void applyState(String state) {
-        // VBox رو با توجه به وضعیت پر کن
         menuBox.getChildren().clear();
         ImageView headerImage = new ImageView();
         headerImage.setFitHeight(100);
@@ -118,7 +86,7 @@ public class DayMenu {
                 buttonBox.getChildren().addAll(exit, restart);
             }
         }
-        VBox.setMargin(buttonBox, new Insets(-120, 0, 0, 0)); // فاصه عکس و hbox
+        VBox.setMargin(buttonBox, new Insets(-120, 0, 0, 0));
         menuBox.getChildren().addAll(headerImage, buttonBox);
     }
 
@@ -164,8 +132,7 @@ public class DayMenu {
         imageView.setFitHeight(450);
         imageView.setPreserveRatio(true);
 
-        VBox.setMargin(imageView, new Insets(-80, 0, 0, 0)); // فاصله کل از بالا
-
+        VBox.setMargin(imageView, new Insets(-80, 0, 0, 0));
         return imageView;
     }
 }
