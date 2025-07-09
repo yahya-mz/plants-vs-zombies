@@ -2,36 +2,32 @@ package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.TallNutGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
 import com.pvz.plantsvszombies.Presentation.Animations.WallNutAnimations;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
 public class WallNutVisualObject extends AbstractPlantVisualObject {
-
-
     public enum States {
         FULL_HEALTH,
         CRACKED1,
         CRACKED2
     }
 
-    private WallNutGameObject _gameObject;
-
     private States _currentState = States.FULL_HEALTH;
 
     private GeneralFadingAnimation _fadingAnimation;
     private GeneralTransformAnimation _transformAnimation;
 
-    private VisualEngine _engine;
+    private final IVisualEngine _engine;
 
-    public WallNutVisualObject(WallNutGameObject gameObject, VisualEngine engine) {
+    public WallNutVisualObject(WallNutGameObject gameObject, IVisualEngine engine) {
+        super._gameObject = gameObject;
         _engine = engine;
 
         var temp_this = this;
@@ -68,8 +64,8 @@ public class WallNutVisualObject extends AbstractPlantVisualObject {
     }
 
     @Override
-    public void playAnimation(IAnimation animation) {
-        super.playAnimation(animation, WallNutAnimations.getFrames((WallNutAnimations.Animations) animation), Duration.millis(80));
+    public void playAnimation(IAnimation animation, Duration frameDuration) {
+        super.playAnimation(WallNutAnimations.getFrames((WallNutAnimations.Animations) animation), frameDuration);
     }
 
     @Override
@@ -82,13 +78,13 @@ public class WallNutVisualObject extends AbstractPlantVisualObject {
         switch (state) {
             case FULL_HEALTH -> {
                 _currentState = States.FULL_HEALTH;
-                playAnimation(WallNutAnimations.Animations.FULL_HEALTH);
+                playAnimation(WallNutAnimations.Animations.FULL_HEALTH, Duration.millis(80));
             }
             case CRACKED1 -> {
                 if (_currentState.equals(States.FULL_HEALTH)) {
                     _currentState = States.CRACKED1;
                     stopAnimation();
-                    playAnimation(WallNutAnimations.Animations.CRACKED1);
+                    playAnimation(WallNutAnimations.Animations.CRACKED1, Duration.millis(80));
                 }
             }
 
@@ -96,7 +92,7 @@ public class WallNutVisualObject extends AbstractPlantVisualObject {
                 if (_currentState.equals(States.CRACKED1)) {
                     _currentState = States.CRACKED2;
                     stopAnimation();
-                    playAnimation(WallNutAnimations.Animations.CRACKED2);
+                    playAnimation(WallNutAnimations.Animations.CRACKED2, Duration.millis(80));
                 }
             }
         }

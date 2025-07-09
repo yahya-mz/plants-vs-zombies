@@ -7,31 +7,28 @@ import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.SkySunVisualObject;
-import com.pvz.plantsvszombies.Presentation.VisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
-public class TallnutVisualObject extends AbstractAnimatedVisualObject {
-
-
+public class TallnutVisualObject extends AbstractPlantVisualObject {
     public enum States {
         FULLHEALTH,
         CRACKED1,
         CRACKED2
     }
 
-    private TallNutGameObject _gameObject;
-
     private States _currentState;
 
     private GeneralFadingAnimation _fadingAnimation;
     private GeneralTransformAnimation _transformAnimation;
 
-    private VisualEngine _engine;
+    private final IVisualEngine _engine;
 
-    public TallnutVisualObject(TallNutGameObject gameObject, VisualEngine engine) {
+    public TallnutVisualObject(TallNutGameObject gameObject, IVisualEngine engine) {
+        super._gameObject = gameObject;
         _engine = engine;
 //
 //        gameObject.subscribeToFullHealthEvent(new IEventSubscriber() {
@@ -68,21 +65,21 @@ public class TallnutVisualObject extends AbstractAnimatedVisualObject {
     }
 
     @Override
-    public void playAnimation(IAnimation animation) {
-        super.playAnimation(animation, WallNutAnimations.getFrames((WallNutAnimations.Animations) animation), Duration.millis(80));
+    public void playAnimation(IAnimation animation, Duration frameDuration) {
+        super.playAnimation(WallNutAnimations.getFrames((WallNutAnimations.Animations) animation), frameDuration);
     }
 
     @Override
     public void spawn() {
         changeStateTo(States.FULLHEALTH);
-        playAnimation(WallNutAnimations.Animations.FULL_HEALTH);
+        playAnimation(WallNutAnimations.Animations.FULL_HEALTH, Duration.millis(90));
     }
 
     public SkySunVisualObject changeStateTo(States state) {
         switch (state) {
             case FULLHEALTH -> {
                 _currentState = States.FULLHEALTH;
-                playAnimation(WallNutAnimations.Animations.FULL_HEALTH);
+                playAnimation(WallNutAnimations.Animations.FULL_HEALTH, Duration.millis(90));
             }
             case CRACKED1 -> {
                 if (_currentState == States.CRACKED1) {
@@ -90,13 +87,13 @@ public class TallnutVisualObject extends AbstractAnimatedVisualObject {
                 }
                 if (_currentState.equals(States.FULLHEALTH)) {
                     changeStateTo(States.CRACKED1);
-                    playAnimation(WallNutAnimations.Animations.CRACKED1);
+                    playAnimation(WallNutAnimations.Animations.CRACKED1, Duration.millis(90));
                 }
             }
 
             case CRACKED2 -> {
                 _currentState = States.CRACKED2;
-                playAnimation(WallNutAnimations.Animations.CRACKED2);
+                playAnimation(WallNutAnimations.Animations.CRACKED2, Duration.millis(90));
             }
         }
         return null;

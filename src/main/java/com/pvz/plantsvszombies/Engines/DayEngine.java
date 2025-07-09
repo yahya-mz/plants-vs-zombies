@@ -1,16 +1,17 @@
-package com.pvz.plantsvszombies.GameEngine;
+package com.pvz.plantsvszombies.Engines;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
-import javafx.scene.control.ButtonType;
-import javafx.scene.input.MouseButton;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 public class DayEngine implements IGameEngine {
@@ -34,7 +35,7 @@ public class DayEngine implements IGameEngine {
     private final Random _zombieTypeRandom = new Random(System.currentTimeMillis() / 1000);
 
 
-    private final ArrayList<AbstractGameObject> _gameObjects;
+    private final CopyOnWriteArrayList<AbstractGameObject> _gameObjects;
     private MapGameObject _currentMap;
 
     private final ArrayList<IEventSubscriber> _gameObjectSpawnEventSubscribers = new ArrayList<>();
@@ -45,7 +46,7 @@ public class DayEngine implements IGameEngine {
         this._windowWidth = windowWidth;
         this._windowHeight = windowHeight;
 
-        this._gameObjects = new ArrayList<>();
+        this._gameObjects = new CopyOnWriteArrayList<>();
     }
 
     private int tick = 1;
@@ -90,13 +91,13 @@ public class DayEngine implements IGameEngine {
         // Checking wave changes:
         if (getMilliseconds() % _gameInterval.toMillis() == 0) {
             System.out.println("GameOver !");
-        } else if (getMilliseconds() % _wave_4_Start.toMillis() == 0) {
+        } else if (getMilliseconds() == _wave_4_Start.toMillis()) {
+            _currentWave = 4;
+            System.out.println("Wave 4");
+        } else if (getMilliseconds() == _wave_3_Start.toMillis()) {
             _currentWave = 3;
             System.out.println("Wave 3");
-        } else if (getMilliseconds() % _wave_3_Start.toMillis() == 0) {
-            _currentWave = 3;
-            System.out.println("Wave 3");
-        } else if (getMilliseconds() % _wave_2_Start.toMillis() == 0) {
+        } else if (getMilliseconds() == _wave_2_Start.toMillis()) {
             _currentWave = 2;
             System.out.println("Wave 2");
         }
@@ -110,7 +111,6 @@ public class DayEngine implements IGameEngine {
         switch (_currentWave) {
             case 1 -> {
                 if (getMilliseconds() % 3000.0 == 0) {
-                    System.out.println("demo");
                     var row = _zombieSpawnRandom.nextInt(0, _rows);
                     spawnZombie(row, _columns - 1, AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE);
                 }
@@ -139,18 +139,22 @@ public class DayEngine implements IGameEngine {
             }
         }
 
-        Iterator<AbstractGameObject> iter = _gameObjects.iterator();
-        while (iter.hasNext()) {
-            AbstractGameObject gameObject = iter.next();
-            if (gameObject.getCoordinate().x() > this._windowWidth
-                    || gameObject.getCoordinate().y() > this._windowHeight
-                    || gameObject.getCoordinate().x() < 0
-                    || gameObject.getCoordinate().y() < 0) {
-                _gameObjects.remove(gameObject);
-                continue;
+//        List<AbstractGameObject> toRemove = new ArrayList<>();
+
+        synchronized (_gameObjects) {
+            for (AbstractGameObject gameObject : _gameObjects) {
+                gameObject.update(); // Safe now
+                if (gameObject.getCoordinate().x() > this._windowWidth
+                        || gameObject.getCoordinate().y() > this._windowHeight
+                        || gameObject.getCoordinate().x() < 0
+                        || gameObject.getCoordinate().y() < 0) {
+//                    toRemove.add(gameObject); // Just mark for removal
+                    gameObject.dispose();
+                }
             }
-            gameObject.update();
+//            _gameObjects.removeAll(toRemove); // Remove after iteration — safe
         }
+
 
         tick++;
     }
@@ -233,7 +237,7 @@ public class DayEngine implements IGameEngine {
     private void spawnZombie(int row, int col, AbstractZombieGameObject.ZombieType zombieType) {
         String zombieObjectId = "Zombie" + UUID.randomUUID();
         var block = _currentMap.getBlock(row, col);
-        Coordinate coordinate = block.getTopLeftCoordinate();
+        Coordinate coordinate = block.getCenterCoordinate();
         AbstractZombieGameObject zombie = switch (zombieType) {
             case NORMAL_ZOMBIE -> NormalZombieGameObject.createNormalZombieGameObject(this, zombieObjectId,
                     coordinate.copy(), row, col); // Here if you pass 'coordinate' as coordinate.copy(), all zombies will share a same coordinate
