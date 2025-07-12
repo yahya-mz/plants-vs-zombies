@@ -1,4 +1,4 @@
-package com.pvz.plantsvszombies.GUI.Views;
+package com.pvz.plantsvszombies.Presentation.GUI.Views;
 
 import com.pvz.plantsvszombies.GlobalSettings;
 import javafx.application.Platform;

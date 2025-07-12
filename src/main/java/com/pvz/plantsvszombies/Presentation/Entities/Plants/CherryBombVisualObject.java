@@ -20,7 +20,7 @@ public class CherryBombVisualObject extends AbstractPlantVisualObject {
         this._engine = engine;
 
         var temp_this = this;
-        gameObject.subscribeToExplosionEvent(new IEventSubscriber() {//notify//we dont need this
+        gameObject.subscribeToExplosionEvent(new IEventSubscriber() {//notify
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {

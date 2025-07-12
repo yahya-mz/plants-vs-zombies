@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class TallnutAnimations {//this animation is empty
     public enum Animations implements IAnimation {
-        STANDING,
+        FULL_HEALTH,
         CRACKED1,
         CRACKED2
     }
@@ -17,7 +17,7 @@ public class TallnutAnimations {//this animation is empty
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(NormalZombieAnimations.class.getResource("graphics/Plants/TallNut").getPath());
+        var animationsDirectory = new File(NormalZombieAnimations.class.getResource("graphics/Plants/Tallnut").getPath());
         for (int i = 0; i < Animations.values().length; i++) {
             var animationImages = new File(animationsDirectory.getPath() + "/" + Animations.values()[i]).listFiles();//this is null for now
             Objects.requireNonNull(animationImages);

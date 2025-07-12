@@ -1,14 +1,11 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.CherryBombGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.JalapenoGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Engines.DayEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
-import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

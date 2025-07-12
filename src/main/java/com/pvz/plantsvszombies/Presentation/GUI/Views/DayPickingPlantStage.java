@@ -1,6 +1,7 @@
-package com.pvz.plantsvszombies.GUI.Views;
+package com.pvz.plantsvszombies.Presentation.GUI.Views;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.DayView;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -21,19 +22,24 @@ import javafx.scene.layout.HBox;
 import java.util.ArrayList;
 
 public class DayPickingPlantStage {
-    private final ArrayList<AbstractPlantGameObject.PlantType> selectedPlants = new ArrayList<>();
+    private static final ArrayList<AbstractPlantGameObject.PlantType> selectedPlants = new ArrayList<>();
     private final HBox selectedPlantHBox = new HBox(0);
-    private Button startBtn;
+    static Stage primaryStage;
+    static Button playBtn;
 
     private Image[] cardImages;
 
     public Stage createStage(Stage primaryStage) {
-        startBtn = new Button("Start");
-        startBtn.setDisable(true);
-
+        this.primaryStage = primaryStage;
         VBox root = new VBox(5);
-        root.setPadding(new Insets(20));
+        StackPane mainPickingPane = new StackPane();
+        playBtn = createStartButton();
 
+        mainPickingPane.setAlignment(playBtn , Pos.BOTTOM_CENTER);
+        StackPane.setMargin(playBtn, new Insets(0, 0, -50, 0));
+        playBtn.setDisable(true);
+
+        root.setPadding(new Insets(20));
         Image backgroundImage = new Image(
                 GlobalSettings.getResource("graphics/Items/Background/daypickingstage.png").toString()
         );
@@ -59,24 +65,12 @@ public class DayPickingPlantStage {
         HBox secondRow = createCardRow(4, 7);
         VBox.setMargin(secondRow, new Insets(0, 0, 0, 220));
         addHoverEffectToImages(secondRow);
-
         VBox.setMargin(selectedPlantHBox, new Insets(5, 0, 0, 125));
 
+        root.getChildren().addAll(firstRow, secondRow, selectedPlantHBox);
+        mainPickingPane.getChildren().addAll(root , playBtn);
 
-
-        startBtn.setOnAction(e -> {
-            DayView gameStage = DayView.createStage(selectedPlants);
-            gameStage.show();
-            gameStage.setOnHiding(event -> {
-                primaryStage.show();
-                Mediator.getInstance().stopEngine();
-            });
-            ((Stage) startBtn.getScene().getWindow()).close();
-        });
-
-        root.getChildren().addAll(firstRow, secondRow, selectedPlantHBox, startBtn);
-
-        Scene scene = new Scene(root, 900, 600);
+        Scene scene = new Scene(mainPickingPane, 900, 600);
         Stage stage = new Stage();
         stage.setTitle("Picking Plant Stage");
         stage.setScene(scene);
@@ -110,6 +104,7 @@ public class DayPickingPlantStage {
                     String imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1, imgPath.lastIndexOf('.'));
                     AbstractPlantGameObject.PlantType type = AbstractPlantGameObject.PlantType.valueOf(imgName);
                     selectedPlants.add(type);
+                    playBtn.setDisable(selectedPlants.size() != 6);
 
                     ImageView clonedCard = new ImageView(cardImages[index]);
                     clonedCard.setFitWidth(100);
@@ -132,11 +127,12 @@ public class DayPickingPlantStage {
                         if (event.getButton().equals(MouseButton.PRIMARY)) {
                             selectedPlantHBox.getChildren().remove(selectedPlants.indexOf(type));
                             selectedPlants.remove(type);
+
                             updateCardMargins();
 
                             card.setOpacity(1);
                             card.setDisable(false);
-                            startBtn.setDisable(selectedPlants.size() != 6);
+                            playBtn.setDisable(selectedPlants.size() != 6);
                         }
                     });
 
@@ -146,7 +142,7 @@ public class DayPickingPlantStage {
 
                     card.setDisable(true);
                     card.setOpacity(0.5);
-                    startBtn.setDisable(selectedPlants.size() != 6);
+                    playBtn.setDisable(selectedPlants.size() != 6);
                 }
             });
 
@@ -190,5 +186,59 @@ public class DayPickingPlantStage {
             HBox.setMargin(node, margin);
         }
     }
+
+    public static Button createStartButton() {
+        double width = 250;
+        double height = 250;
+        String[] imagePath = {
+                "graphics/Items/Buttons/play/normalplay.png",
+                "graphics/Items/Buttons/play/onactionplay.png"
+        };
+
+        Image defaultImage = new Image(GlobalSettings.getResource(imagePath[0]));
+        Image hoverImage = new Image(GlobalSettings.getResource(imagePath[1]));
+
+        ImageView imageView = new ImageView(defaultImage);
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+        imageView.setPreserveRatio(true);
+
+        Button button = new Button();
+        button.setMinSize(width, height);
+        button.setMaxSize(width, height);
+        button.setGraphic(imageView);
+        button.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+
+
+
+        button.setOnMouseEntered(e -> {
+            ImageView hoverImageView = new ImageView(hoverImage);
+            hoverImageView.setFitWidth(width);
+            hoverImageView.setFitHeight(height);
+            hoverImageView.setPreserveRatio(true);
+            button.setGraphic(hoverImageView);
+        });
+
+        button.setOnMouseExited(e -> {
+            ImageView normalImageView = new ImageView(defaultImage);
+            normalImageView.setFitWidth(width);
+            normalImageView.setFitHeight(height);
+            normalImageView.setPreserveRatio(true);
+            button.setGraphic(normalImageView);
+        });
+
+        button.setOnAction(e -> {
+            DayView gameStage = DayView.createStage(selectedPlants);
+            gameStage.show();
+            gameStage.setOnHiding(event -> {
+                primaryStage.show();
+                Mediator.getInstance().stopEngine();
+            });
+            ((Stage) playBtn.getScene().getWindow()).close();
+        });
+
+        return button;
+    }
+
 
 }

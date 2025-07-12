@@ -7,7 +7,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
-import com.pvz.plantsvszombies.Engines.DayEngine;
+import com.pvz.plantsvszombies.Domain.Engines.DayEngine;
 import com.pvz.plantsvszombies.Presentation.Entities.*;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.AbstractLevelView;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;

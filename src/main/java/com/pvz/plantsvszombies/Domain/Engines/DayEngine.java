@@ -1,4 +1,4 @@
-package com.pvz.plantsvszombies.Engines;
+package com.pvz.plantsvszombies.Domain.Engines;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.*;
