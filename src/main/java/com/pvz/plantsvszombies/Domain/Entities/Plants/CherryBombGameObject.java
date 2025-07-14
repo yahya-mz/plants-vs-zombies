@@ -2,13 +2,11 @@ package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class CherryBombGameObject extends AbstractPlantGameObject {
     public final static Duration EXPLOSION_TIME = Duration.ofSeconds(1);
@@ -16,10 +14,10 @@ public class CherryBombGameObject extends AbstractPlantGameObject {
     private int _tick;
     private final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
 
-    public static CherryBombGameObject createCherryBombGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    public static CherryBombGameObject createCherryBombGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new CherryBombGameObject(gameEngine, id, coordinate, row, column);
     }
-    private CherryBombGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    private CherryBombGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;

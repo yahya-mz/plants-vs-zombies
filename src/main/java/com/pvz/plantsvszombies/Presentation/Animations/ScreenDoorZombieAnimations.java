@@ -12,7 +12,7 @@ public class ScreenDoorZombieAnimations {
     public enum Animations implements IAnimation {
         MOVING_FORWARD,
         DYING,
-        LOSTDOOR,
+//        LOSTDOOR,
         ATTACKING
     }
 
@@ -21,7 +21,7 @@ public class ScreenDoorZombieAnimations {
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/ConeHeadZombie"));
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/ScreenDoorZombie"));
         for (int i = 0; i < ScreenDoorZombieAnimations.Animations.values().length; i++) {
             var animationImages = new File(animationsDirectory.getPath() + "/" + ScreenDoorZombieAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {

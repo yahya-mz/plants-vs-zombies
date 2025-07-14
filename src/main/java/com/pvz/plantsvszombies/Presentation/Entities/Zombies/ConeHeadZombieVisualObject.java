@@ -1,6 +1,7 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.ConeHeadZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
@@ -36,14 +37,14 @@ public class ConeHeadZombieVisualObject extends AbstractZombieVisualObject {
         var width = ((Image) ((ImageView) _node).getImage()).getWidth();
 
         _node.setManaged(false);
-        _node.relocate(_visualCoordinate.x() - 0.3 * width, _visualCoordinate.y() - height * 0.3);
+        _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
 
         _currentState = States.MOVING;
 
         ((ConeHeadZombieGameObject) _gameObject).subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
             Platform.runLater(() -> {
-                _node.relocate(_visualCoordinate.x() - 0.3 * width, _visualCoordinate.y() - height * 0.3);
+                _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
             });
             if (!this._currentState.equals(States.MOVING)) {
                 changeStateTo(States.MOVING);
@@ -71,14 +72,20 @@ public class ConeHeadZombieVisualObject extends AbstractZombieVisualObject {
 
     @Override
     public void spawn() {
-        playAnimation(ConeHeadZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(90));
+        changeStateTo(States.MOVING);
     }
+
+    @Override
+    public AbstractZombieGameObject getGameObject() {
+        return _gameObject;
+    }
+
 
     public ConeHeadZombieVisualObject changeStateTo(ConeHeadZombieVisualObject.States state) {
         switch (state) {
             case MOVING -> {
                 _currentState = States.MOVING;
-                playAnimation(ConeHeadZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(90));
+                playAnimation(ConeHeadZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(40));
             }
             case DYING -> {
                 _currentState = States.DYING;
@@ -86,7 +93,7 @@ public class ConeHeadZombieVisualObject extends AbstractZombieVisualObject {
             }
             case LOST_CONE -> {
                 _currentState = States.LOST_CONE;
-                playAnimation(ConeHeadZombieAnimations.Animations.LOSTCONE, Duration.millis(90));
+//                playAnimation(ConeHeadZombieAnimations.Animations.LOSTCONE, Duration.millis(90));
             }
             case EATING -> {
                 _currentState = States.EATING;

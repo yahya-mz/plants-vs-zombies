@@ -2,7 +2,7 @@ package com.pvz.plantsvszombies.Domain.Entities;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -12,17 +12,17 @@ public class SunGameObject extends AbstractGameObject {
     private final double _points = 50;
     private final int _timeOutMilliseconds = 5000;
 
-    private IGameEngine _engine;
+    private GameEngine _engine;
 
     private boolean isDisposed = false;
 
     private ArrayList<IEventSubscriber> _timeOutSubscribers = new ArrayList<>();
 
-    public static SunGameObject createSunGameObject(IGameEngine gameEngine, String id, Coordinate coordinate) {
+    public static SunGameObject createSunGameObject(GameEngine gameEngine, String id, Coordinate coordinate) {
         return new SunGameObject(gameEngine, id, coordinate);
     }
 
-    SunGameObject(IGameEngine gameEngine, String id, Coordinate coordinate) {
+    SunGameObject(GameEngine gameEngine, String id, Coordinate coordinate) {
         this._engine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;

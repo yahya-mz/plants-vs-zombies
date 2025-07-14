@@ -1,6 +1,7 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
@@ -80,6 +81,11 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
     public void spawn() {
         _gameObject.spawn();
         playAnimation(NormalZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
+    }
+
+    @Override
+    public AbstractZombieGameObject getGameObject() {
+        return _gameObject;
     }
 
     public NormalZombieVisualObject changeStateTo(NormalZombieVisualObject.States state) {

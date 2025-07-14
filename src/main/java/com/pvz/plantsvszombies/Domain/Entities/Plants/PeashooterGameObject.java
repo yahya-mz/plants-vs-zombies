@@ -3,7 +3,7 @@ package com.pvz.plantsvszombies.Domain.Entities.Plants;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
 import java.time.Duration;
@@ -17,11 +17,11 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
     private final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
     private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
-    public static PeashooterGameObject createPeashooterGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    public static PeashooterGameObject createPeashooterGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new PeashooterGameObject(gameEngine, id, coordinate, row, column);
     }
 
-    private PeashooterGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    private PeashooterGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;

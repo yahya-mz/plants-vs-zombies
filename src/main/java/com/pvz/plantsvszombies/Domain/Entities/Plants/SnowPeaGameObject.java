@@ -2,8 +2,9 @@ package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Bullets.SnowBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
 import java.time.Duration;
@@ -17,10 +18,10 @@ public class SnowPeaGameObject extends AbstractPlantGameObject {
     private final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
     private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
-    public static SnowPeaGameObject createSnowPeaGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    public static SnowPeaGameObject createSnowPeaGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new SnowPeaGameObject(gameEngine, id, coordinate, row, column);
     }
-    private SnowPeaGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    private SnowPeaGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
@@ -64,7 +65,7 @@ public class SnowPeaGameObject extends AbstractPlantGameObject {
     }
     private void shoot() {
         String BulletObjectId = "SnowBullet" + UUID.randomUUID();
-        var bulletObj = NormalBulletGameObject.createNormalBulletGameObject(_gameEngine, BulletObjectId, new Coordinate(this._coordinate.x() + 30, this._coordinate.y() - 20), getRow());
+        var bulletObj = SnowBulletGameObject.createSnowBulletGameObject(_gameEngine, BulletObjectId, new Coordinate(this._coordinate.x() + 30, this._coordinate.y() - 20), getRow());
         _gameEngine.spawnObject(bulletObj);
         for (IEventSubscriber eventSubscriber : _shootingEventSubscribers) {
             eventSubscriber._notify(bulletObj);

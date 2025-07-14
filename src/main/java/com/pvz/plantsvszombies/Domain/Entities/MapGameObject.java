@@ -3,7 +3,7 @@ package com.pvz.plantsvszombies.Domain.Entities;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
 import java.util.ArrayList;
 
@@ -16,16 +16,16 @@ public class MapGameObject extends AbstractGameObject {
 
     private MapBlock[] _blocks;
 
-    private final IGameEngine _engine;
+    private final GameEngine _engine;
 
     ArrayList<IEventSubscriber> _plantingEventSubscribers = new ArrayList<>();
     ArrayList<IEventSubscriber> _spawningObjectEventSubscribers = new ArrayList<>();
 
-    public static MapGameObject createMapGameObject(String id, Coordinate coordinate, IGameEngine engine) {
+    public static MapGameObject createMapGameObject(String id, Coordinate coordinate, GameEngine engine) {
         return new MapGameObject(id, coordinate, engine);
     }
 
-    private MapGameObject(String id, Coordinate coordinate, IGameEngine engine) {
+    private MapGameObject(String id, Coordinate coordinate, GameEngine engine) {
 //        this._plants = new AbstractPlantGameObject[_rows * _columns]; Error, might not have been initialized
         this._engine = engine;
         this._columns = _engine.getColumnsCount();
@@ -68,9 +68,10 @@ public class MapGameObject extends AbstractGameObject {
     public AbstractPlantGameObject getPlantAtBlock(int row, int column) {
         return _blocks[_columns * row + column].getPlant();
     }
+
     public MapBlock getBlockByCoordinate(Coordinate coordinate) {
-        for(MapBlock mapBlock:_blocks){
-            if (mapBlock.contains(coordinate)){
+        for (MapBlock mapBlock : _blocks) {
+            if (mapBlock.contains(coordinate)) {
                 return mapBlock;
             }
         }
@@ -91,11 +92,11 @@ public class MapGameObject extends AbstractGameObject {
 //        }
 //    }
 
-    public void subscribeToPlantingEvent(IEventSubscriber subscriber) {
-        _plantingEventSubscribers.add(subscriber);
+    public void subscribeToPlantingEvent(IEventSubscriber eventSubscriber) {
+        _plantingEventSubscribers.add(eventSubscriber);
     }
 
-    public void subscribeToSpawningObjectEvent(IEventSubscriber subscriber) {
-        _spawningObjectEventSubscribers.add(subscriber);
+    public void subscribeToSpawningObjectEvent(IEventSubscriber eventSubscriber) {
+        _spawningObjectEventSubscribers.add(eventSubscriber);
     }
 }

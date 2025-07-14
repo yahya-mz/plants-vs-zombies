@@ -11,6 +11,7 @@ public interface IVisualEngine {
     int getHeight();
 
     void disposeObject(AbstractVisualObject obj);
+    void stopEngine();
 
     void spawnVisualObject(AbstractVisualObject object);
 

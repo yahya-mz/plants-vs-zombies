@@ -1,7 +1,7 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Bullets;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Bullets.SnowBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralFadingAnimation;
@@ -12,7 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
-public class NormalBulletVisualObject extends AbstractVisualObject {
+public class SnowBulletVisualObject extends AbstractVisualObject {
     public enum States {
         MOVING,
         COLLIDED
@@ -21,12 +21,12 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
     private final IVisualEngine _engine;
     private States _state;
 
-    public NormalBulletVisualObject(NormalBulletGameObject gameObject, IVisualEngine engine) {
+    public SnowBulletVisualObject(SnowBulletGameObject gameObject, IVisualEngine engine) {
         super._gameObject = gameObject;
         this._engine = engine;
 
         _visualCoordinate = gameObject.getCoordinate();
-        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Bullets/PeaNormal/PeaNormal_0.png")));
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Bullets/PeaIce/PeaIce_0.png")));
         _node.setManaged(false);
 
         var height = ((Image) ((ImageView) _node).getImage()).getHeight();
@@ -34,7 +34,7 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
 
         _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
 
-        ((NormalBulletGameObject) _gameObject).subscribeToMovementEvent(new IEventSubscriber() {
+        ((SnowBulletGameObject) _gameObject).subscribeToMovementEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
@@ -47,7 +47,7 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
             }
         });
 
-        ((NormalBulletGameObject) _gameObject).subscribeToCollisionEvent(new IEventSubscriber() {
+        ((SnowBulletGameObject) _gameObject).subscribeToCollisionEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 changeStateTo(States.COLLIDED);
@@ -55,10 +55,10 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
         });
 
         var temp_this = this;
-        ((NormalBulletGameObject) _gameObject).subscribeToDisposeEvent(new IEventSubscriber() {
+        ((SnowBulletGameObject) _gameObject).subscribeToDisposeEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
-//                _engine.disposeObject(temp_this); // Needs to be edited
+                _engine.disposeObject(temp_this); // Needs to be edited
             }
         });
     }
@@ -70,7 +70,7 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
         changeStateTo(States.MOVING);
     }
 
-    public NormalBulletVisualObject changeStateTo(States state) {
+    public SnowBulletVisualObject changeStateTo(States state) {
         switch (state) {
             case MOVING -> {
                 _state = States.MOVING;
@@ -79,7 +79,7 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
             case COLLIDED -> {
                 _state = States.COLLIDED;
                 Platform.runLater(() -> {
-                    ((ImageView) _node).setImage(new Image(GlobalSettings.getResource("graphics/Bullets/PeaNormalExplode/PeaNormalExplode_0.png")));
+//                    ((ImageView) _node).setImage(new Image(GlobalSettings.getResource("graphics/Bullets/PeaIceExplode/PeaIceExplode_0.png")));
                     GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(300)).setOnFinished((e) -> {
                         _engine.disposeObject(this);
                     });

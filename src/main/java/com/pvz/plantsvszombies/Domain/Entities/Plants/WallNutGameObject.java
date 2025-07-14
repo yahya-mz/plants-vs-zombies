@@ -2,7 +2,7 @@ package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
 import java.util.ArrayList;
@@ -15,11 +15,11 @@ public class WallNutGameObject extends AbstractPlantGameObject {
     private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
 
-    public static WallNutGameObject createWallNutGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    public static WallNutGameObject createWallNutGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new WallNutGameObject(gameEngine, id, coordinate, row, column);
     }
 
-    WallNutGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    WallNutGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;

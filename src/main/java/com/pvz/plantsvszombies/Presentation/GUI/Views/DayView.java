@@ -169,11 +169,11 @@ public class DayView extends AbstractLevelView {
         DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);
         _visualEngine = new VisualDayEngine(this, dayEngine);
         Mediator.init(dayEngine, _visualEngine);
-        Mediator.getInstance().startEngine();
+        Mediator.getInstance().startGameEngine();
 
         this.setOnHiding((event) -> {
             System.out.println("Stopping GameEngine");
-            Mediator.getInstance().stopEngine();
+            Mediator.getInstance().stopGameEngine();
         });
     }
 
@@ -210,7 +210,7 @@ public class DayView extends AbstractLevelView {
 
             cardpic.setPreserveRatio(true);
             cardpic.setSmooth(true);
-            cardpic.setFitWidth(105);
+            cardpic.setFitWidth(80);
 
             Insets margin;
             switch (i) {
@@ -235,7 +235,7 @@ public class DayView extends AbstractLevelView {
                         case JALAPENO -> _visualEngine.setSelectedPlantType(JalapenoVisualObject.class);
                         case TALL_NUT -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
                         case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
-//                        case 7 -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
+                        case SNOW_PEA -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
                         case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
                     }
                 }
@@ -292,25 +292,33 @@ public class DayView extends AbstractLevelView {
     }
 
     public static Button createPauseButton() {
-        Button PauseButton = new Button("Pause");
+        Button PauseButton = new Button();
+
         Image path = new Image(GlobalSettings.getResource("graphics/Items/Buttons/pause.png"), true);
         ImageView pauseImage = new ImageView(path);
 
-        PauseButton.setPrefWidth(90);
-        PauseButton.setPrefHeight(90);
+        // حفظ نسبت تصویر و جلوگیری از کشیدگی
+        pauseImage.setPreserveRatio(true);
+
+
+        pauseImage.fitHeightProperty().bind(PauseButton.heightProperty());
+
+        PauseButton.setPrefSize(90, 90);
+        PauseButton.setMinSize(90, 90);
+        PauseButton.setMaxSize(90, 90);
+
         PauseButton.setGraphic(pauseImage);
         PauseButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
 
-        PauseButton.setOnAction(e -> {//logic
-            DayMenu dayMenu = new DayMenu();
-            Stage stage = new Stage();
-            stage.setScene(dayMenu.getScene());
-            stage.setResizable(false);
-            dayMenu.applyState("win");
-            stage.show();
-//            stage.setOnCloseRequest();
-            System.out.println("Pause button clicked");
-        });
+//        PauseButton.setOnAction(e -> {
+//            DayMenu dayMenu = new DayMenu();
+//            Stage stage = new Stage();
+//            stage.setScene(dayMenu.getScene());
+//            stage.setResizable(false);
+//            dayMenu.applyState("lose");
+//            stage.show();
+//            System.out.println("Pause button clicked");
+//        });
 
         return PauseButton;
     }

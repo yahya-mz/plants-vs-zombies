@@ -82,8 +82,8 @@ public class MapVisualObject extends AbstractVisualObject {
                 case 4 -> new Insets(7, -10, -10, -52);
                 default -> Insets.EMPTY;
             };
-            VBox.setMargin(rowBox, rowMargin);
-            rowBox.setSpacing(customHGap);
+//            VBox.setMargin(rowBox, rowMargin);
+//            rowBox.setSpacing(customHGap);
             rowBox.setAlignment(Pos.CENTER_LEFT);
 
             for (int col = 0; col < 9; col++) {
@@ -123,11 +123,11 @@ public class MapVisualObject extends AbstractVisualObject {
                             ImageView preview = createPlantImageView("SunFlower", cellButton);
                             cellButton.setGraphic(preview);
                         });
-//                    } else if (selectedType == SnowPeaVisualObject.class) {
-//                        Platform.runLater(() -> {
-//                            ImageView preview = createPlantImageView("SnowPea", cellButton);
-//                            cellButton.setGraphic(preview);
-//                        });
+                    } else if (selectedType == SnowPeaVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("SnowPea", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
                     } else if (selectedType == JalapenoVisualObject.class) {
                         Platform.runLater(() -> {
                             ImageView preview = createPlantImageView("Jalapeno", cellButton);
@@ -202,49 +202,6 @@ public class MapVisualObject extends AbstractVisualObject {
         }
         this._node = mainContainer;
 
-        _mapObject.subscribeToPlantingEvent(new IEventSubscriber() {
-            @Override
-            public void _notify(AbstractGameObject gameObject) {
-                if (gameObject instanceof PeashooterGameObject p) {
-                    var visualObject = new PeashooterVisualObject(p, _engine);
-                    plant(visualObject, p.getRow(), p.getColumn());
-                } else if (gameObject instanceof RepeaterGameObject rp) {
-                    var visualObject = new RepeaterVisualObject(rp, _engine);
-                    plant(visualObject, rp.getRow(), rp.getColumn());
-                } else if (gameObject instanceof WallNutGameObject wn) {
-                    var visualObject = new WallNutVisualObject(wn, _engine);
-                    plant(visualObject, wn.getRow(), wn.getColumn());
-                } else if (gameObject instanceof SunFlowerGameObject sn) {
-                    var visualObject = new SunFlowerVisualObject(sn, _engine);
-                    plant(visualObject, sn.getRow(), sn.getColumn());
-                } else if (gameObject instanceof CherryBombGameObject cb) {
-                    var visualObject = new CherryBombVisualObject(cb, _engine);
-                    plant(visualObject, cb.getRow(), cb.getColumn());
-                } else if (gameObject instanceof TallNutGameObject tl) {
-                    var visualObject = new TallnutVisualObject(tl, _engine);
-                    plant(visualObject, tl.getRow(), tl.getColumn());
-                }
-//                else if (gameObject instanceof SnowPeaGameObject sp ) {
-//                    var visualObject = new S(sp, _engine);
-//                    plant(visualObject, sp.getRow(), sp.getColumn());
-//                }
-                else if (gameObject instanceof JalapenoGameObject jl) {
-                    var visualObject = new JalapenoVisualObject(jl, _engine);
-                    plant(visualObject, jl.getRow(), jl.getColumn());
-                }
-            }
-        });
-
-        _mapObject.subscribeToSpawningObjectEvent(new IEventSubscriber() {
-            @Override
-            public void _notify(AbstractGameObject gameObject) {
-                Platform.runLater(() -> {
-                    if (gameObject instanceof NormalBulletGameObject bullet) {
-                        spawnByCoordinate(new NormalBulletVisualObject(bullet, engine));
-                    }
-                });
-            }
-        });
     }
 
     public Button createImageButton(String imagePath) {

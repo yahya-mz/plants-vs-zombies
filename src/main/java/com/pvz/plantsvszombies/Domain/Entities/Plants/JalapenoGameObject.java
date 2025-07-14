@@ -3,7 +3,7 @@ package com.pvz.plantsvszombies.Domain.Entities.Plants;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
 import java.time.Duration;
@@ -17,11 +17,11 @@ public class JalapenoGameObject extends AbstractPlantGameObject {
     private int _tick;
     private final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
 
-    public static JalapenoGameObject createJalapenoGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    public static JalapenoGameObject createJalapenoGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new JalapenoGameObject(gameEngine, id, coordinate, row, column);
     }
 
-    private JalapenoGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    private JalapenoGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;

@@ -3,7 +3,7 @@ package com.pvz.plantsvszombies.Domain.Entities.Bullets;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
 import java.util.ArrayList;
 
@@ -11,11 +11,11 @@ public class SnowBulletGameObject extends AbstractBulletGameObject {
     private final ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
     private final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
-    public static SnowBulletGameObject createSnowBulletGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row) {
+    public static SnowBulletGameObject createSnowBulletGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row) {
         return new SnowBulletGameObject(gameEngine, id, coordinate, row);
     }
 
-    SnowBulletGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row) {
+    SnowBulletGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
@@ -51,11 +51,11 @@ public class SnowBulletGameObject extends AbstractBulletGameObject {
         }
     }
 
-    public void subscribeToCollisionEvent(IEventSubscriber subscriber) {
-        _collisionEventSubscribers.add(subscriber);
+    public void subscribeToCollisionEvent(IEventSubscriber eventSubscriber) {
+        _collisionEventSubscribers.add(eventSubscriber);
     }
 
-    public void subscribeToMovementEvent(IEventSubscriber subscriber) {
-        _movementEventSubscribers.add(subscriber);
+    public void subscribeToMovementEvent(IEventSubscriber eventSubscriber) {
+        _movementEventSubscribers.add(eventSubscriber);
     }
 }

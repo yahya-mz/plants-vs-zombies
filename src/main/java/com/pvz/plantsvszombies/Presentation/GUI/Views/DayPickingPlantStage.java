@@ -1,7 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.GUI.Views;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
-import com.pvz.plantsvszombies.Presentation.GUI.Views.DayView;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -11,15 +10,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import java.io.File;
 import java.util.ArrayList;
 import javafx.scene.Node;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import java.util.ArrayList;
 
 public class DayPickingPlantStage {
     private static final ArrayList<AbstractPlantGameObject.PlantType> selectedPlants = new ArrayList<>();
@@ -232,7 +228,7 @@ public class DayPickingPlantStage {
             gameStage.show();
             gameStage.setOnHiding(event -> {
                 primaryStage.show();
-                Mediator.getInstance().stopEngine();
+                Mediator.getInstance().stopGameEngine();
             });
             ((Stage) playBtn.getScene().getWindow()).close();
         });

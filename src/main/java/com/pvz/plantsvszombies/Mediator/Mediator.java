@@ -1,10 +1,10 @@
 package com.pvz.plantsvszombies.Mediator;
 
 import com.pvz.plantsvszombies.Domain.Entities.Events.*;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
 import com.pvz.plantsvszombies.Presentation.EventHandlers.*;
-import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
 import javafx.application.Platform;
 
 import java.time.Duration;
@@ -16,8 +16,8 @@ public class Mediator {
 //
 //    }
 
-    private IGameEngine _gameEngine;
-    private VisualDayEngine _visualEngine;
+    private GameEngine _gameEngine;
+    private IVisualEngine _visualEngine;
 
     private boolean _engineThreadRunning = false;
 
@@ -25,7 +25,7 @@ public class Mediator {
 
     private static Mediator _instance;
 
-    public static void init(IGameEngine gameEngine, VisualDayEngine visualEngine) {
+    public static void init(GameEngine gameEngine, IVisualEngine visualEngine) {
         _instance = new Mediator(gameEngine, visualEngine);
     }
 
@@ -33,7 +33,7 @@ public class Mediator {
         return _instance;
     }
 
-    public Mediator(IGameEngine gameEngine, VisualDayEngine visualEngine) {
+    public Mediator(GameEngine gameEngine, IVisualEngine visualEngine) {
         this._gameEngine = gameEngine;
         this._visualEngine = visualEngine;
     }
@@ -60,7 +60,7 @@ public class Mediator {
         }
     }
 
-    public void startEngine() {
+    public void startGameEngine() {
         _engineThreadRunning = true;
         var gameEngineThread = new Thread(() -> {
             try {
@@ -81,8 +81,13 @@ public class Mediator {
         gameEngineThread.start();
     }
 
-    public void stopEngine() {
+    public void stopGameEngine() {
         _engineThreadRunning = false;
+        stopVisualEngine();
+    }
+
+    private void stopVisualEngine(){
+        _visualEngine.stopEngine();
     }
 
 }

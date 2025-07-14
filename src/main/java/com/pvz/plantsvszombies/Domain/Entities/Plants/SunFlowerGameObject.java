@@ -2,7 +2,7 @@ package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.IGameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 
@@ -18,10 +18,10 @@ public class SunFlowerGameObject extends AbstractPlantGameObject {
     private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
 
-    public static SunFlowerGameObject createSunFlowerGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    public static SunFlowerGameObject createSunFlowerGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new SunFlowerGameObject(gameEngine, id, coordinate, row, column);
     }
-    SunFlowerGameObject(IGameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    SunFlowerGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;

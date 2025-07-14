@@ -21,19 +21,37 @@ public class DayMenu {
     private VBox menuBox;
     private Scene scene;
 
-    public Scene getScene() {
+    public static Stage createWinPopup() {
+        DayMenu dayMenu = new DayMenu();
+        Stage stage = new Stage();
+        stage.setScene(dayMenu.getScene());
+        stage.setResizable(false);
+        dayMenu.applyState("win");
+        return stage;
+    }
+
+    public static Stage createLostPopup() {
+        DayMenu dayMenu = new DayMenu();
+        Stage stage = new Stage();
+        stage.setScene(dayMenu.getScene());
+        stage.setResizable(false);
+        dayMenu.applyState("lose");
+        return stage;
+    }
+
+    private Scene getScene() {
         if (scene == null) {
             scene = createScene();
         }
         return scene;
     }
 
-    public Scene createScene() {
+    private Scene createScene() {
         double width = 700;
         double height = 500;
 
         Rectangle backgroundColor = new Rectangle(width, height, Color.BLACK);
-        Image backgroundImage = new Image(GlobalSettings.getResource("graphics/Items/Background/daypause.png").toString());
+        Image backgroundImage = new Image(GlobalSettings.getResource("graphics/Items/Background/daypause.png"));
 
         ImageView backgroundImageView = new ImageView(backgroundImage);
         backgroundImageView.setFitWidth(width);
@@ -44,7 +62,7 @@ public class DayMenu {
         menuBox.setSpacing(20);
         menuBox.setAlignment(Pos.CENTER);
 
-        StackPane root = new StackPane(backgroundColor ,backgroundImageView, menuBox);
+        StackPane root = new StackPane(backgroundColor, backgroundImageView, menuBox);
 
         Scene scene = new Scene(root, width, height);
         scene.setFill(Color.TRANSPARENT); // صحنه شفاف برای حذف پس‌زمینه سفید
@@ -53,13 +71,13 @@ public class DayMenu {
     }
 
 
-    public void applyState(String state) {
+    private void applyState(String state) {
         menuBox.getChildren().clear();
         ImageView headerImage = new ImageView();
         headerImage.setFitHeight(100);
         headerImage.setPreserveRatio(true);
 
-        HBox buttonBox = new HBox() ;
+        HBox buttonBox = new HBox();
         buttonBox.setSpacing(25);
         buttonBox.setAlignment(Pos.CENTER);
 
@@ -91,10 +109,10 @@ public class DayMenu {
     }
 
 
-    public Button createImageButton(String imagePath ) {
+    private Button createImageButton(String imagePath) {
         double width = 160;
         double height = 160;
-        Image image = new Image(GlobalSettings.getResource("graphics/Items/Buttons/" + imagePath + ".png").toString());
+        Image image = new Image(GlobalSettings.getResource("graphics/Items/Buttons/" + imagePath + ".png"));
         ImageView imageView = new ImageView(image);
 
         imageView.setFitWidth(width);
@@ -108,11 +126,11 @@ public class DayMenu {
         button.setMaxSize(width, height);
         button.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
 
-        switch (imagePath){//logic
-            case "restart" -> button.setOnAction(e-> System.out.println("restart"));
-            case "back" -> button.setOnAction(e-> System.out.println("back"));
-            case "resume" -> button.setOnAction(e-> System.out.println("resume"));
-            case "nextlevel" -> button.setOnAction(e-> System.out.println("nextlevel"));
+        switch (imagePath) {//logic
+            case "restart" -> button.setOnAction(e -> System.out.println("restart"));
+            case "back" -> button.setOnAction(e -> System.out.println("back"));
+            case "resume" -> button.setOnAction(e -> System.out.println("resume"));
+            case "nextlevel" -> button.setOnAction(e -> System.out.println("nextlevel"));
         }
 
         ColorAdjust hoverEffect = new ColorAdjust();
@@ -123,8 +141,8 @@ public class DayMenu {
     }
 
 
-    public ImageView createHeaderImage(String imageName) {
-        String fullPath = GlobalSettings.getResource("graphics/Items/Messages/" + imageName + ".png").toString();
+    private ImageView createHeaderImage(String imageName) {
+        String fullPath = GlobalSettings.getResource("graphics/Items/Messages/" + imageName + ".png");
         Image image = new Image(fullPath);
 
         ImageView imageView = new ImageView(image);
