@@ -100,7 +100,7 @@ import java.util.List;
 
 public class DayView extends AbstractLevelView {
 
-    public static final double Width = 1088;
+    public static final double Width = 1200;
     public static final double Height = 728;
     private static IntegerProperty counterValue = new SimpleIntegerProperty(0);
     private VisualDayEngine _visualEngine;
@@ -142,8 +142,8 @@ public class DayView extends AbstractLevelView {
         mainbar.setAlignment(Pos.TOP_CENTER);
         mainbar.setMouseTransparent(false);
         mainbar.setPickOnBounds(true);
-        HBox.setMargin(suncounter, new Insets(90, 60, 0, 150));//dont change this
-        HBox.setMargin(plantbar, new Insets(0,40,0,-85));
+        HBox.setMargin(suncounter, new Insets(73, 60, 0, 220));//dont change this
+        HBox.setMargin(plantbar, new Insets(0,85,0, -70));
         mainbar.setMinWidth(50);
         mainbar.setMinHeight(30);
 
@@ -196,9 +196,8 @@ public class DayView extends AbstractLevelView {
     }
 
     public HBox createTopPlantSelectionBar(List<AbstractPlantGameObject.PlantType> selectedPlants) {
+        HBox buttonBar = new HBox(0);
 
-
-        HBox buttonBar = new HBox(17);
         buttonBar.setAlignment(Pos.TOP_CENTER);
         buttonBar.setPrefHeight(86);
 
@@ -210,17 +209,17 @@ public class DayView extends AbstractLevelView {
 
             cardpic.setPreserveRatio(true);
             cardpic.setSmooth(true);
-            cardpic.setFitWidth(80);
+            cardpic.setFitWidth(79);
 
             Insets margin;
             switch (i) {
-                case 0 -> margin = new Insets(11, 7, 0, 18);
-                case 1 -> margin = new Insets(11, 0, 0, 7);
-                case 2 -> margin = new Insets(11, 5, 0, 10);
-                case 3 -> margin = new Insets(11, 10, 0, 10);
-                case 4 -> margin = new Insets(11, 4, 0, 0);
-                case 5 -> margin = new Insets(11, 8, 0, 10);
-                default -> margin = new Insets(0, 0, 0, 0);
+                case 0 -> margin = new Insets(5, 4, 0, 40);
+                case 1 -> margin = new Insets(5, 0, 0, 0);
+                case 2 -> margin = new Insets(5, 3, 0, 5);
+                case 3 -> margin = new Insets(5, 25, 0, 0);
+                case 4 -> margin = new Insets(5, 4, 0, -20);
+                case 5 -> margin = new Insets(5, 8, 0, 0);
+                default -> margin = new Insets(5, 0, 0, 0);
             }
             HBox.setMargin(btn, margin);
 
@@ -279,10 +278,16 @@ public class DayView extends AbstractLevelView {
 
     public static Button createShovelToolButton() {
         Button shovelButton = new Button("Shovel");
-        shovelButton.setPrefWidth(120);
-        shovelButton.setPrefHeight(120);
-        shovelButton.setStyle("-fx-background-color: brown; -fx-text-fill: white; -fx-font-weight: bold;");
+        Image path = new Image(GlobalSettings.getResource("graphics/Items/Buttons/shuveltool.png"), true);
+        ImageView shuvelPic = new ImageView(path);
+        shuvelPic.setPreserveRatio(false);
+        shovelButton.setGraphic(shuvelPic);
+
         shovelButton.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-border-color: transparent;");
+        shuvelPic.setFitHeight(50);
+        shuvelPic.setFitWidth(50);
+//        shovelButton.setMaxHeight(20);
+//        shovelButton.setMaxWidth(20);
         shovelButton.setOnAction(e -> {
             System.out.println("Shovel tool activated!");
 
@@ -297,10 +302,7 @@ public class DayView extends AbstractLevelView {
         Image path = new Image(GlobalSettings.getResource("graphics/Items/Buttons/pause.png"), true);
         ImageView pauseImage = new ImageView(path);
 
-        // حفظ نسبت تصویر و جلوگیری از کشیدگی
         pauseImage.setPreserveRatio(true);
-
-
         pauseImage.fitHeightProperty().bind(PauseButton.heightProperty());
 
         PauseButton.setPrefSize(90, 90);
@@ -310,15 +312,10 @@ public class DayView extends AbstractLevelView {
         PauseButton.setGraphic(pauseImage);
         PauseButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
 
-//        PauseButton.setOnAction(e -> {
-//            DayMenu dayMenu = new DayMenu();
-//            Stage stage = new Stage();
-//            stage.setScene(dayMenu.getScene());
-//            stage.setResizable(false);
-//            dayMenu.applyState("lose");
-//            stage.show();
-//            System.out.println("Pause button clicked");
-//        });
+        PauseButton.setOnAction(e -> {
+            DayMenu.createPausePopup().show();
+            System.out.println("Pause button clicked");
+        });
 
         return PauseButton;
     }

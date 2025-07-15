@@ -79,7 +79,7 @@ public class SnowBulletVisualObject extends AbstractVisualObject {
             case COLLIDED -> {
                 _state = States.COLLIDED;
                 Platform.runLater(() -> {
-//                    ((ImageView) _node).setImage(new Image(GlobalSettings.getResource("graphics/Bullets/PeaIceExplode/PeaIceExplode_0.png")));
+                    ((ImageView) _node).setImage(new Image(GlobalSettings.getResource("graphics/Bullets/PeaIceExplode/PeaIceExplode_0.png")));
                     GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(300)).setOnFinished((e) -> {
                         _engine.disposeObject(this);
                     });

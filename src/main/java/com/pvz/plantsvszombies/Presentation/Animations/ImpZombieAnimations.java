@@ -1,5 +1,4 @@
 package com.pvz.plantsvszombies.Presentation.Animations;
-
 import com.pvz.plantsvszombies.GlobalSettings;
 import javafx.scene.image.Image;
 
@@ -9,18 +8,21 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class SnowPeaAnimations {
+public class ImpZombieAnimations {
     public enum Animations implements IAnimation {
-        STANDING
+        MOVING_FORWARD,
+        DYING,
+        ATTACKING,
+        BURNING
     }
 
-    private static final ArrayList<Image[]> animations;
+    private final static ArrayList<Image[]> animations;
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Snowpea"));
-        for (int i = 0; i < SnowPeaAnimations.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + SnowPeaAnimations.Animations.values()[i].name()).listFiles();
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/ImpZombie"));
+        for (int i = 0; i < ImpZombieAnimations.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + ImpZombieAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
                 String name = f.getName();
                 int dotIndex = name.lastIndexOf('.');
@@ -38,7 +40,7 @@ public class SnowPeaAnimations {
         }
     }
 
-    public static Image[] getFrames(SnowPeaAnimations.Animations animation) {
+    public static Image[] getFrames(ImpZombieAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
 }

@@ -60,36 +60,28 @@ public class MapVisualObject extends AbstractVisualObject {
         //
         for (int row = 0; row < 5; row++) {
             HBox rowBox = new HBox();
+            rowBox.setAlignment(Pos.CENTER_LEFT);
 
-            double customHGap = switch (row) {//فاصله بین هر عنصر در یک ریدف
-                case 0 -> 4;
-                case 1 -> 4;
-                case 2 -> 4;
-                case 3 -> 4;
-                case 4 -> 4;
-                default -> 7;
+            Insets rowMargin = switch (row) {//جابه جایی هر ردیف
+                case 0 -> new Insets(-13, -10, -10, 3);
+                case 1 -> new Insets(5, -10, -10, 2);//up,right,down,left
+                case 2 -> new Insets(7, -10, -10, -2);
+                case 3 -> new Insets(7, -10, -10, -6);
+                case 4 -> new Insets(7, -10, -10, -10);
+                default -> Insets.EMPTY;
             };
+            VBox.setMargin(rowBox, rowMargin);
 
 
             double buttonWidth = MapBlock.BLOCK_SIZE, buttonHeight = MapBlock.BLOCK_SIZE;
-
-
-            Insets rowMargin = switch (row) {//جابه جایی هر ردیف
-                case 0 -> new Insets(-5, -10, -10, -10);
-                case 1 -> new Insets(5, -10, -10, -15);//up,right,down,left
-                case 2 -> new Insets(7, -10, -10, -20);
-                case 3 -> new Insets(7, -10, -10, -40);
-                case 4 -> new Insets(7, -10, -10, -52);
-                default -> Insets.EMPTY;
-            };
-//            VBox.setMargin(rowBox, rowMargin);
-//            rowBox.setSpacing(customHGap);
             rowBox.setAlignment(Pos.CENTER_LEFT);
 
             for (int col = 0; col < 9; col++) {
                 Button cellButton = new Button();
                 cellButton.setPrefSize(buttonWidth, buttonHeight);
-                cellButton.setStyle("-fx-background-color: #FF000022; -fx-border-color: black; -fx-border-width: 1;");
+// rgba(255, 0, 0, 0.1)
+                cellButton.setStyle("-fx-background-color:transparent ; -fx-border-color: transparent; -fx-border-width: 1;");
+                cellButton.setPadding(Insets.EMPTY);
 
                 final int r = row;
                 final int c = col;

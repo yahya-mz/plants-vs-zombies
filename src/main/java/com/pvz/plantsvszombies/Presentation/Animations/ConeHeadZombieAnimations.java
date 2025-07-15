@@ -13,7 +13,8 @@ public class ConeHeadZombieAnimations {
         MOVING_FORWARD,
         DYING,
 //        LOSTCONE,
-        ATTACKING
+        ATTACKING,
+        BURNING
     }
 
 

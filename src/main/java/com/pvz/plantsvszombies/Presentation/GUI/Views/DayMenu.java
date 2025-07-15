@@ -39,6 +39,15 @@ public class DayMenu {
         return stage;
     }
 
+    public static Stage createPausePopup() {
+        DayMenu dayMenu = new DayMenu();
+        Stage stage = new Stage();
+        stage.setScene(dayMenu.getScene());
+        stage.setResizable(false);
+        dayMenu.applyState("pause");
+        return stage;
+    }
+
     private Scene getScene() {
         if (scene == null) {
             scene = createScene();
@@ -97,6 +106,7 @@ public class DayMenu {
                 Button nextmode = createImageButton("nextmode");
                 buttonBox.getChildren().addAll(exit, restart, nextmode);
             }
+
             case "lose" -> {
                 headerImage = createHeaderImage("youlost");
                 Button exit = createImageButton("back");

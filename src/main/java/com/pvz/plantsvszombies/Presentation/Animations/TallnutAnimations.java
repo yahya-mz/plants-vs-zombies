@@ -17,7 +17,7 @@ public class TallnutAnimations {//this animation is empty
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(NormalZombieAnimations.class.getResource("graphics/Plants/Tallnut").getPath());
+        var animationsDirectory = new File(ImpZombieAnimations.class.getResource("graphics/Plants/Tallnut").getPath());
         for (int i = 0; i < Animations.values().length; i++) {
             var animationImages = new File(animationsDirectory.getPath() + "/" + Animations.values()[i]).listFiles();//this is null for now
             Objects.requireNonNull(animationImages);

@@ -60,7 +60,7 @@ public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
         gameObject.subscribeToTimeOut(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
-                System.out.println("Fading out");
+                System.out.println("fade");
                 changeStateTo(States.FADING_OUT);
             }
         });

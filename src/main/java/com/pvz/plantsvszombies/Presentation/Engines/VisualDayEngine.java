@@ -12,12 +12,9 @@ import com.pvz.plantsvszombies.Domain.Engines.DayEngine;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
 import com.pvz.plantsvszombies.Presentation.Entities.*;
 import com.pvz.plantsvszombies.Presentation.Entities.Bullets.NormalBulletVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Zombies.AbstractZombieVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Zombies.ConeHeadZombieVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Zombies.ScreenDoorZombieVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.AbstractLevelView;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
-import com.pvz.plantsvszombies.Presentation.Entities.Zombies.NormalZombieVisualObject;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.DayMenu;
 import javafx.application.Platform;
 import javafx.scene.layout.Pane;
@@ -308,9 +305,9 @@ public class VisualDayEngine implements IVisualEngine {
                 case ScreenDoorZombieVisualObject sd -> {
                     sd.changeStateTo(ScreenDoorZombieVisualObject.States.MOVING);
                 }
-//                case NormalZombieVisualObject p -> {
-//                    p.changeStateTo(NormalZombieVisualObject.States.MOVING);
-//                }
+                case ImpZombieVisualObject p -> {
+                    p.changeStateTo(ImpZombieVisualObject.States.MOVING);
+                }
                 default -> {
                 }
             }

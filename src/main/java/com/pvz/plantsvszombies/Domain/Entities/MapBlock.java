@@ -5,7 +5,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 
 public class MapBlock {
 
-    public final static int BLOCK_SIZE = 87;
+    public final static int BLOCK_SIZE = 90;
 
     private final int _row;
     private final int _column;

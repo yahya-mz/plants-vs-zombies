@@ -96,7 +96,7 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
             }
             case DYING -> {
                 _currentState = States.DYING;
-                playAnimation(NormalZombieAnimations.Animations.DYING, Duration.millis(35), 1);
+                playAnimation(NormalZombieAnimations.Animations.DYING, Duration.millis(70), 1);
                 setOnAnimationFinished(e -> {
                     _engine.disposeObject(this);
                 });
@@ -107,7 +107,7 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
             }
             case Burning -> {
                 _currentState = States.Burning;
-                playAnimation(NormalZombieAnimations.Animations.BURNING, Duration.millis(35), 1);
+                playAnimation(NormalZombieAnimations.Animations.BURNING, Duration.millis(70), 1);
                 setOnAnimationFinished(e -> {
                     _engine.disposeObject(this);
                 });
