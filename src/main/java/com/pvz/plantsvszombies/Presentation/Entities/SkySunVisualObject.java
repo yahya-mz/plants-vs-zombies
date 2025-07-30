@@ -71,7 +71,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
     public void spawn() {
         _gameObject.spawn();
         changeStateTo(States.DROPPING);
-        playAnimation(SunAnimations.Animations.SHINING,Duration.millis(80));
+        playAnimation(SunAnimations.Animations.SHINING,Duration.millis(60));
     }
 
     public SkySunVisualObject changeStateTo(States state) {
