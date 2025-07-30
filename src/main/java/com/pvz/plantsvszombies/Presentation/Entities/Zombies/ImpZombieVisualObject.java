@@ -14,8 +14,8 @@ import javafx.util.Duration;
 
 public class ImpZombieVisualObject extends AbstractZombieVisualObject {
     public enum States {
-        MOVING,
-        EATING,
+        MOVING_FORWARD,
+        ATTACKING,
         DYING,
         Burning,
     }
@@ -38,15 +38,15 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
         _node.setManaged(false);
         _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
 
-        _currentState = States.MOVING;
+        _currentState = States.MOVING_FORWARD;
 
         ((ImpZombieGameObject) _gameObject).subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
             Platform.runLater(() -> {
                 _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
             });
-            if (!this._currentState.equals(States.MOVING)) {
-                changeStateTo(States.MOVING);
+            if (!this._currentState.equals(States.MOVING_FORWARD)) {
+                changeStateTo(States.MOVING_FORWARD);
             }
         });
 
@@ -54,7 +54,7 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
-                    changeStateTo(States.EATING);
+                    changeStateTo(States.ATTACKING);
                 });
             }
         });
@@ -90,8 +90,8 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
 
     public ImpZombieVisualObject changeStateTo(ImpZombieVisualObject.States state) {
         switch (state) {
-            case MOVING -> {
-                _currentState = States.MOVING;
+            case MOVING_FORWARD -> {
+                _currentState = States.MOVING_FORWARD;
                 playAnimation(ImpZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
             }
             case DYING -> {
@@ -101,8 +101,8 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
                     _engine.disposeObject(this);
                 });
             }
-            case EATING -> {
-                _currentState = States.EATING;
+            case ATTACKING -> {
+                _currentState = States.ATTACKING;
                 playAnimation(ImpZombieAnimations.Animations.ATTACKING, Duration.millis(35));
             }
             case Burning -> {

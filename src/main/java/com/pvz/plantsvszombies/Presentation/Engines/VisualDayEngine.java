@@ -7,6 +7,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.*;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Engines.DayEngine;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
 import com.pvz.plantsvszombies.Presentation.Entities.*;
@@ -15,6 +16,8 @@ import com.pvz.plantsvszombies.Presentation.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.AbstractLevelView;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.DayMenu;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.DayView;
+import com.pvz.plantsvszombies.Presentation.Entities.Zombies.ImpZombieVisualObject;
 import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 
@@ -109,8 +112,8 @@ public class VisualDayEngine implements IVisualEngine {
                             ScreenDoorZombieVisualObject object = new ScreenDoorZombieVisualObject(sd, temp_this);
                             spawnVisualObject(object);
                         }
-                        case ImpZombieGameObject iz -> {
-                            ImpZombieVisualObject object = new ImpZombieVisualObject(iz, temp_this);
+                        case ImpZombieGameObject im -> {
+                            ImpZombieVisualObject object = new ImpZombieVisualObject(im, temp_this);
                             spawnVisualObject(object);
                         }
 
@@ -306,7 +309,7 @@ public class VisualDayEngine implements IVisualEngine {
                     ch.changeStateTo(ConeHeadZombieVisualObject.States.MOVING);
                 }
                 case ScreenDoorZombieVisualObject sd -> {
-                    sd.changeStateTo(ScreenDoorZombieVisualObject.States.MOVING);
+                    sd.changeStateTo(ScreenDoorZombieVisualObject.States.MOVING_FORWARD);
                 }
                 case ImpZombieVisualObject p -> {
                     p.changeStateTo(ImpZombieVisualObject.States.MOVING);
@@ -319,5 +322,38 @@ public class VisualDayEngine implements IVisualEngine {
                 DayMenu.createLostPopup().show();
             });
         });
+    }
+
+
+    public void shovelActivation() {
+        if (_currentMapVisualObject != null) {
+            _currentMapVisualObject.setIsShovelActivated(true);
+        }
+    }
+    public void shovelRemover(int row, int col) {
+        System.out.println("Shovel activated at: " + row + ", " + col);
+
+        AbstractPlantVisualObject visualToRemove = null;
+
+        for (AbstractVisualObject vo : _visualObjects) {
+            if (vo instanceof AbstractPlantVisualObject plantVO) {
+                AbstractGameObject gameObj = plantVO.getGameObject();
+                if (gameObj instanceof AbstractPlantGameObject plant &&
+                        plant.getRow() == row && plant.getColumn() == col) {
+                    visualToRemove = plantVO;
+                    break;
+                }
+            }
+        }
+        if (visualToRemove != null) {
+            _gameEngine.disposeObject(visualToRemove.getGameObject());
+            disposeObject(visualToRemove);
+            DayView.setIsShovelMode(false);
+            _currentMapVisualObject.setIsShovelActivated(false);
+            System.out.println("Plant removed from both logic and visual.");
+        }
+        else {
+            System.out.println("No plant found at selected location.");
+        }
     }
 }

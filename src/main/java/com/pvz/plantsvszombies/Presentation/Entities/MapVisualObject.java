@@ -31,6 +31,8 @@ import javafx.animation.FadeTransition;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import java.util.List;
 
@@ -38,6 +40,7 @@ public class MapVisualObject extends AbstractVisualObject {
     MapGameObject _mapObject;
     private final IVisualEngine _engine;
     private final StackPane[][] visualGrid = new StackPane[5][9];
+    private Boolean isShovelActivated = false;
 
     public MapVisualObject(MapGameObject object, IVisualEngine engine) {
         this._mapObject = object;
@@ -88,10 +91,17 @@ public class MapVisualObject extends AbstractVisualObject {
                 cellButton.setStyle("-fx-background-color:transparent ; -fx-border-color: transparent; -fx-border-width: 1;");
                 cellButton.setPadding(Insets.EMPTY);
 
+
                 final int r = row;
                 final int c = col;
                 cellButton.setOnMouseClicked(e -> {
                     if (e.getButton().equals(MouseButton.PRIMARY)) {
+                        if (isShovelActivated) {
+                            _engine.shovelRemover(r, c); // ⬅️ به جای حذف مستقیم، درخواست رو می‌فرسته به VisualDayEngine
+                            setIsShovelActivated(false); // غیرفعال کردن بیل
+                            return; // خروج زودهنگام چون shovel mode فعال بوده
+                        }
+                        
                         if (_engine.getSelectedPlantType() != null) {
                             _engine.plant(_engine.getSelectedPlantType(), r, c, new Coordinate(cellButton.localToScene(cellButton.getLayoutBounds()).getCenterX(), cellButton.localToScene(cellButton.getLayoutBounds()).getCenterY()));
                             cellButton.setGraphic(null);
@@ -155,6 +165,7 @@ public class MapVisualObject extends AbstractVisualObject {
                     fade.setOnFinished(ev -> cellButton.setGraphic(null));
                     fade.play();
                 });
+
                 //
 //                cellButton.setOnMouseEntered((event) -> {
 //                    var demo = pick(mainContainer, event.getSceneX(), event.getSceneY());
@@ -175,6 +186,10 @@ public class MapVisualObject extends AbstractVisualObject {
 //                    System.out.println(e.getScreenX()+" , "+e.getScreenY());
 //                });
                 cell.getChildren().add(cellButton);
+                if(isShovelActivated){
+                    applyShovelHoverEffect(cell, cellButton); // ✅ چون نیاز داریم cell رو هم بشناسیم
+
+                }
                 visualGrid[row][col] = cell;
                 rowBox.getChildren().add(cell);
             }
@@ -200,6 +215,23 @@ public class MapVisualObject extends AbstractVisualObject {
         this._node = mainContainer;
 
     }
+
+    private void applyShovelHoverEffect(StackPane cell, Button button) {
+        Rectangle hoverOverlay = new Rectangle(button.getPrefWidth(), button.getPrefHeight());
+        hoverOverlay.setFill(new Color(0, 0, 0, 0.1)); // نیمه شفاف
+        hoverOverlay.setVisible(false); // پیش‌فرض خاموش
+        cell.getChildren().add(hoverOverlay); // لایه بالا دکمه
+
+        button.setOnMouseEntered(e -> {
+            if (isShovelActivated) {
+                hoverOverlay.setVisible(true);
+            }
+        });
+
+        button.setOnMouseExited(e -> hoverOverlay.setVisible(false));
+    }
+
+
 
     public Button createImageButton(String imagePath) {
         Image image = new Image(imagePath);
@@ -293,6 +325,11 @@ public class MapVisualObject extends AbstractVisualObject {
 
         return node;
     }
+
+    public void setIsShovelActivated(boolean isShovelActivated) {
+        this.isShovelActivated = isShovelActivated;
+    }
+
 }
 
 
