@@ -22,7 +22,7 @@ public class PickingPlantStage {
     private final HBox selectedPlantHBox = new HBox(0);
     private Stage primaryStage;
     private Button playBtn;
-    private String _mode;
+    private final String _mode;
 
     public PickingPlantStage(String mode){
         this._mode = mode;
@@ -36,13 +36,13 @@ public class PickingPlantStage {
         StackPane mainPickingPane = new StackPane();
         playBtn = createStartButton();
 
-        mainPickingPane.setAlignment(playBtn , Pos.BOTTOM_CENTER);
+        StackPane.setAlignment(playBtn , Pos.BOTTOM_CENTER);
         StackPane.setMargin(playBtn, new Insets(0, 0, -50, 0));
         playBtn.setDisable(true);
 
         root.setPadding(new Insets(20));
         Image backgroundImage = new Image(
-                GlobalSettings.getResource("graphics/Items/Background/daypickingstage.png").toString()
+                GlobalSettings.getResource("graphics/Items/Background/daypickingstage.png")
         );
         BackgroundSize backgroundSize = new BackgroundSize(
                 100, 100, true, true, true, false
@@ -82,7 +82,7 @@ public class PickingPlantStage {
     }
 
     private void loadCardImages() {
-        File cardsDirectory = new File(GlobalSettings.getDir("graphics/Cards/Day"));
+        File cardsDirectory = new File(GlobalSettings.getDir("graphics/Cards"));
         File[] cardFiles = cardsDirectory.listFiles();
         cardImages = new Image[cardFiles.length];
         for (int j = 0; j < cardImages.length; j++) {

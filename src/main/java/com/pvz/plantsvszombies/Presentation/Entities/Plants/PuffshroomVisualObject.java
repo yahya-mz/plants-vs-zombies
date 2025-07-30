@@ -4,6 +4,7 @@ import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.PuffShroomGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
@@ -27,7 +28,7 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
 
     private final IVisualEngine _engine;
 
-    public PuffshroomVisualObject(PeashooterGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
+    public PuffshroomVisualObject(PuffShroomGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
         super._gameObject = gameObject;
         _engine = engine;
 

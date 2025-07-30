@@ -23,7 +23,7 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject {
     private final ArrayList<IEventSubscriber> _switchAwakenessEventSubscribers = new ArrayList<>();
     private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
-    public static ScaredyShroomGameObject createScaredy(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    public static ScaredyShroomGameObject createScaredyShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new ScaredyShroomGameObject(gameEngine, id, coordinate, row, column);
     }
 
@@ -61,7 +61,6 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject {
         if (!this._isDisposed) {
             tick++;
             var rowsZombies = _gameEngine.getZombiesByRow(_row);
-            rowsZombies.sort(Comparator.comparingInt(AbstractZombieGameObject::getColumn));
             if (!rowsZombies.isEmpty()) {
                 var frontZombie = rowsZombies.getFirst(); // Most front zombie
                 if (frontZombie.getColumn() - _column < 2) {

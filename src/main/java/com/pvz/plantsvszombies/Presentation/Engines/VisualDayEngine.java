@@ -7,7 +7,6 @@ import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.*;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Engines.DayEngine;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
 import com.pvz.plantsvszombies.Presentation.Entities.*;
@@ -94,6 +93,7 @@ public class VisualDayEngine implements IVisualEngine {
                             _currentMapVisualObject.plant(visualObject, jl.getRow(), jl.getColumn());
                         }
                         default -> {
+                            System.out.println("demo");
                         }
                     }
                     temp_this._visualObjects.add(visualObject);
@@ -309,7 +309,7 @@ public class VisualDayEngine implements IVisualEngine {
                     ch.changeStateTo(ConeHeadZombieVisualObject.States.MOVING);
                 }
                 case ScreenDoorZombieVisualObject sd -> {
-                    sd.changeStateTo(ScreenDoorZombieVisualObject.States.MOVING_FORWARD);
+                    sd.changeStateTo(ScreenDoorZombieVisualObject.States.MOVING);
                 }
                 case ImpZombieVisualObject p -> {
                     p.changeStateTo(ImpZombieVisualObject.States.MOVING);

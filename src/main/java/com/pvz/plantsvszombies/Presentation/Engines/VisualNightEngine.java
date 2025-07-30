@@ -192,74 +192,55 @@ public class VisualNightEngine implements IVisualEngine {
     @Override
     public void plant(Class<? extends AbstractPlantVisualObject> plantType, int x, int y, Coordinate coordinate) {
         Platform.runLater(() -> {
+            try {
+                if (plantType == PeashooterVisualObject.class) {
+                    String PeashooterObjectId = "Peashooter_" + UUID.randomUUID();
+                    var obj = PeashooterGameObject.createPeashooterGameObject(this._gameEngine, PeashooterObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == WallNutVisualObject.class) {
+                    String WalnutObjectId = "Walnut_" + UUID.randomUUID();
+                    var obj = WallNutGameObject.createWallNutGameObject(this._gameEngine, WalnutObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == TallnutVisualObject.class) {
+                    String PeashooterObjectId = "Tallnut_" + UUID.randomUUID();
+                    var obj = TallNutGameObject.createTallNutGameObject(this._gameEngine, PeashooterObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == SunFlowerVisualObject.class) {
+                    String SunFlowerObjectId = "SunFlower_" + UUID.randomUUID();
+                    var obj = SunFlowerGameObject.createSunFlowerGameObject(this._gameEngine, SunFlowerObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == JalapenoVisualObject.class) {
+                    String JalapenoObjectId = "Jalapeno_" + UUID.randomUUID();
+                    var obj = JalapenoGameObject.createJalapenoGameObject(this._gameEngine, JalapenoObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == SnowPeaVisualObject.class) {
+                    String SnowpeaObjectId = "Snowpea_" + UUID.randomUUID();
+                    var obj = SnowPeaGameObject.createSnowPeaGameObject(this._gameEngine, SnowpeaObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == CherryBombVisualObject.class) {
+                    String CherryBombObjectId = "CherryBomb_" + UUID.randomUUID();
+                    var obj = CherryBombGameObject.createCherryBombGameObject(this._gameEngine, CherryBombObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == RepeaterVisualObject.class) {
+                    String RepeaterObjectId = "RepeaterPea_" + UUID.randomUUID();
+                    var obj = RepeaterGameObject.createRepeaterGameObject(this._gameEngine, RepeaterObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == ScaredyshroomVisualObject.class) {
+                    String scaredyShroomObjectId = "ScaredyShroom_" + UUID.randomUUID();
+                    var obj = ScaredyShroomGameObject.createScaredyShroomGameObject(this._gameEngine, scaredyShroomObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == PuffshroomVisualObject.class) {
+                    String puffShroomObjectId = "PuffShroom_" + UUID.randomUUID();
+                    var obj = PuffShroomGameObject.createPuffShroomGameObject(this._gameEngine, puffShroomObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == IceshroomVisualObject.class) {
+                    String iceShroomObjectId = "IceShroom_" + UUID.randomUUID();
+                    var obj = IceShroomGameObject.createIceShroomGameObject(this._gameEngine, iceShroomObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                }
 
-            if (plantType == PeashooterVisualObject.class) {
-                String PeashooterObjectId = "Peashooter" + UUID.randomUUID();
-                var obj = PeashooterGameObject.createPeashooterGameObject(this._gameEngine, PeashooterObjectId, coordinate, x, y);
-                try {
-                    this._gameEngine.plantObject(obj);
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else if (plantType == WallNutVisualObject.class) {
-                String WalnutObjectId = "Walnut" + UUID.randomUUID();
-                var obj = WallNutGameObject.createWallNutGameObject(this._gameEngine, WalnutObjectId, coordinate, x, y);
-                try {
-                    this._gameEngine.plantObject(obj);
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else if (plantType == TallnutVisualObject.class) {
-                String PeashooterObjectId = "Tallnut" + UUID.randomUUID();
-                var obj = TallNutGameObject.createTallNutGameObject(this._gameEngine, PeashooterObjectId, coordinate, x, y);
-                try {
-                    this._gameEngine.plantObject(obj);
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else if (plantType == SunFlowerVisualObject.class) {
-                String SunFlowerObjectId = "SunFlower" + UUID.randomUUID();
-                var obj = SunFlowerGameObject.createSunFlowerGameObject(this._gameEngine, SunFlowerObjectId, coordinate, x, y);
-                try {
-                    this._gameEngine.plantObject(obj);
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else if (plantType == JalapenoVisualObject.class) {
-                String JalapenoObjectId = "Jalapeno" + UUID.randomUUID();
-                var obj = JalapenoGameObject.createJalapenoGameObject(this._gameEngine, JalapenoObjectId, coordinate, x, y);
-                try {
-                    this._gameEngine.plantObject(obj);
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else if (plantType == SnowPeaVisualObject.class) {
-                String SnowpeaObjectId = "Snowpea" + UUID.randomUUID();
-                var obj = SnowPeaGameObject.createSnowPeaGameObject(this._gameEngine, SnowpeaObjectId, coordinate, x, y);
-                try {
-                    this._gameEngine.plantObject(obj);
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else if (plantType == CherryBombVisualObject.class) {
-                String CherryBombObjectId = "CherryBomb" + UUID.randomUUID();
-                var obj = CherryBombGameObject.createCherryBombGameObject(this._gameEngine, CherryBombObjectId, coordinate, x, y);
-                try {
-                    this._gameEngine.plantObject(obj);
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                }
-            }
-//
-//                        }
-            else if (plantType == RepeaterVisualObject.class) {
-                String RepeaterObjectId = "RepeaterPea" + UUID.randomUUID();
-                var obj = RepeaterGameObject.createRepeaterGameObject(this._gameEngine, RepeaterObjectId, coordinate, x, y);
-                try {
-                    this._gameEngine.plantObject(obj);
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
         });
     }
@@ -283,6 +264,17 @@ public class VisualNightEngine implements IVisualEngine {
     @Override
     public AbstractLevelView getLevelStage() {
         return this._levelStage;
+    }
+
+    @Override
+    public void shovelRemover(int row, int col) {
+
+    }
+
+    public void shovelActivation() {
+        if (_currentMapVisualObject != null) {
+            _currentMapVisualObject.setIsShovelActivated(true);
+        }
     }
 
     private void playLosingSequence(String winnerZombieId) {

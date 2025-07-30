@@ -1,75 +1,3 @@
-//package com.pvz.plantsvszombies.GUI.Views;
-//
-//import com.pvz.plantsvszombies.GameEngine.DayEngine;
-//import com.pvz.plantsvszombies.Mediator.Mediator;
-//import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
-//import com.pvz.plantsvszombies.Presentation.VisualEngine;
-//import javafx.geometry.Insets;
-//import javafx.scene.Scene;
-//import javafx.scene.control.Button;
-//import javafx.scene.input.MouseButton;
-//import javafx.scene.layout.*;
-//import javafx.scene.paint.Color;
-//
-//public class DayView extends AbstractLevelView {
-//
-//    public static final double Width = 1280;
-//    public static final double Height = 728;
-//
-//    private boolean engineThreadRunning = false;
-//
-//    private VisualEngine _visualEngine;
-//
-//    private DayView() {
-//    }
-//
-//    public static DayView createStage() {
-//        var dayView = new DayView();
-//        dayView.setupEngines();
-//        StackPane bottommostPlane = new StackPane();
-//        bottommostPlane.setBackground(new Background(
-//                new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)
-//        ));
-//
-//        var btn = new Button("Spawn Peashooter");
-//        bottommostPlane.getChildren().add(btn);
-//        btn.setOnMouseClicked((e) -> {
-//            if (e.getButton().equals(MouseButton.PRIMARY)) {
-//                dayView._visualEngine.plant(PeashooterVisualObject.class
-//                        , 1, 1);
-//            }
-//        });
-//
-//        var btn2 = new Button("Spawn Peashooter 2");
-//        bottommostPlane.getChildren().add(btn2);
-//        btn2.setOnMouseClicked((e) -> {
-//            if (e.getButton().equals(MouseButton.PRIMARY)) {
-//                dayView._visualEngine.plant(PeashooterVisualObject.class
-//                        , 2, 2);
-//            }
-//        });
-//
-//
-//        var scene = new Scene(bottommostPlane, Width, Height);
-//        dayView._gameBoxPane = bottommostPlane;
-//        dayView.setScene(scene);
-//        return dayView;
-//
-//    }
-//
-//
-//    private void setupEngines() {
-//        DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);
-//        _visualEngine = new VisualEngine(this, dayEngine);
-//        Mediator.init(dayEngine, _visualEngine);
-//        Mediator.getInstance().startEngine();
-//
-//        this.setOnHiding((event) -> {
-//            System.out.println("Stopping GameEngine");
-//            Mediator.getInstance().stopEngine();
-//        });
-//    }
-//}
 package com.pvz.plantsvszombies.Presentation.GUI.Views;
 
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
@@ -106,7 +34,7 @@ public class DayView extends AbstractLevelView {
     public static final double Width = 1200;
     public static final double Height = 728;
     public int cursorType;
-    private static IntegerProperty counterValue = new SimpleIntegerProperty(0);
+    private static final IntegerProperty counterValue = new SimpleIntegerProperty(0);
     private VisualDayEngine _visualEngine;
     private static StackPane bottommostPlane;
     private static final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
@@ -137,26 +65,26 @@ public class DayView extends AbstractLevelView {
         VBox suncounter = createCounter();
         HBox plantbar = dayView.createTopPlantSelectionBar(selectedPlants);
         addHoverEffectToImages(plantbar);
-        Button shuveltool = dayView.createShovelToolButton();
+        Button shoveltool = dayView.createShovelToolButton();
         Button pause = createPauseButton();
 
         HBox mainbar = new HBox(80);
 //        mainbar.setStyle("-fx-background-color: red;");-debug
         mainbar.setMaxWidth(1100);
         mainbar.setMaxHeight(100);
-        mainbar.getChildren().addAll(suncounter, plantbar, shuveltool);
+        mainbar.getChildren().addAll(suncounter, plantbar, shoveltool);
         mainbar.setAlignment(Pos.TOP_CENTER);
         mainbar.setMouseTransparent(false);
         mainbar.setPickOnBounds(true);
         HBox.setMargin(suncounter, new Insets(73, 60, 0, 236));//dont change this
         HBox.setMargin(plantbar, new Insets(0,85,0, -70));
-        HBox.setMargin(shuveltool , new Insets(-14,0,0,-30));
+        HBox.setMargin(shoveltool , new Insets(-14,0,0,-30));
         mainbar.setMinWidth(50);
         mainbar.setMinHeight(30);
 
         bottommostPlane.getChildren().addAll(mainbar , pause);
         //StackPane.setMargin(mainbar, new Insets(20, -40, 200, 60));//dont change this
-        bottommostPlane.setAlignment(pause, Pos.BOTTOM_LEFT);
+        StackPane.setAlignment(pause, Pos.BOTTOM_LEFT);
         StackPane.setAlignment(mainbar, Pos.TOP_CENTER);
         StackPane.setMargin(mainbar, new Insets(15, 60, 185,-20));
 
@@ -211,7 +139,7 @@ public class DayView extends AbstractLevelView {
         for (int i = 0; i < selectedPlants.size(); i++) {
             Button btn = new Button("Item " + i);
             btn.setCursor(Cursor.HAND);
-            Image path = new Image(GlobalSettings.getResource("graphics/Cards/Day/" + selectedPlants.get(i).name() + ".png"), true);
+            Image path = new Image(GlobalSettings.getResource("graphics/Cards/" + selectedPlants.get(i).name() + ".png"), true);
             ImageView cardpic = new ImageView(path);
 
             cardpic.setPreserveRatio(true);
@@ -265,8 +193,7 @@ public class DayView extends AbstractLevelView {
 
     public static void addHoverEffectToImages(HBox hbox) {//fixing
         for (Node node : hbox.getChildren()) {
-            if (node instanceof ImageView) {
-                ImageView imageView = (ImageView) node;
+            if (node instanceof ImageView imageView) {
 
                 imageView.setOnMouseEntered(e -> {
                     imageView.setTranslateY(-9);
@@ -284,22 +211,22 @@ public class DayView extends AbstractLevelView {
     }
 
     public Button createShovelToolButton() {
-        Image shovelCursorImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shuveltool/shuvel.png"));
-        Image shovelFullImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shuveltool/shuvelToolFull.png"), true);
-        Image shovelEmptyImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shuveltool/shuvelToolEmpty.png"), true);
+        Image shovelCursorImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shoveltool/shovel.png"));
+        Image shovelFullImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shoveltool/shovelToolFull.png"), true);
+        Image shovelEmptyImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shoveltool/shovelToolEmpty.png"), true);
 
         Button shovelButton = new Button();
         ImageView shovelFullView = new ImageView(shovelFullImage);
         ImageView shovelEmptyView = new ImageView(shovelEmptyImage);
 
-        shuvelBarView(shovelButton, shovelFullView);
+        shovelBarView(shovelButton, shovelFullView);
 
         // ✅ فقط یک‌بار لیسنر اضافه می‌کنیم
         DayView.isShovelModeProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal && shovelButton.getScene() != null) {
                 Platform.runLater(() -> {
                     shovelButton.getScene().setCursor(Cursor.DEFAULT);
-                    shuvelBarView(shovelButton, new ImageView(shovelFullImage));
+                    shovelBarView(shovelButton, new ImageView(shovelFullImage));
                 });
             }
         });
@@ -311,7 +238,7 @@ public class DayView extends AbstractLevelView {
             if (scene != null && DayView.getIsShovelMode()) {
                 scene.setCursor(new ImageCursor(shovelCursorImage, 32, 32));
                 _visualEngine.shovelActivation();
-                shuvelBarView(shovelButton, new ImageView(shovelEmptyImage));
+                shovelBarView(shovelButton, new ImageView(shovelEmptyImage));
 
                 scene.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
                     if (event.getButton() == MouseButton.SECONDARY && DayView.getIsShovelMode()) {
@@ -336,7 +263,7 @@ public class DayView extends AbstractLevelView {
         return isShovelMode.get();
     }
 
-    private static void shuvelBarView(Button btn , ImageView shovelView){
+    private static void shovelBarView(Button btn , ImageView shovelView){
         shovelView.setFitWidth(120);
         shovelView.setFitHeight(120);
         shovelView.setPreserveRatio(false);
@@ -391,7 +318,7 @@ public class DayView extends AbstractLevelView {
 
         for (int i = 0; i < imagePaths.length; i++) {
             String path = imagePaths[i];
-            Image image = new Image(GlobalSettings.getResource(path).toString(), true);
+            Image image = new Image(GlobalSettings.getResource(path), true);
             PauseTransition setImage = new PauseTransition(Duration.ZERO);
             setImage.setOnFinished(e -> imageView.setImage(image));
 

@@ -26,4 +26,5 @@ public interface IVisualEngine {
     void clearSelectedPlantType();
 
     AbstractLevelView getLevelStage();
+    void shovelRemover(int row, int col);
 }

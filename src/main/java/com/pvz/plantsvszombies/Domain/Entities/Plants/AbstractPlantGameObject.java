@@ -11,7 +11,11 @@ public abstract class AbstractPlantGameObject extends AbstractGameObject {
         WALL_NUT,
         TALL_NUT,
         SUNFLOWER,
-        SNOW_PEA
+        SNOW_PEA,
+        SCAREDY_SHROOM,
+        PUFF_SHROOM,
+        ICE_SHROOM
+
     }
 
     protected int _row;

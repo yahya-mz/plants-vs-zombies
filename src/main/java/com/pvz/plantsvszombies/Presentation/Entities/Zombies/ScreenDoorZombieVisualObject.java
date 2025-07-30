@@ -14,8 +14,8 @@ import javafx.util.Duration;
 
 public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
     public enum States {
-        MOVING_FORWARD,
-        ATTACKING,
+        MOVING,
+        EATING,
         DYING,
         BURNING
     }
@@ -39,22 +39,22 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
         _node.setManaged(false);
         _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
 
-        _currentState = States.MOVING_FORWARD;
+        _currentState = States.MOVING;
 
         _gameObject.subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
             Platform.runLater(() -> {
                 _node.relocate(_visualCoordinate.x() - 0.5 * width , _visualCoordinate.y() - height * 0.5);
             });
-            if (!this._currentState.equals(States.MOVING_FORWARD)) {
-                changeStateTo(States.MOVING_FORWARD);
+            if (!this._currentState.equals(States.MOVING)) {
+                changeStateTo(States.MOVING);
             }
         });
         _gameObject.subscribeToEatingEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
-                    changeStateTo(States.ATTACKING);
+                    changeStateTo(States.EATING);
                 });
             }
         });
@@ -81,8 +81,8 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
 
     public ScreenDoorZombieVisualObject changeStateTo(ScreenDoorZombieVisualObject.States state) {
         switch (state) {
-            case MOVING_FORWARD -> {
-                _currentState = States.MOVING_FORWARD;
+            case MOVING -> {
+                _currentState = States.MOVING;
                 stopAnimation();
                 playAnimation(ScreenDoorZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(90));
             }
@@ -91,8 +91,8 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
                 stopAnimation();
                 playAnimation(ScreenDoorZombieAnimations.Animations.DYING, Duration.millis(90));
             }
-            case ATTACKING -> {
-                _currentState = States.ATTACKING;
+            case EATING -> {
+                _currentState = States.EATING;
                 stopAnimation();
                 playAnimation(ScreenDoorZombieAnimations.Animations.ATTACKING, Duration.millis(90));
             }

@@ -184,6 +184,7 @@ public abstract class GameEngine {
     }
 
     public List<AbstractZombieGameObject> getZombiesByRow(int row) {
-        return queryZombies(z -> z.getRow() == row);
+        return queryZombies(z -> z.getRow() == row)
+                .stream().sorted(Comparator.comparingInt(AbstractZombieGameObject::getColumn)).toList();
     }
 }

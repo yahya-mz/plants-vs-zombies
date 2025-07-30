@@ -12,7 +12,6 @@ public class ScreenDoorZombieAnimations {
     public enum Animations implements IAnimation {
         MOVING_FORWARD,
         DYING,
-//        LOSTDOOR,
         ATTACKING,
         BURNING
     }

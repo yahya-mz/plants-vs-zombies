@@ -1,7 +1,6 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
@@ -21,7 +20,7 @@ public class PuffShroomGameObject extends AbstractPlantGameObject {
     private final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
     private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
-    public static PuffShroomGameObject createPuffShroom(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    public static PuffShroomGameObject createPuffShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new PuffShroomGameObject(gameEngine, id, coordinate, row, column);
     }
 
@@ -45,7 +44,7 @@ public class PuffShroomGameObject extends AbstractPlantGameObject {
 
     @Override
     public void spawn() {
-
+        System.out.println("dude?");
     }
 
     private double _lastShootTick = 0;
