@@ -2,33 +2,37 @@ package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.UUID;
 
-public class PeashooterGameObject extends AbstractPlantGameObject {
+public class PuffShroomGameObject extends AbstractPlantGameObject {
+
     private final Duration _coolDown = Duration.ofMillis(4000);
     private int tick = 1;
 
     private final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
     private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
-    public static PeashooterGameObject createPeashooterGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
-        return new PeashooterGameObject(gameEngine, id, coordinate, row, column);
+    public static PuffShroomGameObject createPuffShroom(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+        return new PuffShroomGameObject(gameEngine, id, coordinate, row, column);
     }
 
-    private PeashooterGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    private PuffShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
         this._row = row;
         this._column = column;
 
-        this._cost = 100;
+        this._cost = 0;
     }
 
     public void subscribeToShootingEvent(IEventSubscriber event) {
@@ -50,8 +54,13 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
     public void update() {
         if (!this._isDisposed) {
             tick++;
-            if (_gameEngine.doesRowHaveZombie(_row)) {
-                if ((_lastShootTick * 1000 / GlobalSettings.FPS) % _coolDown.toMillis() == 0) {
+            var rowsZombies = _gameEngine.getZombiesByRow(_row);
+            if (!rowsZombies.isEmpty()) {
+                rowsZombies.sort(Comparator.comparingInt(AbstractZombieGameObject::getColumn));
+                var frontZombie = rowsZombies.getFirst(); // Most front zombie
+
+                if ((_lastShootTick * 1000 / GlobalSettings.FPS) % _coolDown.toMillis() == 0
+                        && frontZombie.getColumn() - 4 <= _column) {
                     shoot();
                     _lastShootTick = 0;
                 }
@@ -72,8 +81,8 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
     }
 
     private void shoot() {
-        String BulletObjectId = "NormalBullet" + UUID.randomUUID();
-        var bulletObj = NormalBulletGameObject.createNormalBulletGameObject(_gameEngine, BulletObjectId, new Coordinate(this._coordinate.x() + 30, this._coordinate.y() - 20), getRow());
+        String BulletObjectId = "ShroomBullet" + UUID.randomUUID();
+        var bulletObj = ShroomBulletGameObject.createShroomBulletGameObject(_gameEngine, BulletObjectId, new Coordinate(this._coordinate.x() + 30, this._coordinate.y() - 20), getRow());
         _gameEngine.spawnObject(bulletObj);
         for (IEventSubscriber eventSubscriber : _shootingEventSubscribers) {
             eventSubscriber._notify(bulletObj);
@@ -90,4 +99,5 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
     private double getMilliseconds() {
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }
+
 }

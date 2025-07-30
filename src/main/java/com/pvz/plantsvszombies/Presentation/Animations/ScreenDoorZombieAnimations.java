@@ -13,7 +13,8 @@ public class ScreenDoorZombieAnimations {
         MOVING_FORWARD,
         DYING,
 //        LOSTDOOR,
-        ATTACKING
+        ATTACKING,
+        BURNING
     }
 
 

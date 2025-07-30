@@ -41,7 +41,7 @@ public class ConeHeadZombieVisualObject extends AbstractZombieVisualObject {
 
         _currentState = States.MOVING;
 
-        ((ConeHeadZombieGameObject) _gameObject).subscribeToMovementEvent((zombieObj) -> {
+        (_gameObject).subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
             Platform.runLater(() -> {
                 _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
@@ -50,8 +50,7 @@ public class ConeHeadZombieVisualObject extends AbstractZombieVisualObject {
                 changeStateTo(States.MOVING);
             }
         });
-
-        ((ConeHeadZombieGameObject) _gameObject).subscribeToEatingEvent(new IEventSubscriber() {
+        (_gameObject).subscribeToEatingEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
@@ -59,9 +58,14 @@ public class ConeHeadZombieVisualObject extends AbstractZombieVisualObject {
                 });
             }
         });
-
-        ((ConeHeadZombieGameObject) _gameObject).subscribeToDeathEvent((zombieObj) -> {//we have to change this
+        (_gameObject).subscribeToDeathEvent((zombieObj) -> {//we have to change this
             Platform.runLater(() -> changeStateTo(States.DYING));
+        });
+        _gameObject.subscribeToBurnEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                Platform.runLater(() -> changeStateTo(States.BURNING));
+            }
         });
     }
 

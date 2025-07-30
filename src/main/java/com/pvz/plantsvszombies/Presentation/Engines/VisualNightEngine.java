@@ -7,7 +7,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.*;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Engines.DayEngine;
+import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
 import com.pvz.plantsvszombies.Presentation.Entities.*;
 import com.pvz.plantsvszombies.Presentation.Entities.Bullets.NormalBulletVisualObject;
@@ -21,7 +21,7 @@ import javafx.scene.layout.Pane;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class VisualDayEngine implements IVisualEngine {
+public class VisualNightEngine implements IVisualEngine {
     private final int _width = 1280;
     private final int _height = 728;
     //
@@ -32,9 +32,9 @@ public class VisualDayEngine implements IVisualEngine {
     private MapVisualObject _currentMapVisualObject;
     private final AbstractLevelView _levelStage;
 
-    private final DayEngine _gameEngine;
+    private final NightEngine _gameEngine;
 
-    public VisualDayEngine(AbstractLevelView levelStage, DayEngine gameEngine) {
+    public VisualNightEngine(AbstractLevelView levelStage, NightEngine gameEngine) {
         _levelStage = levelStage;
         _gameEngine = gameEngine;
 
@@ -45,10 +45,6 @@ public class VisualDayEngine implements IVisualEngine {
                 if (gameObject instanceof MapGameObject) {
                     _currentMapVisualObject = new MapVisualObject((MapGameObject) gameObject, temp_this);
                     spawnVisualObject(_currentMapVisualObject, 1);
-                }
-                if (gameObject instanceof SunGameObject) {
-                    SkySunVisualObject object = new SkySunVisualObject((SunGameObject) gameObject, temp_this);
-                    spawnVisualObject(object);
                 }
                 if (gameObject instanceof AbstractBulletGameObject) {
                     if (gameObject instanceof NormalBulletGameObject bullet) {

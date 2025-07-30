@@ -9,6 +9,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Mediator.Mediator;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -171,4 +172,18 @@ public abstract class GameEngine {
         return this._gameObjects.stream().toList();
     }
 
+    public boolean doesRowHaveZombie(int row) {
+        for (AbstractGameObject obj : _gameObjects) {
+            if (obj instanceof AbstractZombieGameObject) {
+                if (((AbstractZombieGameObject) obj).getRow() == row) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public List<AbstractZombieGameObject> getZombiesByRow(int row) {
+        return queryZombies(z -> z.getRow() == row);
+    }
 }

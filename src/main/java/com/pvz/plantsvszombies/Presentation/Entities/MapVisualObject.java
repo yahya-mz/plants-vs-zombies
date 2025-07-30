@@ -7,6 +7,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
 import com.pvz.plantsvszombies.Presentation.Entities.Bullets.NormalBulletVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
@@ -35,10 +36,10 @@ import java.util.List;
 
 public class MapVisualObject extends AbstractVisualObject {
     MapGameObject _mapObject;
-    private final VisualDayEngine _engine;
+    private final IVisualEngine _engine;
     private final StackPane[][] visualGrid = new StackPane[5][9];
 
-    public MapVisualObject(MapGameObject object, VisualDayEngine engine) {
+    public MapVisualObject(MapGameObject object, IVisualEngine engine) {
         this._mapObject = object;
         this._engine = engine;
 
@@ -49,7 +50,11 @@ public class MapVisualObject extends AbstractVisualObject {
 
         mainContainer.setBackground(new Background(
                 new BackgroundImage(
-                        new Image(GlobalSettings.getResource("graphics/Items/Background/daymap.jpg").toString(), true),
+                        new Image(GlobalSettings.getResource(
+                                (_engine instanceof VisualDayEngine ?
+                                        "graphics/Items/Background/daymap.jpg" :
+                                        "graphics/Items/Background/nightmap.jpg")
+                        ), true),
                         BackgroundRepeat.NO_REPEAT,
                         BackgroundRepeat.NO_REPEAT,
                         BackgroundPosition.CENTER,

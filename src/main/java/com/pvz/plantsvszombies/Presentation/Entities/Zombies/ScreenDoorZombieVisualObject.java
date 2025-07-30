@@ -16,8 +16,9 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
     public enum States {
         MOVING,
         EATING,
-        LOSTDOOR,
-        DYING
+        //        LOSTDOOR,
+        DYING,
+        BURNING
     }
 
     private ScreenDoorZombieGameObject _gameObject;
@@ -44,7 +45,7 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
         _gameObject.subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
             Platform.runLater(() -> {
-                _node.relocate(_visualCoordinate.x() - 0.5 * width , _visualCoordinate.y() - height * 0.5);
+                _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
             });
             if (!this._currentState.equals(States.MOVING)) {
                 changeStateTo(States.MOVING);
@@ -58,7 +59,12 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
                 });
             }
         });
-
+        _gameObject.subscribeToBurnEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                Platform.runLater(() -> changeStateTo(States.BURNING));
+            }
+        });
         _gameObject.subscribeToDeathEvent((zombieObj) -> {//we have to change this
             Platform.runLater(() -> changeStateTo(States.DYING));
         });
@@ -67,6 +73,10 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
     @Override
     public void playAnimation(IAnimation animation, Duration frameDuration) {
         super.playAnimation(ScreenDoorZombieAnimations.getFrames((ScreenDoorZombieAnimations.Animations) animation), frameDuration);
+    }
+
+    public void playAnimation(IAnimation animation, Duration frameDuration, int cycleCount) {
+        super.playAnimation(ScreenDoorZombieAnimations.getFrames((ScreenDoorZombieAnimations.Animations) animation), frameDuration, cycleCount);
     }
 
     @Override
@@ -88,13 +98,22 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
             }
             case DYING -> {
                 _currentState = States.DYING;
-                stopAnimation();
-                playAnimation(ScreenDoorZombieAnimations.Animations.DYING, Duration.millis(90));
+                playAnimation(ScreenDoorZombieAnimations.Animations.DYING, Duration.millis(70), 1);
+                setOnAnimationFinished(e -> {
+                    _engine.disposeObject(this);
+                });
             }
-            case LOSTDOOR -> {
-                _currentState = States.LOSTDOOR;
-                stopAnimation();
-//                playAnimation(ScreenDoorZombieAnimations.Animations.LOSTDOOR, Duration.millis(90));
+//            case LOSTDOOR -> {
+//                _currentState = States.LOSTDOOR;
+//                stopAnimation();
+////                playAnimation(ScreenDoorZombieAnimations.Animations.LOSTDOOR, Duration.millis(90));
+//            }
+            case BURNING -> {
+                _currentState = States.BURNING;
+                playAnimation(ScreenDoorZombieAnimations.Animations.BURNING, Duration.millis(70), 1);
+                setOnAnimationFinished(e -> {
+                    _engine.disposeObject(this);
+                });
             }
             case EATING -> {
                 _currentState = States.EATING;

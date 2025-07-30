@@ -1,83 +1,11 @@
-//package com.pvz.plantsvszombies.GUI.Views;
-//
-//import com.pvz.plantsvszombies.GameEngine.DayEngine;
-//import com.pvz.plantsvszombies.Mediator.Mediator;
-//import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
-//import com.pvz.plantsvszombies.Presentation.VisualEngine;
-//import javafx.geometry.Insets;
-//import javafx.scene.Scene;
-//import javafx.scene.control.Button;
-//import javafx.scene.input.MouseButton;
-//import javafx.scene.layout.*;
-//import javafx.scene.paint.Color;
-//
-//public class DayView extends AbstractLevelView {
-//
-//    public static final double Width = 1280;
-//    public static final double Height = 728;
-//
-//    private boolean engineThreadRunning = false;
-//
-//    private VisualEngine _visualEngine;
-//
-//    private DayView() {
-//    }
-//
-//    public static DayView createStage() {
-//        var dayView = new DayView();
-//        dayView.setupEngines();
-//        StackPane bottommostPlane = new StackPane();
-//        bottommostPlane.setBackground(new Background(
-//                new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)
-//        ));
-//
-//        var btn = new Button("Spawn Peashooter");
-//        bottommostPlane.getChildren().add(btn);
-//        btn.setOnMouseClicked((e) -> {
-//            if (e.getButton().equals(MouseButton.PRIMARY)) {
-//                dayView._visualEngine.plant(PeashooterVisualObject.class
-//                        , 1, 1);
-//            }
-//        });
-//
-//        var btn2 = new Button("Spawn Peashooter 2");
-//        bottommostPlane.getChildren().add(btn2);
-//        btn2.setOnMouseClicked((e) -> {
-//            if (e.getButton().equals(MouseButton.PRIMARY)) {
-//                dayView._visualEngine.plant(PeashooterVisualObject.class
-//                        , 2, 2);
-//            }
-//        });
-//
-//
-//        var scene = new Scene(bottommostPlane, Width, Height);
-//        dayView._gameBoxPane = bottommostPlane;
-//        dayView.setScene(scene);
-//        return dayView;
-//
-//    }
-//
-//
-//    private void setupEngines() {
-//        DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);
-//        _visualEngine = new VisualEngine(this, dayEngine);
-//        Mediator.init(dayEngine, _visualEngine);
-//        Mediator.getInstance().startEngine();
-//
-//        this.setOnHiding((event) -> {
-//            System.out.println("Stopping GameEngine");
-//            Mediator.getInstance().stopEngine();
-//        });
-//    }
-//}
 package com.pvz.plantsvszombies.Presentation.GUI.Views;
 
+import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
-import com.pvz.plantsvszombies.Domain.Engines.DayEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualNightEngine;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
-import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
@@ -96,25 +24,25 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import java.util.List;
 
-public class DayView extends AbstractLevelView {
+public class NightView extends AbstractLevelView {
 
     public static final double Width = 1200;
     public static final double Height = 728;
     private static IntegerProperty counterValue = new SimpleIntegerProperty(0);
-    private VisualDayEngine _visualEngine;
+    private VisualNightEngine _visualEngine;
     private static StackPane bottommostPlane;
 
-
-    private DayView() {
+    private NightView() {
     }
 
-    public static DayView createStage(List<AbstractPlantGameObject.PlantType> selectedPlants) {
+    public static NightView createStage(List<AbstractPlantGameObject.PlantType> selectedPlants) {
         bottommostPlane = new StackPane();//changed
-        var dayView = new DayView();
-        dayView.setupEngines();
-        dayView._gameBoxPane = bottommostPlane;
+        var nightView = new NightView();
+        nightView.setupEngines();
+        nightView._gameBoxPane = bottommostPlane;
 
         //ready-set-plant
         VBox animationBox = new VBox();
@@ -129,7 +57,7 @@ public class DayView extends AbstractLevelView {
 
         //bar
         VBox suncounter = createCounter();
-        HBox plantbar = dayView.createTopPlantSelectionBar(selectedPlants);
+        HBox plantbar = nightView.createTopPlantSelectionBar(selectedPlants);
         addHoverEffectToImages(plantbar);
         Button shuveltool = createShovelToolButton();
         Button pause = createPauseButton();
@@ -143,32 +71,32 @@ public class DayView extends AbstractLevelView {
         mainbar.setMouseTransparent(false);
         mainbar.setPickOnBounds(true);
         HBox.setMargin(suncounter, new Insets(73, 60, 0, 220));//dont change this
-        HBox.setMargin(plantbar, new Insets(0,85,0, -70));
+        HBox.setMargin(plantbar, new Insets(0, 85, 0, -70));
         mainbar.setMinWidth(50);
         mainbar.setMinHeight(30);
 
-        bottommostPlane.getChildren().addAll(mainbar , pause);
+        bottommostPlane.getChildren().addAll(mainbar, pause);
         //StackPane.setMargin(mainbar, new Insets(20, -40, 200, 60));//dont change this
         bottommostPlane.setAlignment(pause, Pos.BOTTOM_LEFT);
         StackPane.setAlignment(mainbar, Pos.TOP_CENTER);
-        StackPane.setMargin(mainbar, new Insets(15, 60, 185,-20));
+        StackPane.setMargin(mainbar, new Insets(15, 60, 185, -20));
 
 
         var scene = new Scene(bottommostPlane, Width, Height);
 
 
-        dayView.setScene(scene);
-        dayView.setResizable(false);
+        nightView.setScene(scene);
+        nightView.setResizable(false);
 
 
-        return dayView;
+        return nightView;
 
     }
 
     private void setupEngines() {
-        DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);
-        _visualEngine = new VisualDayEngine(this, dayEngine);
-        Mediator.init(dayEngine, _visualEngine);
+        NightEngine nightEngine = new NightEngine(NightView.Width, NightView.Height);
+        _visualEngine = new VisualNightEngine(this, nightEngine);
+        Mediator.init(nightEngine, _visualEngine);
         Mediator.getInstance().startGameEngine();
 
         this.setOnHiding((event) -> {
@@ -321,9 +249,6 @@ public class DayView extends AbstractLevelView {
     }
 
 
-
-
-
     public static void playImageSequenceInBox(Pane targetBox, Runnable onFinished) {
         String[] imagePaths = {
                 "graphics/Items/Messages/ready.png",
@@ -348,10 +273,10 @@ public class DayView extends AbstractLevelView {
             setImage.setOnFinished(e -> imageView.setImage(image));
 
             FadeTransition fadeIn;
-            if (i==0){
+            if (i == 0) {
                 fadeIn = new FadeTransition(Duration.seconds(1.2), imageView);
 
-            }else {
+            } else {
                 fadeIn = new FadeTransition(Duration.seconds(0.5), imageView);
             }
             fadeIn.setFromValue(0);
@@ -382,18 +307,22 @@ public class DayView extends AbstractLevelView {
     }
 
 
-    public void showWave1(){
-        showWaveImages(bottommostPlane , "wave1");
+    public void showWave1() {
+        showWaveImages(bottommostPlane, "wave1");
     }
-    public void showWave2(){
-        showWaveImages(bottommostPlane , "wave2");
+
+    public void showWave2() {
+        showWaveImages(bottommostPlane, "wave2");
     }
-    public void showWave3(){
-        showWaveImages(bottommostPlane , "wave3");
+
+    public void showWave3() {
+        showWaveImages(bottommostPlane, "wave3");
     }
-    public void showFinalWave(){
-        showWaveImages(bottommostPlane , "finalwave");
+
+    public void showFinalWave() {
+        showWaveImages(bottommostPlane, "finalwave");
     }
+
     private static void showWaveImages(StackPane parentPane, String imageName) {
 
         VBox overlayBox = new VBox();

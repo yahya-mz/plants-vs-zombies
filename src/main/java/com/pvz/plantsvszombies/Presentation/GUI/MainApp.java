@@ -1,7 +1,7 @@
 //}
 package com.pvz.plantsvszombies.Presentation.GUI;
 
-import com.pvz.plantsvszombies.Presentation.GUI.Views.DayPickingPlantStage;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.PickingPlantStage;
 import com.pvz.plantsvszombies.GlobalSettings;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -44,11 +44,11 @@ public class MainApp extends Application {
         );
 
         dayModeBtn.setOnAction(e -> {
-            launchGame(primaryStage);
+            launchGame(primaryStage, "day");
         });
 
         nightModeBtn.setOnAction(e -> {
-            // Add night mode functionality here
+            launchGame(primaryStage, "night");
         });
 
 
@@ -96,9 +96,9 @@ public class MainApp extends Application {
     }
 
 
-        private void launchGame(Stage primaryStage) {//for launching game
+        private void launchGame(Stage primaryStage, String mode) {//for launching game
             try {
-                DayPickingPlantStage pickingStageBuilder = new DayPickingPlantStage();
+                PickingPlantStage pickingStageBuilder = new PickingPlantStage(mode);
                 Stage pickingPlantStage = pickingStageBuilder.createStage(primaryStage);
                 pickingPlantStage.show();
                 pickingPlantStage.setOnCloseRequest(e -> primaryStage.show());

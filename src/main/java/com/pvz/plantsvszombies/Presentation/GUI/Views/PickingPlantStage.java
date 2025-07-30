@@ -17,11 +17,16 @@ import java.util.ArrayList;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 
-public class DayPickingPlantStage {
-    private static final ArrayList<AbstractPlantGameObject.PlantType> selectedPlants = new ArrayList<>();
+public class PickingPlantStage {
+    private final ArrayList<AbstractPlantGameObject.PlantType> selectedPlants = new ArrayList<>();
     private final HBox selectedPlantHBox = new HBox(0);
-    static Stage primaryStage;
-    static Button playBtn;
+    private Stage primaryStage;
+    private Button playBtn;
+    private String _mode;
+
+    public PickingPlantStage(String mode){
+        this._mode = mode;
+    }
 
     private Image[] cardImages;
 
@@ -183,7 +188,7 @@ public class DayPickingPlantStage {
         }
     }
 
-    public static Button createStartButton() {
+    public Button createStartButton() {
         double width = 250;
         double height = 250;
         String[] imagePath = {
@@ -224,7 +229,13 @@ public class DayPickingPlantStage {
         });
 
         button.setOnAction(e -> {
-            DayView gameStage = DayView.createStage(selectedPlants);
+            Stage gameStage;
+            if (_mode.equals("day")){
+                gameStage = DayView.createStage(selectedPlants);
+            }
+            else {
+                gameStage = NightView.createStage(selectedPlants);
+            }
             gameStage.show();
             gameStage.setOnHiding(event -> {
                 primaryStage.show();
@@ -235,6 +246,4 @@ public class DayPickingPlantStage {
 
         return button;
     }
-
-
 }
