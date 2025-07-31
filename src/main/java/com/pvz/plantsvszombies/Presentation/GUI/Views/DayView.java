@@ -27,6 +27,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
+
 import java.util.List;
 
 public class DayView extends AbstractLevelView {
@@ -34,12 +35,11 @@ public class DayView extends AbstractLevelView {
     public static final double Width = 1200;
     public static final double Height = 728;
     public int cursorType;
-    private static final IntegerProperty counterValue = new SimpleIntegerProperty(0);
+    private final IntegerProperty counterValue = new SimpleIntegerProperty(0);
     private VisualDayEngine _visualEngine;
-    private static StackPane bottommostPlane;
-    private static final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
-    private static Button shovelButton;
-
+    private StackPane bottommostPlane;
+    private final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
+    private Button shovelButton;
 
 
     private DayView() {
@@ -47,26 +47,26 @@ public class DayView extends AbstractLevelView {
 
     public static DayView createStage(List<AbstractPlantGameObject.PlantType> selectedPlants) {
         var dayView = new DayView();
-        bottommostPlane = new StackPane();//changed
-        dayView._gameBoxPane = bottommostPlane;
+        dayView.bottommostPlane = new StackPane();//changed
+        dayView._gameBoxPane = dayView.bottommostPlane;
 
         //ready-set-plant
         VBox animationBox = new VBox();
         animationBox.setPrefSize(500, 500);
         animationBox.setAlignment(Pos.CENTER);
-        bottommostPlane.getChildren().add(animationBox);
+        dayView.bottommostPlane.getChildren().add(animationBox);
         StackPane.setAlignment(animationBox, Pos.CENTER);
-        playImageSequenceInBox(animationBox, () -> {
-            bottommostPlane.getChildren().remove(animationBox);
+        dayView.playImageSequenceInBox(animationBox, () -> {
+            dayView.bottommostPlane.getChildren().remove(animationBox);
         });
         //
 
         //bar
-        VBox suncounter = createCounter();
+        VBox suncounter = dayView.createCounter();
         HBox plantbar = dayView.createTopPlantSelectionBar(selectedPlants);
-        addHoverEffectToImages(plantbar);
+        dayView.addHoverEffectToImages(plantbar);
         Button shoveltool = dayView.createShovelToolButton();
-        Button pause = createPauseButton();
+        Button pause = dayView.createPauseButton();
 
         HBox mainbar = new HBox(80);
 //        mainbar.setStyle("-fx-background-color: red;");-debug
@@ -77,19 +77,19 @@ public class DayView extends AbstractLevelView {
         mainbar.setMouseTransparent(false);
         mainbar.setPickOnBounds(true);
         HBox.setMargin(suncounter, new Insets(73, 60, 0, 236));//dont change this
-        HBox.setMargin(plantbar, new Insets(0,85,0, -70));
-        HBox.setMargin(shoveltool , new Insets(-14,0,0,-30));
+        HBox.setMargin(plantbar, new Insets(0, 85, 0, -70));
+        HBox.setMargin(shoveltool, new Insets(-14, 0, 0, -30));
         mainbar.setMinWidth(50);
         mainbar.setMinHeight(30);
 
-        bottommostPlane.getChildren().addAll(mainbar , pause);
+        dayView.bottommostPlane.getChildren().addAll(mainbar, pause);
         //StackPane.setMargin(mainbar, new Insets(20, -40, 200, 60));//dont change this
         StackPane.setAlignment(pause, Pos.BOTTOM_LEFT);
         StackPane.setAlignment(mainbar, Pos.TOP_CENTER);
-        StackPane.setMargin(mainbar, new Insets(15, 60, 185,-20));
+        StackPane.setMargin(mainbar, new Insets(15, 60, 185, -20));
 
 
-        var scene = new Scene(bottommostPlane, Width, Height);
+        var scene = new Scene(dayView.bottommostPlane, Width, Height);
 
 
         dayView.setScene(scene);
@@ -112,7 +112,7 @@ public class DayView extends AbstractLevelView {
         });
     }
 
-    public static VBox createCounter() {
+    public VBox createCounter() {
         Label counterLabel = new Label();
         counterLabel.textProperty().bind(counterValue.asString());
         counterLabel.setId("counter-label");
@@ -191,7 +191,7 @@ public class DayView extends AbstractLevelView {
         return buttonBar;
     }
 
-    public static void addHoverEffectToImages(HBox hbox) {//fixing
+    public void addHoverEffectToImages(HBox hbox) {//fixing
         for (Node node : hbox.getChildren()) {
             if (node instanceof ImageView imageView) {
 
@@ -217,12 +217,11 @@ public class DayView extends AbstractLevelView {
 
         Button shovelButton = new Button();
         ImageView shovelFullView = new ImageView(shovelFullImage);
-        ImageView shovelEmptyView = new ImageView(shovelEmptyImage);
 
         shovelBarView(shovelButton, shovelFullView);
 
         // ✅ فقط یک‌بار لیسنر اضافه می‌کنیم
-        DayView.isShovelModeProperty().addListener((obs, oldVal, newVal) -> {
+        isShovelModeProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal && shovelButton.getScene() != null) {
                 Platform.runLater(() -> {
                     shovelButton.getScene().setCursor(Cursor.DEFAULT);
@@ -232,17 +231,17 @@ public class DayView extends AbstractLevelView {
         });
 
         shovelButton.setOnAction(e -> {
-            DayView.setIsShovelMode(true); // ✅ به‌جای isShovelMode = true;
+            setIsShovelMode(true); // ✅ به‌جای isShovelMode = true;
 
             Scene scene = shovelButton.getScene();
-            if (scene != null && DayView.getIsShovelMode()) {
+            if (scene != null && getIsShovelMode()) {
                 scene.setCursor(new ImageCursor(shovelCursorImage, 32, 32));
                 _visualEngine.shovelActivation();
                 shovelBarView(shovelButton, new ImageView(shovelEmptyImage));
 
                 scene.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
-                    if (event.getButton() == MouseButton.SECONDARY && DayView.getIsShovelMode()) {
-                        DayView.setIsShovelMode(false);
+                    if (event.getButton() == MouseButton.SECONDARY && getIsShovelMode()) {
+                        setIsShovelMode(false);
                     }
                 });
             }
@@ -251,19 +250,19 @@ public class DayView extends AbstractLevelView {
         return shovelButton;
     }
 
-    public static BooleanProperty isShovelModeProperty() {
+    public BooleanProperty isShovelModeProperty() {
         return isShovelMode;
     }
 
-    public static void setIsShovelMode(boolean value) {
+    public void setIsShovelMode(boolean value) {
         isShovelMode.set(value);
     }
 
-    public static boolean getIsShovelMode() {
+    public boolean getIsShovelMode() {
         return isShovelMode.get();
     }
 
-    private static void shovelBarView(Button btn , ImageView shovelView){
+    private void shovelBarView(Button btn, ImageView shovelView) {
         shovelView.setFitWidth(120);
         shovelView.setFitHeight(120);
         shovelView.setPreserveRatio(false);
@@ -271,7 +270,7 @@ public class DayView extends AbstractLevelView {
         btn.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-border-color: transparent;");
     }
 
-    public static Button createPauseButton() {
+    public Button createPauseButton() {
         Button PauseButton = new Button();
 
         Image path = new Image(GlobalSettings.getResource("graphics/Items/Buttons/pause.png"), true);
@@ -295,11 +294,7 @@ public class DayView extends AbstractLevelView {
         return PauseButton;
     }
 
-
-
-
-
-    public static void playImageSequenceInBox(Pane targetBox, Runnable onFinished) {
+    public void playImageSequenceInBox(Pane targetBox, Runnable onFinished) {
         String[] imagePaths = {
                 "graphics/Items/Messages/ready.png",
                 "graphics/Items/Messages/set.png",
@@ -323,10 +318,10 @@ public class DayView extends AbstractLevelView {
             setImage.setOnFinished(e -> imageView.setImage(image));
 
             FadeTransition fadeIn;
-            if (i==0){
+            if (i == 0) {
                 fadeIn = new FadeTransition(Duration.seconds(1.2), imageView);
 
-            }else {
+            } else {
                 fadeIn = new FadeTransition(Duration.seconds(0.5), imageView);
             }
             fadeIn.setFromValue(0);
@@ -356,19 +351,22 @@ public class DayView extends AbstractLevelView {
         sequence.play();
     }
 
+    public void showWave1() {
+        showWaveImages(bottommostPlane, "wave1");
+    }
 
-    public void showWave1(){
-        showWaveImages(bottommostPlane , "wave1");
+    public void showWave2() {
+        showWaveImages(bottommostPlane, "wave2");
     }
-    public void showWave2(){
-        showWaveImages(bottommostPlane , "wave2");
+
+    public void showWave3() {
+        showWaveImages(bottommostPlane, "wave3");
     }
-    public void showWave3(){
-        showWaveImages(bottommostPlane , "wave3");
+
+    public void showFinalWave() {
+        showWaveImages(bottommostPlane, "finalwave");
     }
-    public void showFinalWave(){
-        showWaveImages(bottommostPlane , "finalwave");
-    }
+
     private static void showWaveImages(StackPane parentPane, String imageName) {
 
         VBox overlayBox = new VBox();

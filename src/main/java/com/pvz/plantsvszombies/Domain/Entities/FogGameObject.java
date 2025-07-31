@@ -12,6 +12,7 @@ public class FogGameObject extends AbstractGameObject {
 
     private int _tick;
     private int _column;
+    private int _row;
 
     private boolean _isFadingAway = false;
     private boolean _isFadedAway = false;
@@ -25,6 +26,10 @@ public class FogGameObject extends AbstractGameObject {
 
     public int getColumn() {
         return _column;
+    }
+
+    public int getRow(){
+        return _row;
     }
 
     public void subscribeToMovementEvent(IEventSubscriber eventSubscriber) {

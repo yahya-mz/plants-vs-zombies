@@ -83,11 +83,6 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
         playAnimation(NormalZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
     }
 
-    @Override
-    public AbstractZombieGameObject getGameObject() {
-        return _gameObject;
-    }
-
     public NormalZombieVisualObject changeStateTo(NormalZombieVisualObject.States state) {
         switch (state) {
             case MOVING -> {

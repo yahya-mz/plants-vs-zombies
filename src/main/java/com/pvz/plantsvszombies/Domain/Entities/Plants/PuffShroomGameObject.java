@@ -55,11 +55,10 @@ public class PuffShroomGameObject extends AbstractPlantGameObject {
             tick++;
             var rowsZombies = _gameEngine.getZombiesByRow(_row);
             if (!rowsZombies.isEmpty()) {
-                rowsZombies.sort(Comparator.comparingInt(AbstractZombieGameObject::getColumn));
                 var frontZombie = rowsZombies.getFirst(); // Most front zombie
 
                 if ((_lastShootTick * 1000 / GlobalSettings.FPS) % _coolDown.toMillis() == 0
-                        && frontZombie.getColumn() - 4 <= _column) {
+                        && frontZombie.getColumn() - 4 >= _column) {
                     shoot();
                     _lastShootTick = 0;
                 }

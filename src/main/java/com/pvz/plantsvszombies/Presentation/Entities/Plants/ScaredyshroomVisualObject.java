@@ -1,17 +1,12 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.ScaredyShroomGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
-import com.pvz.plantsvszombies.Presentation.Animations.PuffshroomAnimations;
 import com.pvz.plantsvszombies.Presentation.Animations.ScaredyshroomAnimations;
-import com.pvz.plantsvszombies.Presentation.Animations.WallNutAnimations;
 import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
-import com.pvz.plantsvszombies.Presentation.Entities.Bullets.ShroomBulletVisualObject;
-import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
@@ -19,7 +14,7 @@ import javafx.util.Duration;
 public class ScaredyshroomVisualObject extends AbstractPlantVisualObject {
     public enum States {
         STANDING,
-        HIDING,
+        CRYING,
         SLEEPING
     }
     private ScaredyshroomVisualObject.States _currentState = States.STANDING;
@@ -27,12 +22,12 @@ public class ScaredyshroomVisualObject extends AbstractPlantVisualObject {
 
     private final IVisualEngine _engine;
 
-    public ScaredyshroomVisualObject(PeashooterGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
+    public ScaredyshroomVisualObject(ScaredyShroomGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
         super._gameObject = gameObject;
         _engine = engine;
 
         _visualCoordinate = gameObject.getCoordinate();
-        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Scaredyshroom/Scaredyshroom_0.png")));
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/ScaredyShroom/ScaredyShroom_0.png")));
 
 //        gameObject.subscribeToShootingEvent(new IEventSubscriber() {//notify
 //            @Override
@@ -100,11 +95,11 @@ public class ScaredyshroomVisualObject extends AbstractPlantVisualObject {
                 stopAnimation();
                 playAnimation(ScaredyshroomAnimations.Animations.STANDING, Duration.millis(80));
             }
-            case HIDING -> {
+            case CRYING -> {
                 if (_currentState.equals(States.STANDING)) {
-                    _currentState = States.HIDING;
+                    _currentState = States.CRYING;
                     stopAnimation();
-                    playAnimation(ScaredyshroomAnimations.Animations.HIDING, Duration.millis(80));
+                    playAnimation(ScaredyshroomAnimations.Animations.CRYING, Duration.millis(80));
                 }
             }
         }

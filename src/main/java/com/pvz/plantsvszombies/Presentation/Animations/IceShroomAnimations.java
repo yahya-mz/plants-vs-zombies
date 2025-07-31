@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class IceshroomAnimations {
+public class IceShroomAnimations {
         public enum Animations implements IAnimation {
             BLOWING
         }
@@ -19,8 +19,8 @@ public class IceshroomAnimations {
         static {
         animations = new ArrayList<>();
         var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Iceshroom"));
-        for (int i = 0; i < IceshroomAnimations.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + IceshroomAnimations.Animations.values()[i].name()).listFiles();
+        for (int i = 0; i < IceShroomAnimations.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + IceShroomAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
                 String name = f.getName();
                 int dotIndex = name.lastIndexOf('.');
@@ -38,7 +38,7 @@ public class IceshroomAnimations {
         }
     }
 
-        public static Image[] getFrames(IceshroomAnimations.Animations animation) {
+        public static Image[] getFrames(IceShroomAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
 

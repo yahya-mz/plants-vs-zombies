@@ -83,12 +83,6 @@ public class ConeHeadZombieVisualObject extends AbstractZombieVisualObject {
         changeStateTo(States.MOVING);
     }
 
-    @Override
-    public AbstractZombieGameObject getGameObject() {
-        return _gameObject;
-    }
-
-
     public ConeHeadZombieVisualObject changeStateTo(ConeHeadZombieVisualObject.States state) {
         switch (state) {
             case MOVING -> {

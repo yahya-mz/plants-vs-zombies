@@ -83,11 +83,6 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
         playAnimation(ImpZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
     }
 
-    @Override
-    public AbstractZombieGameObject getGameObject() {
-        return _gameObject;
-    }
-
     public ImpZombieVisualObject changeStateTo(ImpZombieVisualObject.States state) {
         switch (state) {
             case MOVING -> {

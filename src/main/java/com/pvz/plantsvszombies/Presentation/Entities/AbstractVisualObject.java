@@ -14,9 +14,6 @@ public abstract class AbstractVisualObject {
     public Node getNode() {
         return this._node;
     }
-    public AbstractGameObject getGameObject() {
-        return _gameObject;
-    }
 
     public abstract void spawn();
 }

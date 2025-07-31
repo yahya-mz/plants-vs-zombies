@@ -108,7 +108,7 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
                     _remainingFrozenTime = 0;
 
                 } else {
-                    _remainingFrozenTime = -1000.0 / GlobalSettings.FPS;
+                    _remainingFrozenTime -= 1000.0 / GlobalSettings.FPS;
                 }
             } else {
                 if (_remainingFreezyTime < 0) {
@@ -198,8 +198,8 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
     }
 
     public void getFrozen(Duration duration) {
-        this._isFrozen = true;
         _remainingFrozenTime = duration.toMillis();
+        this._isFrozen = true;
         for (IEventSubscriber eventSubscriber : _frozenEventSubscribers) {
             eventSubscriber._notify(this);
         }

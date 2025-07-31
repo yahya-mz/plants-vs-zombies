@@ -17,7 +17,7 @@ public class PuffshroomAnimations {
 
         static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Puffshroom"));
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/PuffShroom"));
         for (int i = 0; i < PuffshroomAnimations.Animations.values().length; i++) {
             var animationImages = new File(animationsDirectory.getPath() + "/" + PuffshroomAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {

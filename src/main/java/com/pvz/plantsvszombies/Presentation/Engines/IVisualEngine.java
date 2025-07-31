@@ -11,6 +11,7 @@ public interface IVisualEngine {
     int getHeight();
 
     void disposeObject(AbstractVisualObject obj);
+
     void stopEngine();
 
     void spawnVisualObject(AbstractVisualObject object);
@@ -26,5 +27,8 @@ public interface IVisualEngine {
     void clearSelectedPlantType();
 
     AbstractLevelView getLevelStage();
+
     void shovelRemover(int row, int col);
+
+    abstract boolean isShovelActivated();
 }

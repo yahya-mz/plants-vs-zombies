@@ -44,7 +44,7 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
         _gameObject.subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
             Platform.runLater(() -> {
-                _node.relocate(_visualCoordinate.x() - 0.5 * width , _visualCoordinate.y() - height * 0.5);
+                _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
             });
             if (!this._currentState.equals(States.MOVING)) {
                 changeStateTo(States.MOVING);
@@ -72,11 +72,6 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
     @Override
     public void spawn() {
         playAnimation(ScreenDoorZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(90));
-    }
-
-    @Override
-    public AbstractZombieGameObject getGameObject() {
-        return _gameObject;
     }
 
     public ScreenDoorZombieVisualObject changeStateTo(ScreenDoorZombieVisualObject.States state) {

@@ -32,11 +32,13 @@ public class VisualDayEngine implements IVisualEngine {
 
     private final ArrayList<AbstractVisualObject> _visualObjects = new ArrayList<>();
     private MapVisualObject _currentMapVisualObject;
-    private final AbstractLevelView _levelStage;
+    private final DayView _levelStage;
+
+    private boolean _isShovelActivated = false;
 
     private final DayEngine _gameEngine;
 
-    public VisualDayEngine(AbstractLevelView levelStage, DayEngine gameEngine) {
+    public VisualDayEngine(DayView levelStage, DayEngine gameEngine) {
         _levelStage = levelStage;
         _gameEngine = gameEngine;
 
@@ -326,10 +328,12 @@ public class VisualDayEngine implements IVisualEngine {
 
 
     public void shovelActivation() {
-        if (_currentMapVisualObject != null) {
-            _currentMapVisualObject.setIsShovelActivated(true);
-        }
+        _isShovelActivated = true;
     }
+
+    @Override
+    public boolean isShovelActivated(){return _isShovelActivated;}
+
     public void shovelRemover(int row, int col) {
         System.out.println("Shovel activated at: " + row + ", " + col);
 
@@ -337,9 +341,7 @@ public class VisualDayEngine implements IVisualEngine {
 
         for (AbstractVisualObject vo : _visualObjects) {
             if (vo instanceof AbstractPlantVisualObject plantVO) {
-                AbstractGameObject gameObj = plantVO.getGameObject();
-                if (gameObj instanceof AbstractPlantGameObject plant &&
-                        plant.getRow() == row && plant.getColumn() == col) {
+                if (plantVO.getRow() == row && plantVO.getColumn() == col) {
                     visualToRemove = plantVO;
                     break;
                 }
@@ -348,11 +350,10 @@ public class VisualDayEngine implements IVisualEngine {
         if (visualToRemove != null) {
             _gameEngine.disposeObject(visualToRemove.getGameObject());
             disposeObject(visualToRemove);
-            DayView.setIsShovelMode(false);
-            _currentMapVisualObject.setIsShovelActivated(false);
+            _isShovelActivated = false;
+            _levelStage.setIsShovelMode(false);
             System.out.println("Plant removed from both logic and visual.");
-        }
-        else {
+        } else {
             System.out.println("No plant found at selected location.");
         }
     }

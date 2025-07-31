@@ -12,14 +12,14 @@ import java.util.Objects;
 public class ScaredyshroomAnimations {
         public enum Animations implements IAnimation {
             STANDING,
-            HIDING,
+            CRYING,
             SLEEPING
         }
         private static final ArrayList<Image[]> animations;
 
         static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Scaredyshroom"));
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/ScaredyShroom"));
         for (int i = 0; i < ScaredyshroomAnimations.Animations.values().length; i++) {
             var animationImages = new File(animationsDirectory.getPath() + "/" + ScaredyshroomAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
