@@ -6,7 +6,6 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
-import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
@@ -50,7 +49,7 @@ public class BloverVisualObject extends AbstractPlantVisualObject {
 
     @Override
     public void playAnimation(IAnimation animation, Duration frameDuration) {
-        super.playAnimation(ScaredyshroomAnimations.getFrames((ScaredyshroomAnimations.Animations) animation), frameDuration);
+        super.playAnimation(ScaredyShroomAnimations.getFrames((ScaredyShroomAnimations.Animations) animation), frameDuration);
     }
 
     public void playAnimation(IAnimation animation, Duration frameDuration, int cycleCount) {
@@ -67,7 +66,7 @@ public class BloverVisualObject extends AbstractPlantVisualObject {
         switch (state) {
             case STANDING -> {
                 _currentState = BloverVisualObject.States.STANDING;
-                playAnimation(ScaredyshroomAnimations.Animations.STANDING, Duration.millis(80));
+                playAnimation(ScaredyShroomAnimations.Animations.STANDING, Duration.millis(80));
             }
             case BLOWING -> {
                 if (_currentState.equals(States.STANDING)) {

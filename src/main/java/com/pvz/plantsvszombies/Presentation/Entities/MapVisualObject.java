@@ -2,13 +2,8 @@ package com.pvz.plantsvszombies.Presentation.Entities;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.*;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.RepeaterGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.WallNutGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
-import com.pvz.plantsvszombies.Presentation.Entities.Bullets.NormalBulletVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.WallNutVisualObject;
@@ -24,12 +19,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.*;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.SunFlowerGameObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import javafx.animation.FadeTransition;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -164,7 +155,7 @@ public class MapVisualObject extends AbstractVisualObject {
                             ImageView preview = createPlantImageView("PuffShroom", cellButton);
                             cellButton.setGraphic(preview);
                         });
-                    } else if (selectedType == IceShroomVisualObject.class) {
+                    } else if (selectedType == IceshroomVisualObject.class) {
                         Platform.runLater(() -> {
                             ImageView preview = createPlantImageView("IceShroom", cellButton);
                             cellButton.setGraphic(preview);

@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -59,17 +60,12 @@ public class PickingPlantStage {
 
         loadCardImages();
 
-        HBox firstRow = createCardRow(0, 3);
-        VBox.setMargin(firstRow, new Insets(110, 0, 0, 220));
-        addHoverEffectToImages(firstRow);
+        ScrollPane cardScrollPane = createCardScrollPaneWithCards();
+        VBox.setMargin(cardScrollPane, new Insets(108, 0, 0, 180));
+        VBox.setMargin(selectedPlantHBox, new Insets(10, 0, 0, 125));
 
-        HBox secondRow = createCardRow(4, 7);
-        VBox.setMargin(secondRow, new Insets(0, 0, 0, 220));
-        addHoverEffectToImages(secondRow);
-        VBox.setMargin(selectedPlantHBox, new Insets(5, 0, 0, 125));
-
-        root.getChildren().addAll(firstRow, secondRow, selectedPlantHBox);
-        mainPickingPane.getChildren().addAll(root , playBtn);
+        root.getChildren().addAll(cardScrollPane, selectedPlantHBox);
+        mainPickingPane.getChildren().addAll(root, playBtn);
 
         Scene scene = new Scene(mainPickingPane, 900, 600);
         Stage stage = new Stage();
@@ -90,66 +86,197 @@ public class PickingPlantStage {
         }
     }
 
-    public HBox createCardRow(int from, int to) {
-        HBox row = new HBox(5);
-        for (int i = from; i <= to; i++) {
-            ImageView card = new ImageView(cardImages[i]);
-            card.setFitWidth(100);
-            card.setPreserveRatio(true);
-            card.setCursor(Cursor.HAND);
+//    public HBox createCardRow(int from, int to) {
+//        HBox row = new HBox(8);
+//        for (int i = from; i <= to; i++) {
+//            ImageView card = new ImageView(cardImages[i]);
+//            card.setFitWidth(100);
+//            card.setPreserveRatio(true);
+//            card.setCursor(Cursor.HAND);
+//
+//            final int index = i;
+//            card.setOnMouseClicked(e -> {
+//                if (selectedPlants.size() < 6) {
+//                    String imgPath = cardImages[index].getUrl();
+//                    String imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1, imgPath.lastIndexOf('.'));
+//                    AbstractPlantGameObject.PlantType type = AbstractPlantGameObject.PlantType.valueOf(imgName);
+//                    selectedPlants.add(type);
+//                    playBtn.setDisable(selectedPlants.size() != 6);
+//
+//                    ImageView clonedCard = new ImageView(cardImages[index]);
+//                    clonedCard.setFitWidth(100);
+//                    clonedCard.setPreserveRatio(true);
+//                    clonedCard.setCursor(Cursor.HAND);
+//
+//                    clonedCard.setOnMouseEntered(ev -> {
+//                        clonedCard.setTranslateY(-10);
+//                        clonedCard.setScaleX(1.05);
+//                        clonedCard.setScaleY(1.05);
+//                    });
+//                    clonedCard.setOnMouseExited(ev -> {
+//                        clonedCard.setTranslateY(0);
+//                        clonedCard.setScaleX(1);
+//                        clonedCard.setScaleY(1);
+//                    });
+//
+//
+//                    clonedCard.setOnMouseClicked(event -> {
+//                        if (event.getButton().equals(MouseButton.PRIMARY)) {
+//                            selectedPlantHBox.getChildren().remove(selectedPlants.indexOf(type));
+//                            selectedPlants.remove(type);
+//
+//                            updateCardMargins();
+//
+//                            card.setOpacity(1);
+//                            card.setDisable(false);
+//                            playBtn.setDisable(selectedPlants.size() != 6);
+//                        }
+//                    });
+//
+//                    selectedPlantHBox.getChildren().add(clonedCard);
+//                    updateCardMargins();
+//
+//
+//                    card.setDisable(true);
+//                    card.setOpacity(0.5);
+//                    playBtn.setDisable(selectedPlants.size() != 6);
+//                }
+//            });
+//
+//            row.getChildren().add(card);
+//        }
+//        return row;
+//    }
 
-            final int index = i;
-            card.setOnMouseClicked(e -> {
-                if (selectedPlants.size() < 6) {
-                    String imgPath = cardImages[index].getUrl();
-                    String imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1, imgPath.lastIndexOf('.'));
-                    AbstractPlantGameObject.PlantType type = AbstractPlantGameObject.PlantType.valueOf(imgName);
-                    selectedPlants.add(type);
-                    playBtn.setDisable(selectedPlants.size() != 6);
 
-                    ImageView clonedCard = new ImageView(cardImages[index]);
-                    clonedCard.setFitWidth(100);
-                    clonedCard.setPreserveRatio(true);
-                    clonedCard.setCursor(Cursor.HAND);
+    public ScrollPane createCardScrollPaneWithCards() {
+        VBox cardVBox = new VBox(10);
+        cardVBox.setPadding(new Insets(20, 0, 0, 0));
+        cardVBox.setStyle("-fx-background-color: transparent;");
+        cardVBox.setFillWidth(true);
+        cardVBox.setBackground(Background.EMPTY);
 
-                    clonedCard.setOnMouseEntered(ev -> {
-                        clonedCard.setTranslateY(-10);
-                        clonedCard.setScaleX(1.05);
-                        clonedCard.setScaleY(1.05);
-                    });
-                    clonedCard.setOnMouseExited(ev -> {
-                        clonedCard.setTranslateY(0);
-                        clonedCard.setScaleX(1);
-                        clonedCard.setScaleY(1);
-                    });
+        int cardsPerRow = 4;
+        for (int i = 0; i < cardImages.length; i += cardsPerRow) {
+            HBox row = new HBox(8);
+            row.setAlignment(Pos.CENTER);
+            for (int j = i; j < i + cardsPerRow && j < cardImages.length; j++) {
+                ImageView card = createSelectableCard(j);
+                row.getChildren().add(card);
+            }
+            addHoverEffectToImages(row);
+            cardVBox.getChildren().add(row);
+        }
 
+        ScrollPane scrollPane = new ScrollPane(cardVBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setMaxHeight(200);
+        scrollPane.setMaxWidth(510);
+        scrollPane.getStyleClass().add("custom-scroll-pane");
 
-                    clonedCard.setOnMouseClicked(event -> {
-                        if (event.getButton().equals(MouseButton.PRIMARY)) {
-                            selectedPlantHBox.getChildren().remove(selectedPlants.indexOf(type));
-                            selectedPlants.remove(type);
+        String css = """
+        .custom-scroll-pane .scroll-bar {
+            -fx-background-color: transparent;
+        }
 
-                            updateCardMargins();
+        .custom-scroll-pane .scroll-bar:vertical .thumb {
+            -fx-background-color: #4A2C00;
+            -fx-background-insets: 2;
+            -fx-background-radius: 5;
+        }
 
-                            card.setOpacity(1);
-                            card.setDisable(false);
-                            playBtn.setDisable(selectedPlants.size() != 6);
-                        }
-                    });
+        .custom-scroll-pane .scroll-bar:horizontal .thumb {
+            -fx-background-color: #4A2C00;
+            -fx-background-insets: 2;
+            -fx-background-radius: 5;
+        }
 
-                    selectedPlantHBox.getChildren().add(clonedCard);
-                    updateCardMargins();
+        .custom-scroll-pane .scroll-bar .track {
+            -fx-background-color: transparent;
+        }
+    """;
 
+        scrollPane.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-background-insets: 0;" +
+                        "-fx-padding: 0;" +
+                        "-fx-control-inner-background: transparent;" +
+                        "-fx-background: transparent;" +
+                        "-fx-focus-color: transparent;" +
+                        "-fx-faint-focus-color: transparent;"
+        );
 
-                    card.setDisable(true);
-                    card.setOpacity(0.5);
-                    playBtn.setDisable(selectedPlants.size() != 6);
+        // افزودن CSS به صحنه
+        Scene scene = scrollPane.getScene();
+        if (scene != null) {
+            scene.getStylesheets().add("data:text/css," + css);
+        } else {
+            scrollPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    newScene.getStylesheets().add("data:text/css," + css);
                 }
             });
-
-            row.getChildren().add(card);
         }
-        return row;
+
+        return scrollPane;
+    }
+
+
+
+
+    private ImageView createSelectableCard(int index) {
+        ImageView card = new ImageView(cardImages[index]);
+        card.setFitWidth(100);
+        card.setPreserveRatio(true);
+        card.setCursor(Cursor.HAND);
+
+        card.setOnMouseClicked(e -> {
+            if (selectedPlants.size() < 6) {
+                String imgPath = cardImages[index].getUrl();
+                String imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1, imgPath.lastIndexOf('.'));
+                AbstractPlantGameObject.PlantType type = AbstractPlantGameObject.PlantType.valueOf(imgName);
+                selectedPlants.add(type);
+                playBtn.setDisable(selectedPlants.size() != 6);
+
+                ImageView clonedCard = new ImageView(cardImages[index]);
+                clonedCard.setFitWidth(100);
+                clonedCard.setPreserveRatio(true);
+                clonedCard.setCursor(Cursor.HAND);
+
+                clonedCard.setOnMouseEntered(ev -> {
+                    clonedCard.setTranslateY(-10);
+                    clonedCard.setScaleX(1.05);
+                    clonedCard.setScaleY(1.05);
+                });
+                clonedCard.setOnMouseExited(ev -> {
+                    clonedCard.setTranslateY(0);
+                    clonedCard.setScaleX(1);
+                    clonedCard.setScaleY(1);
+                });
+
+                clonedCard.setOnMouseClicked(event -> {
+                    if (event.getButton().equals(MouseButton.PRIMARY)) {
+                        selectedPlantHBox.getChildren().remove(selectedPlants.indexOf(type));
+                        selectedPlants.remove(type);
+                        updateCardMargins();
+
+                        card.setOpacity(1);
+                        card.setDisable(false);
+                        playBtn.setDisable(selectedPlants.size() != 6);
+                    }
+                });
+
+                selectedPlantHBox.getChildren().add(clonedCard);
+                updateCardMargins();
+
+                card.setDisable(true);
+                card.setOpacity(0.5);
+            }
+        });
+
+        return card;
     }
 
     public void addHoverEffectToImages(HBox hbox) {

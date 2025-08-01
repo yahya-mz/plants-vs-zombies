@@ -64,7 +64,7 @@ public class NightView extends AbstractLevelView {
         //bar
         VBox suncounter = createCounter();
         HBox plantbar = NightView.createTopPlantSelectionBar(selectedPlants);
-        addHoverEffectToImages(plantbar);
+//        addHoverEffectToImages(plantbar);
         Button shoveltool = NightView.createShovelToolButton();
         Button pause = createPauseButton();
 
@@ -171,9 +171,9 @@ public class NightView extends AbstractLevelView {
                         case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
                         case SNOW_PEA -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
                         case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
-                        case PUFF_SHROOM -> _visualEngine.setSelectedPlantType(ScaredyshroomVisualObject.class);
-                        case SCAREDY_SHROOM -> _visualEngine.setSelectedPlantType(PuffshroomVisualObject.class);
-                        case ICE_SHROOM -> _visualEngine.setSelectedPlantType(IceShroomVisualObject.class);
+                        case PUFF_SHROOM -> _visualEngine.setSelectedPlantType(PuffshroomVisualObject.class);
+                        case SCAREDY_SHROOM -> _visualEngine.setSelectedPlantType(ScaredyshroomVisualObject.class);
+                        case ICE_SHROOM -> _visualEngine.setSelectedPlantType(IceshroomVisualObject.class);
                     }
                 }
             });
@@ -190,28 +190,29 @@ public class NightView extends AbstractLevelView {
 
             buttonBar.getChildren().add(btn);
         }
-
+        addHoverEffectToImages(buttonBar);
         return buttonBar;
     }
 
-    public static void addHoverEffectToImages(HBox hbox) {//fixing
+    public static void addHoverEffectToImages(HBox hbox) {
         for (Node node : hbox.getChildren()) {
-            if (node instanceof ImageView imageView) {
-
-                imageView.setOnMouseEntered(e -> {
-                    imageView.setTranslateY(-9);
-                    imageView.setScaleX(1.02);
-                    imageView.setScaleY(1.02);
+            if (node instanceof Button btn) {
+                btn.setOnMouseEntered(e -> {
+                    btn.setTranslateY(-9);
+                    btn.setScaleX(1.02);
+                    btn.setScaleY(1.02);
                 });
 
-                imageView.setOnMouseExited(e -> {
-                    imageView.setTranslateY(0);
-                    imageView.setScaleX(1);
-                    imageView.setScaleY(1);
+                btn.setOnMouseExited(e -> {
+                    btn.setTranslateY(0);
+                    btn.setScaleX(1);
+                    btn.setScaleY(1);
                 });
             }
         }
     }
+
+
 
     public Button createShovelToolButton() {
         Image shovelCursorImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shoveltool/shovel.png"));
@@ -224,7 +225,6 @@ public class NightView extends AbstractLevelView {
 
         shovelBarView(shovelButton, shovelFullView);
 
-        // ✅ فقط یک‌بار لیسنر اضافه می‌کنیم
         NightView.isShovelModeProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal && shovelButton.getScene() != null) {
                 Platform.runLater(() -> {
@@ -245,14 +245,32 @@ public class NightView extends AbstractLevelView {
 
                 scene.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
                     if (event.getButton() == MouseButton.SECONDARY && NightView.getIsShovelMode()) {
+                        _visualEngine.shovelDeactivation();
                         NightView.setIsShovelMode(false);
                     }
                 });
             }
         });
+        addHoverEffectToShovel(shovelButton);
 
         return shovelButton;
     }
+
+    private void addHoverEffectToShovel(Button btn) {
+        btn.setOnMouseEntered(e -> {
+            if (!NightView.getIsShovelMode()) {
+                btn.setScaleX(1.1);
+                btn.setScaleY(1.1);
+            }
+        });
+
+        btn.setOnMouseExited(e -> {
+            btn.setScaleX(1.0);
+            btn.setScaleY(1.0);
+        });
+    }
+
+
 
     public static BooleanProperty isShovelModeProperty() {
         return isShovelMode;

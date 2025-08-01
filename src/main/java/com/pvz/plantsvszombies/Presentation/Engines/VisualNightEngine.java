@@ -15,6 +15,8 @@ import com.pvz.plantsvszombies.Presentation.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.AbstractLevelView;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.DayMenu;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.DayView;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.NightView;
 import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 
@@ -30,13 +32,13 @@ public class VisualNightEngine implements IVisualEngine {
 
     private final ArrayList<AbstractVisualObject> _visualObjects = new ArrayList<>();
     private MapVisualObject _currentMapVisualObject;
-    private final AbstractLevelView _levelStage;
+    private final NightView _levelStage;
 
     private boolean _isShovelActivated = false;
 
     private final NightEngine _gameEngine;
 
-    public VisualNightEngine(AbstractLevelView levelStage, NightEngine gameEngine) {
+    public VisualNightEngine(NightView levelStage, NightEngine gameEngine) {
         _levelStage = levelStage;
         _gameEngine = gameEngine;
 
@@ -97,7 +99,7 @@ public class VisualNightEngine implements IVisualEngine {
                             _currentMapVisualObject.plant(visualObject, ps.getRow(), ps.getColumn());
                         }
                         case IceShroomGameObject is -> {
-                            visualObject = new IceShroomVisualObject(is, temp_this);
+                            visualObject = new IceshroomVisualObject(is, temp_this);
                             _currentMapVisualObject.plant(visualObject, is.getRow(), is.getColumn());
                         }
                         default -> {
@@ -247,7 +249,7 @@ public class VisualNightEngine implements IVisualEngine {
                     String puffShroomObjectId = "PuffShroom_" + UUID.randomUUID();
                     var obj = PuffShroomGameObject.createPuffShroomGameObject(this._gameEngine, puffShroomObjectId, coordinate, x, y);
                     this._gameEngine.plantObject(obj);
-                } else if (plantType == IceShroomVisualObject.class) {
+                } else if (plantType == IceshroomVisualObject.class) {
                     String iceShroomObjectId = "IceShroom_" + UUID.randomUUID();
                     var obj = IceShroomGameObject.createIceShroomGameObject(this._gameEngine, iceShroomObjectId, coordinate, x, y);
                     this._gameEngine.plantObject(obj);
@@ -282,12 +284,33 @@ public class VisualNightEngine implements IVisualEngine {
 
     @Override
     public void shovelRemover(int row, int col) {
+        System.out.println("Shovel activated at: " + row + ", " + col);
 
+        AbstractPlantVisualObject visualToRemove = null;
+
+        for (AbstractVisualObject vo : _visualObjects) {
+            if (vo instanceof AbstractPlantVisualObject plantVO) {
+                if (plantVO.getRow() == row && plantVO.getColumn() == col) {
+                    visualToRemove = plantVO;
+                    break;
+                }
+            }
+        }
+        if (visualToRemove != null) {
+            _gameEngine.disposeObject(visualToRemove.getGameObject());
+            disposeObject(visualToRemove);
+            _isShovelActivated = false;
+            _levelStage.setIsShovelMode(false);
+            System.out.println("Plant removed from both logic and visual.");
+        } else {
+            System.out.println("No plant found at selected location.");
+        }
     }
 
     public void shovelActivation() {
         _isShovelActivated = true;
     }
+    public void shovelDeactivation() {_isShovelActivated = false;}
 
     @Override
     public boolean isShovelActivated() {

@@ -22,12 +22,12 @@ public class ShroomBulletVisualObject  extends AbstractAnimatedVisualObject {
         private final IVisualEngine _engine;
         private ShroomBulletVisualObject.States _state;
 
-    public ShroomBulletVisualObject(NormalBulletGameObject gameObject, IVisualEngine engine) {
+    public ShroomBulletVisualObject(ShroomBulletGameObject gameObject, IVisualEngine engine) {
         super._gameObject = gameObject;
         this._engine = engine;
 
         _visualCoordinate = gameObject.getCoordinate();
-        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Bullets/PeaShroom/PeaShroom_0.png")));
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Bullets/ShroomBullet/Moving/ShroomBullet_0.png")));
         _node.setManaged(false);
 
         var height = ((Image) ((ImageView) _node).getImage()).getHeight();
@@ -66,7 +66,7 @@ public class ShroomBulletVisualObject  extends AbstractAnimatedVisualObject {
 
     @Override
     public void playAnimation(IAnimation animation, Duration frameDuration) {
-        super.playAnimation(PuffshroomAnimations.getFrames((PuffshroomAnimations.Animations) animation), frameDuration);
+        super.playAnimation(ShroomBulletAnimations.getFrames((ShroomBulletAnimations.Animations) animation), frameDuration);
     }
 
     @Override

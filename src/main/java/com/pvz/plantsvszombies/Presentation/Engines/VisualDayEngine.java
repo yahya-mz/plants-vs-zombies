@@ -330,7 +330,9 @@ public class VisualDayEngine implements IVisualEngine {
     public void shovelActivation() {
         _isShovelActivated = true;
     }
-
+    public void shovelDeactivation() {
+        _isShovelActivated = false;
+    }
     @Override
     public boolean isShovelActivated(){return _isShovelActivated;}
 

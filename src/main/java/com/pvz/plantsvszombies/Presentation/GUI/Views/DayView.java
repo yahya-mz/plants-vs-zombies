@@ -64,7 +64,7 @@ public class DayView extends AbstractLevelView {
         //bar
         VBox suncounter = dayView.createCounter();
         HBox plantbar = dayView.createTopPlantSelectionBar(selectedPlants);
-        dayView.addHoverEffectToImages(plantbar);
+
         Button shoveltool = dayView.createShovelToolButton();
         Button pause = dayView.createPauseButton();
 
@@ -187,24 +187,23 @@ public class DayView extends AbstractLevelView {
 
             buttonBar.getChildren().add(btn);
         }
-
+        addHoverEffectToImages(buttonBar);
         return buttonBar;
     }
 
-    public void addHoverEffectToImages(HBox hbox) {//fixing
+    public static void addHoverEffectToImages(HBox hbox) {
         for (Node node : hbox.getChildren()) {
-            if (node instanceof ImageView imageView) {
-
-                imageView.setOnMouseEntered(e -> {
-                    imageView.setTranslateY(-9);
-                    imageView.setScaleX(1.02);
-                    imageView.setScaleY(1.02);
+            if (node instanceof Button btn) {
+                btn.setOnMouseEntered(e -> {
+                    btn.setTranslateY(-9);
+                    btn.setScaleX(1.02);
+                    btn.setScaleY(1.02);
                 });
 
-                imageView.setOnMouseExited(e -> {
-                    imageView.setTranslateY(0);
-                    imageView.setScaleX(1);
-                    imageView.setScaleY(1);
+                btn.setOnMouseExited(e -> {
+                    btn.setTranslateY(0);
+                    btn.setScaleX(1);
+                    btn.setScaleY(1);
                 });
             }
         }
@@ -241,13 +240,28 @@ public class DayView extends AbstractLevelView {
 
                 scene.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
                     if (event.getButton() == MouseButton.SECONDARY && getIsShovelMode()) {
+                        _visualEngine.shovelDeactivation();
                         setIsShovelMode(false);
                     }
                 });
             }
         });
+        addHoverEffectToShovel(shovelButton);
 
         return shovelButton;
+    }
+    private void addHoverEffectToShovel(Button btn) {
+        btn.setOnMouseEntered(e -> {
+            if (!NightView.getIsShovelMode()) {
+                btn.setScaleX(1.1);
+                btn.setScaleY(1.1);
+            }
+        });
+
+        btn.setOnMouseExited(e -> {
+            btn.setScaleX(1.0);
+            btn.setScaleY(1.0);
+        });
     }
 
     public BooleanProperty isShovelModeProperty() {

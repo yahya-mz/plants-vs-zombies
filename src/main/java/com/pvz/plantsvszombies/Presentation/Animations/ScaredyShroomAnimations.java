@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class ScaredyshroomAnimations {
+public class ScaredyShroomAnimations {
         public enum Animations implements IAnimation {
             STANDING,
             CRYING,
@@ -20,8 +20,8 @@ public class ScaredyshroomAnimations {
         static {
         animations = new ArrayList<>();
         var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/ScaredyShroom"));
-        for (int i = 0; i < ScaredyshroomAnimations.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + ScaredyshroomAnimations.Animations.values()[i].name()).listFiles();
+        for (int i = 0; i < ScaredyShroomAnimations.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + ScaredyShroomAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
                 String name = f.getName();
                 int dotIndex = name.lastIndexOf('.');
@@ -39,7 +39,7 @@ public class ScaredyshroomAnimations {
         }
     }
 
-        public static Image[] getFrames(ScaredyshroomAnimations.Animations animation) {
+        public static Image[] getFrames(ScaredyShroomAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
 

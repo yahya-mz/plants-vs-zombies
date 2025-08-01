@@ -1,21 +1,14 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
-import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PuffShroomGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
-import com.pvz.plantsvszombies.Presentation.Animations.PeashooterAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.PuffshroomAnimations;
-import com.pvz.plantsvszombies.Presentation.Animations.ScaredyshroomAnimations;
+import com.pvz.plantsvszombies.Presentation.Animations.ScaredyShroomAnimations;
 import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualNightEngine;
-import com.pvz.plantsvszombies.Presentation.Entities.Bullets.NormalBulletVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.Bullets.ShroomBulletVisualObject;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -36,18 +29,18 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
         _engine = engine;
 
         _visualCoordinate = gameObject.getCoordinate();
-        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/PuffShroom/PuffShroom_0.png")));
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Puffshroom/Puffshroom_0.png")));
 
-//        gameObject.subscribeToShootingEvent(new IEventSubscriber() {//notify
-//            @Override
-//            public void _notify(AbstractGameObject gameObject) {
-//                Platform.runLater(() -> {
-//                    System.out.println("Shooting: " + gameObject.getCoordinate().x() + "," + gameObject.getCoordinate().y());
+        gameObject.subscribeToShootingEvent(new IEventSubscriber() {//notify
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                Platform.runLater(() -> {
+                    System.out.println("Shooting: " + gameObject.getCoordinate().x() + "," + gameObject.getCoordinate().y());
 //                    var bulletVisualObject = new ShroomBulletVisualObject((ShroomBulletGameObject) gameObject, engine);
 //                    _engine.spawnVisualObject(bulletVisualObject);
-//                });
-//            }
-//        });
+                });
+            }
+        });
 //        gameObject.subscribeToSleepingEvent(new IEventSubscriber() {//notify//fix this later
 //            @Override
 //            public void _notify(AbstractGameObject gameObject) {
@@ -56,13 +49,13 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
 //                });
 //            }
 //        });
-//        var temp_this = this;
-//        gameObject.subscribeToEatenEvent(new IEventSubscriber() {//notify
-//            @Override
-//            public void _notify(AbstractGameObject gameObject) {
-//                _engine.disposeObject(temp_this);
-//            }
-//        });
+        var temp_this = this;
+        gameObject.subscribeToEatenEvent(new IEventSubscriber() {//notify
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                _engine.disposeObject(temp_this);
+            }
+        });
 
     }
 
@@ -79,7 +72,7 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
             this._currentState = States.SLEEPING;
         }
         if (_currentState.equals(PuffshroomVisualObject.States.STANDING)) {
-            playAnimation(PuffshroomAnimations.Animations.STANDING, Duration.millis(20));//standing
+            playAnimation(PuffshroomAnimations.Animations.STANDING, Duration.millis(80));//standing
         } else if (_currentState.equals(PuffshroomVisualObject.States.SLEEPING)) {
             playAnimation(PuffshroomAnimations.Animations.SLEEPING, Duration.millis(20));//standing
         }
@@ -89,7 +82,7 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
         switch (state) {
             case SLEEPING -> {
                 _currentState = States.SLEEPING;
-                playAnimation(ScaredyshroomAnimations.Animations.SLEEPING, Duration.millis(80));
+                playAnimation(ScaredyShroomAnimations.Animations.SLEEPING, Duration.millis(80));
             }
             case STANDING -> {
                 _currentState = States.STANDING;

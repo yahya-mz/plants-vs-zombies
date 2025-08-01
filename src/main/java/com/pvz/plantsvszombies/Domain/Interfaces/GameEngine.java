@@ -89,6 +89,9 @@ public abstract class GameEngine {
 
     public void spawnObject(AbstractGameObject object) {
         this._gameObjects.add(object);
+        for (IEventSubscriber eventSubscriber : _gameObjectSpawnEventSubscribers) { // notify visual engine to spawn the plant
+            eventSubscriber._notify(object);
+        }
     }
 
     public void plantObject(AbstractPlantGameObject object) throws Exception {
