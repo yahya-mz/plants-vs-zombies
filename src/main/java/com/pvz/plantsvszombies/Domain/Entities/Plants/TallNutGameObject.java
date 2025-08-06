@@ -5,14 +5,15 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class TallNutGameObject extends AbstractPlantGameObject {
+public class TallNutGameObject extends AbstractPlantGameObject implements Serializable {
     private int tick = 1;
 
-    private final ArrayList<IEventSubscriber> _cracked_1_EventSubscribers = new ArrayList<>();
-    private final ArrayList<IEventSubscriber> _cracked_2_EventSubscribers = new ArrayList<>();
-    private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _cracked_1_EventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _cracked_2_EventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
 
     public static TallNutGameObject createTallNutGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {

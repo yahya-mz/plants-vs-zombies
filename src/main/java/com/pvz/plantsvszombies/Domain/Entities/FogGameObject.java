@@ -1,12 +1,19 @@
 package com.pvz.plantsvszombies.Domain.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 
-public class FogGameObject extends AbstractGameObject {
+public class FogGameObject extends AbstractGameObject implements Serializable {
 
     public static Duration FADING_COOL_DOWN = Duration.ofSeconds(10);
 
@@ -16,19 +23,33 @@ public class FogGameObject extends AbstractGameObject {
 
     private boolean _isFadingAway = false;
     private boolean _isFadedAway = false;
-    private double _speed;
-    private int _lastFadingTick = 0;
+    private double _fadingSpeed = 5;
+    private double _backingSeed = 5;
+    private double _lastFadingMillis = 0;
+    private final Coordinate _defualtCoordinate;
 
-    private final ArrayList<MapBlock> _foggedBlocks = new ArrayList<>();
+    @JsonIgnore
+    public transient ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
 
-    public final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
+    public static FogGameObject createFogGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+        return new FogGameObject(gameEngine, id, coordinate, row, column);
+    }
+
+    private FogGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+        this._gameEngine = gameEngine;
+        this._ID = id;
+        this._defualtCoordinate = coordinate.copy();
+        this._coordinate = coordinate.copy();
+        this._row = row;
+        this._column = column;
+    }
 
     public int getColumn() {
         return _column;
     }
 
-    public int getRow(){
+    public int getRow() {
         return _row;
     }
 
@@ -39,7 +60,7 @@ public class FogGameObject extends AbstractGameObject {
     public void fadeAwayCompletely() {
         if (!_isFadedAway) {
             _isFadingAway = true;
-            _lastFadingTick = _tick;
+            _lastFadingMillis = getMilliseconds();
         }
     }
 
@@ -51,27 +72,43 @@ public class FogGameObject extends AbstractGameObject {
     @Override
     public void update() {
         if (_isFadedAway &&
-                ((_tick - _lastFadingTick) * 1000.0 / GlobalSettings.FPS) > FADING_COOL_DOWN.toMillis()) {
-            _coordinate.traverse(-(_speed), 0);
-            if (_coordinate.y() == _gameEngine.getWindowWidth() / 2) {
+                (getMilliseconds() - _lastFadingMillis) >= FADING_COOL_DOWN.toMillis()) {
+            _coordinate.traverse(-(_backingSeed), 0);
+            if (Math.abs(_coordinate.x() - _defualtCoordinate.x()) < _backingSeed) {
+                _coordinate = _defualtCoordinate.copy();
                 _isFadedAway = false;
+            }
+            for (IEventSubscriber eventSubscriber : _movementEventSubscribers) {
+                eventSubscriber._notify(this);
             }
         }
         if (_isFadingAway) {
             fadeABit();
-            if (_coordinate.y() == _gameEngine.getWindowWidth()) {
+            if (_coordinate.x() >= _gameEngine.getWindowWidth()) {
                 _isFadingAway = false;
                 _isFadedAway = true;
-                _lastFadingTick = 0;
+                _coordinate = new Coordinate(_gameEngine.getWindowWidth(), _coordinate.y());
             }
         }
-
+        _tick++;
     }
 
     private void fadeABit() {
-        _coordinate.traverse(-10, 0);
-        _movementEventSubscribers.forEach(e -> {
-            e._notify(this);
-        });
+        _coordinate.traverse(_fadingSpeed, 0);
+        for (IEventSubscriber eventSubscriber : _movementEventSubscribers) {
+            eventSubscriber._notify(this);
+        }
+    }
+
+    private double getMilliseconds() {
+        return this._tick * 1000.0 / GlobalSettings.FPS;
+    }
+
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _movementEventSubscribers = new ArrayList<>();
     }
 }

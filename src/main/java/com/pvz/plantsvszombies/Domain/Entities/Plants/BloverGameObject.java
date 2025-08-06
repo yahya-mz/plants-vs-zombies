@@ -1,7 +1,8 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
+import com.pvz.plantsvszombies.Domain.Entities.FogGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
@@ -10,17 +11,18 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 
-public class DoomShroomGameObject extends AbstractPlantGameObject implements Serializable {
+public class BloverGameObject extends AbstractPlantGameObject implements Serializable {
     public final static Duration EXPLOSION_TIME = Duration.ofSeconds(1);
 
-    private int _tick;
-    private transient final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
 
-    public static DoomShroomGameObject createCherryBombGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
-        return new DoomShroomGameObject(gameEngine, id, coordinate, row, column);
+    private int _tick;
+    private transient final ArrayList<IEventSubscriber> _blowingEventSubscribers = new ArrayList<>();
+
+    public static BloverGameObject createBloverGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+        return new BloverGameObject(gameEngine, id, coordinate, row, column);
     }
 
-    private DoomShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    private BloverGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
@@ -31,8 +33,8 @@ public class DoomShroomGameObject extends AbstractPlantGameObject implements Ser
         this._health = 50;
     }
 
-    public void subscribeToExplosionEvent(IEventSubscriber event) {
-        this._explosionEventSubscribers.add(event);
+    public void subscribeToBlowingEvent(IEventSubscriber event) {
+        this._blowingEventSubscribers.add(event);
     }
 
     @Override
@@ -52,7 +54,7 @@ public class DoomShroomGameObject extends AbstractPlantGameObject implements Ser
     public void update() {
         _tick++;
         if (getMilliseconds() == EXPLOSION_TIME.toMillis()) {
-            explode();
+            blow();
         }
     }
 
@@ -61,14 +63,17 @@ public class DoomShroomGameObject extends AbstractPlantGameObject implements Ser
 
     }
 
-    private void explode() {
-        var allZombies = _gameEngine.queryZombies(z -> true);
-        for (AbstractZombieGameObject zombie : allZombies) {
-            zombie.getBurned();
-        }
-        // The Game Engine will subscribe to this event
-        for (IEventSubscriber _subscriber : _explosionEventSubscribers) {
-            _subscriber._notify(this);
+    private void blow() {
+
+        _blowingEventSubscribers.forEach(eventSubscriber ->
+                eventSubscriber._notify(this));
+
+        if (_gameEngine instanceof NightEngine) {
+            var fogs = ((NightEngine) _gameEngine).getFogs();
+            for (FogGameObject fog : fogs) {
+                fog.fadeAwayCompletely();
+            }
+
         }
         super.dispose();
     }

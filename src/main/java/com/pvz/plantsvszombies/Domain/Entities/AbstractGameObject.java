@@ -1,19 +1,29 @@
 package com.pvz.plantsvszombies.Domain.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.IDisposable;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class AbstractGameObject implements IDisposable {
+public abstract class AbstractGameObject implements IDisposable, Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     protected String _ID;
     protected Coordinate _coordinate;
-    protected GameEngine _gameEngine;
+
+    protected transient GameEngine _gameEngine;
+
     protected boolean _isDisposed = false;
-    private final ArrayList<IEventSubscriber> _disposeEventSubscribers = new ArrayList<>();
+
+    private transient ArrayList<IEventSubscriber> _disposeEventSubscribers = new ArrayList<>();
 
 
     public String getId() {
@@ -34,10 +44,25 @@ public abstract class AbstractGameObject implements IDisposable {
 
     @Override
     public void dispose() {
+        dispose(false);
+    }
+
+    public void dispose(boolean trigListeners) {
         _gameEngine.disposeObject(this);
         _isDisposed = true;
-        for (IEventSubscriber _subscriber : _disposeEventSubscribers) {
-            _subscriber._notify(this);
+        if (trigListeners) {
+            for (IEventSubscriber _subscriber : _disposeEventSubscribers) {
+                _subscriber._notify(this);
+            }
         }
+    }
+
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+
+        _disposeEventSubscribers = new ArrayList<>();
     }
 }

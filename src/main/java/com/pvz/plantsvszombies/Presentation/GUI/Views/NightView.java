@@ -51,14 +51,14 @@ public class NightView extends AbstractLevelView {
         NightView._gameBoxPane = bottommostPlane;
 
         //ready-set-plant
-        VBox animationBox = new VBox();
-        animationBox.setPrefSize(500, 500);
-        animationBox.setAlignment(Pos.CENTER);
-        bottommostPlane.getChildren().add(animationBox);
-        StackPane.setAlignment(animationBox, Pos.CENTER);
-        playImageSequenceInBox(animationBox, () -> {
-            bottommostPlane.getChildren().remove(animationBox);
-        });
+//        VBox animationBox = new VBox();
+//        animationBox.setPrefSize(500, 500);
+//        animationBox.setAlignment(Pos.CENTER);
+//        bottommostPlane.getChildren().add(animationBox);
+//        StackPane.setAlignment(animationBox, Pos.CENTER);
+//        playImageSequenceInBox(animationBox, () -> {
+//            bottommostPlane.getChildren().remove(animationBox);
+//        });
         //
 
         //bar
@@ -171,9 +171,11 @@ public class NightView extends AbstractLevelView {
                         case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
                         case SNOW_PEA -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
                         case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
-                        case PUFF_SHROOM -> _visualEngine.setSelectedPlantType(PuffshroomVisualObject.class);
-                        case SCAREDY_SHROOM -> _visualEngine.setSelectedPlantType(ScaredyshroomVisualObject.class);
+                        case PUFF_SHROOM -> _visualEngine.setSelectedPlantType(ScaredyshroomVisualObject.class);
+                        case SCAREDY_SHROOM -> _visualEngine.setSelectedPlantType(PuffshroomVisualObject.class);
                         case ICE_SHROOM -> _visualEngine.setSelectedPlantType(IceshroomVisualObject.class);
+                        case HYPNO_SHROOM -> _visualEngine.setSelectedPlantType(HypnoShroomVisualObject.class);
+                        case BLOVER -> _visualEngine.setSelectedPlantType(BloverVisualObject.class);
                     }
                 }
             });

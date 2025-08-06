@@ -1,38 +1,40 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.HypnotizedZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.HypnotizedZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Zombies.ScreenDoorZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.Animations.*;
+import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
+import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
+import com.pvz.plantsvszombies.Presentation.Animations.NormalZombieAnimations;
 import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
-public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
+public class HypnotizedZombieVisualObject extends AbstractAnimatedVisualObject {
     public enum States {
         MOVING,
         EATING,
         DYING,
-        BURNING
+        Burning,
     }
 
-    private ScreenDoorZombieGameObject _gameObject;
-    private IVisualEngine _engine;
+    private final IVisualEngine _engine;
 
     private States _currentState;
     private GeneralTransformAnimation _transformAnimation;
 
 
-    public ScreenDoorZombieVisualObject(ScreenDoorZombieGameObject gameObject, IVisualEngine engine) {
-        _gameObject = gameObject;
+    public HypnotizedZombieVisualObject(HypnotizedZombieGameObject gameObject, IVisualEngine engine) {
+        super._gameObject = gameObject;
         _engine = engine;
         _visualCoordinate = gameObject.getCoordinate();
-        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Zombies/ScreenDoorZombie/ScreenDoorZombie_0.png")));
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Zombies/HypnotizedZombie/Zombie_0.png")));
 
         var height = ((Image) ((ImageView) _node).getImage()).getHeight();
         var width = ((Image) ((ImageView) _node).getImage()).getWidth();
@@ -42,7 +44,7 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
 
         _currentState = States.MOVING;
 
-        _gameObject.subscribeToMovementEvent((zombieObj) -> {
+        ((HypnotizedZombieGameObject) _gameObject).subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
             Platform.runLater(() -> {
                 _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
@@ -52,7 +54,7 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
             }
         });
 
-        _gameObject.subscribeToEatingEvent(new IEventSubscriber() {
+        ((HypnotizedZombieGameObject) _gameObject).subscribeToEatingEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
@@ -61,60 +63,55 @@ public class ScreenDoorZombieVisualObject extends AbstractZombieVisualObject {
             }
         });
 
-        _gameObject.subscribeToDeathEvent((zombieObj) -> {//we have to change this
+        ((HypnotizedZombieGameObject) _gameObject).subscribeToDeathEvent((zombieObj) -> {//we have to change this
             Platform.runLater(() -> changeStateTo(States.DYING));
         });
 
-         _gameObject.subscribeToBurnEvent((zombieObj) -> {//we have to change this
-            Platform.runLater(() -> changeStateTo(States.BURNING));
-        });
-
-        _gameObject.subscribeToDisposeEvent((zombieObj) -> {
+        ((HypnotizedZombieGameObject) _gameObject).subscribeToDisposeEvent((zombieObj) -> {
             _engine.disposeObject(this);
         });
     }
 
     @Override
     public void playAnimation(IAnimation animation, Duration frameDuration) {
-        super.playAnimation(ScreenDoorZombieAnimations.getFrames((ScreenDoorZombieAnimations.Animations) animation), frameDuration);
+        super.playAnimation(NormalZombieAnimations.getFrames((NormalZombieAnimations.Animations) animation), frameDuration);
     }
 
     public void playAnimation(IAnimation animation, Duration frameDuration, int cycleCount) {
-        super.playAnimation(ScreenDoorZombieAnimations.getFrames((ScreenDoorZombieAnimations.Animations) animation), frameDuration, cycleCount);
+        super.playAnimation(NormalZombieAnimations.getFrames((NormalZombieAnimations.Animations) animation), frameDuration, cycleCount);
     }
 
     @Override
     public void spawn() {
-        playAnimation(ScreenDoorZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(90));
+        _gameObject.spawn();
+        playAnimation(NormalZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
     }
 
-    public ScreenDoorZombieVisualObject changeStateTo(ScreenDoorZombieVisualObject.States state) {
+    public HypnotizedZombieVisualObject changeStateTo(HypnotizedZombieVisualObject.States state) {
         switch (state) {
             case MOVING -> {
                 _currentState = States.MOVING;
-                stopAnimation();
-                playAnimation(ScreenDoorZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(90));
+                playAnimation(NormalZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
             }
             case DYING -> {
-                _currentState = ScreenDoorZombieVisualObject.States.DYING;
-                playAnimation(ScreenDoorZombieAnimations.Animations.DYING, Duration.millis(70), 1);
+                _currentState = States.DYING;
+                playAnimation(NormalZombieAnimations.Animations.DYING, Duration.millis(70), 1);
                 setOnAnimationFinished(e -> {
                     _engine.disposeObject(this);
                 });
             }
             case EATING -> {
                 _currentState = States.EATING;
-                stopAnimation();
-                playAnimation(ScreenDoorZombieAnimations.Animations.ATTACKING, Duration.millis(90));
+                playAnimation(NormalZombieAnimations.Animations.ATTACKING, Duration.millis(35));
             }
-            case BURNING -> {
-                _currentState = States.BURNING;
-                playAnimation(ScreenDoorZombieAnimations.Animations.BURNING, Duration.millis(70), 1);
+            case Burning -> {
+                _currentState = States.Burning;
+                playAnimation(NormalZombieAnimations.Animations.BURNING, Duration.millis(70), 1);
                 setOnAnimationFinished(e -> {
                     _engine.disposeObject(this);
                 });
             }
         }
-        return this;
+        return null;
     }
 }

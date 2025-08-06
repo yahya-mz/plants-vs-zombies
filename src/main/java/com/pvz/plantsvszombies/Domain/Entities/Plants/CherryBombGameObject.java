@@ -5,18 +5,20 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 
-public class CherryBombGameObject extends AbstractPlantGameObject {
+public class CherryBombGameObject extends AbstractPlantGameObject implements Serializable {
     public final static Duration EXPLOSION_TIME = Duration.ofSeconds(1);
 
     private int _tick;
-    private final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
 
     public static CherryBombGameObject createCherryBombGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new CherryBombGameObject(gameEngine, id, coordinate, row, column);
     }
+
     private CherryBombGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;

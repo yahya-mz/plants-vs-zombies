@@ -3,6 +3,7 @@ package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.ImpZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
@@ -40,7 +41,7 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
 
         _currentState = States.MOVING;
 
-        ((ImpZombieGameObject) _gameObject).subscribeToMovementEvent((zombieObj) -> {
+        _gameObject.subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
             Platform.runLater(() -> {
                 _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
@@ -50,7 +51,7 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
             }
         });
 
-        ((ImpZombieGameObject) _gameObject).subscribeToEatingEvent(new IEventSubscriber() {
+        _gameObject.subscribeToEatingEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
@@ -59,12 +60,16 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
             }
         });
 
-        ((ImpZombieGameObject) _gameObject).subscribeToDeathEvent((zombieObj) -> {//we have to change this
+        _gameObject.subscribeToDeathEvent((zombieObj) -> {//we have to change this
             Platform.runLater(() -> changeStateTo(States.DYING));
         });
 
-        ((ImpZombieGameObject) _gameObject).subscribeToBurnEvent((zombieObj) -> {//we have to change this
+        _gameObject.subscribeToBurnEvent((zombieObj) -> {//we have to change this
             Platform.runLater(() -> changeStateTo(States.Burning));
+        });
+
+        _gameObject.subscribeToDisposeEvent((zombieObj) -> {
+            _engine.disposeObject(this);
         });
     }
 

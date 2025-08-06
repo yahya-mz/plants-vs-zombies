@@ -1,13 +1,19 @@
 package com.pvz.plantsvszombies.Domain.Interfaces;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.MapBlock;
-import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
+import com.pvz.plantsvszombies.Domain.Services.PersistenceManager;
 import com.pvz.plantsvszombies.Mediator.Mediator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -89,6 +95,7 @@ public abstract class GameEngine {
 
     public void spawnObject(AbstractGameObject object) {
         this._gameObjects.add(object);
+
         for (IEventSubscriber eventSubscriber : _gameObjectSpawnEventSubscribers) { // notify visual engine to spawn the plant
             eventSubscriber._notify(object);
         }
@@ -110,20 +117,6 @@ public abstract class GameEngine {
             throw new Exception("Exception: A plant already exists in row:" + object.getRow() + " and col:" + object.getColumn());
         }
 
-    }
-
-    public void lose(AbstractZombieGameObject winnerZombie) {
-        Mediator.getInstance().stopGameEngine();
-        for (IEventSubscriber eventSubscriber : _lostEventSubscribers) {
-            eventSubscriber._notify(winnerZombie);
-        }
-    }
-
-    public void win() {
-        Mediator.getInstance().stopGameEngine();
-        for (IEventSubscriber eventSubscriber : _winEventSubscribers) {
-            eventSubscriber._notify(null);
-        }
     }
 
     public AbstractPlantGameObject getPlantAtBlock(int row, int column) {
@@ -189,5 +182,38 @@ public abstract class GameEngine {
     public List<AbstractZombieGameObject> getZombiesByRow(int row) {
         return queryZombies(z -> z.getRow() == row)
                 .stream().sorted(Comparator.comparingInt(AbstractZombieGameObject::getColumn)).toList();
+    }
+
+    public HypnotizedZombieGameObject queryHypnotizedZombie(Predicate<HypnotizedZombieGameObject> predicate) {
+        return _gameObjects.stream().filter(obj -> obj instanceof HypnotizedZombieGameObject &&
+                        (predicate.test((HypnotizedZombieGameObject) obj))).map(obj -> (HypnotizedZombieGameObject) obj)
+                .findFirst().orElse(null);
+    }
+
+    public void lose(AbstractZombieGameObject winnerZombie) {
+        Mediator.getInstance().stopGameEngine();
+        for (IEventSubscriber eventSubscriber : _lostEventSubscribers) {
+            eventSubscriber._notify(winnerZombie);
+        }
+    }
+
+    public void win() {
+        Mediator.getInstance().stopGameEngine();
+        for (IEventSubscriber eventSubscriber : _winEventSubscribers) {
+            eventSubscriber._notify(null);
+        }
+    }
+
+    public void exportObjects() {
+        PersistenceManager.saveAsDat(_gameObjects.stream().toList());
+
+    }
+
+    public void importObjects(ArrayList<AbstractGameObject> objects) {
+        this._gameObjects.clear();
+        this._gameObjects.addAll(objects);
+
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.writeValue(new File("target/car.json"), car);
     }
 }

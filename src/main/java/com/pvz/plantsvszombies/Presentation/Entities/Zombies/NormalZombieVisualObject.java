@@ -1,7 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
@@ -17,7 +16,7 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
         MOVING,
         EATING,
         DYING,
-        Burning,
+        BURNING,
     }
 
     private final IVisualEngine _engine;
@@ -64,7 +63,11 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
         });
 
         ((NormalZombieGameObject) _gameObject).subscribeToBurnEvent((zombieObj) -> {//we have to change this
-            Platform.runLater(() -> changeStateTo(States.Burning));
+            Platform.runLater(() -> changeStateTo(States.BURNING));
+        });
+
+        ((NormalZombieGameObject) _gameObject).subscribeToDisposeEvent((zombieObj) -> {
+            _engine.disposeObject(this);
         });
     }
 
@@ -100,14 +103,14 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
                 _currentState = States.EATING;
                 playAnimation(NormalZombieAnimations.Animations.ATTACKING, Duration.millis(35));
             }
-            case Burning -> {
-                _currentState = States.Burning;
+            case BURNING -> {
+                _currentState = States.BURNING;
                 playAnimation(NormalZombieAnimations.Animations.BURNING, Duration.millis(70), 1);
                 setOnAnimationFinished(e -> {
                     _engine.disposeObject(this);
                 });
             }
         }
-        return null;
+        return this;
     }
 }

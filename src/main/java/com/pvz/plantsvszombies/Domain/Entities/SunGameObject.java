@@ -4,19 +4,20 @@ import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class SunGameObject extends AbstractGameObject {
+public class SunGameObject extends AbstractGameObject implements Serializable {
     private final double _points = 50;
     private final int _timeOutMilliseconds = 5000;
 
-    private GameEngine _engine;
+    private transient GameEngine _engine;
 
     private boolean isDisposed = false;
 
-    private ArrayList<IEventSubscriber> _timeOutSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _timeOutSubscribers = new ArrayList<>();
 
     public static SunGameObject createSunGameObject(GameEngine gameEngine, String id, Coordinate coordinate) {
         return new SunGameObject(gameEngine, id, coordinate);

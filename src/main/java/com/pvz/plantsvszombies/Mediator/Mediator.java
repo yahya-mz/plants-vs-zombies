@@ -38,28 +38,6 @@ public class Mediator {
         this._visualEngine = visualEngine;
     }
 
-    private Mediator() {
-//        handlers.put(FlowerSunSpawnEvent.class, new FlowerSunSpawnEventHandler());
-//        handlers.put(SkySunSpawnEvent.class, new SkySunSpawnEventHandler());
-//        handlers.put(MapSpawnEvent.class, new MapSpawnEventHandler());
-//        handlers.put(PlantSpawnEvent.class, new PlantSpawnEventHandler());
-    }
-
-    public void _notify(AbstractEvent event) {
-        try {
-            Platform.runLater(() -> {
-                try {
-                    handlers.get(event.getClass()).handle(event);
-
-                } catch (Exception ex) {
-                    System.out.println("Exception occurred on event handle: " + ex.getMessage());
-                }
-            });
-        } catch (Exception ex) {
-            System.out.println("Exception occurred: " + ex.getMessage());
-        }
-    }
-
     public void startGameEngine() {
         _engineThreadRunning = true;
         var gameEngineThread = new Thread(() -> {
@@ -86,7 +64,11 @@ public class Mediator {
         stopVisualEngine();
     }
 
-    private void stopVisualEngine(){
+    public IVisualEngine getVisualEngine() {
+        return _visualEngine;
+    }
+
+    private void stopVisualEngine() {
         _visualEngine.stopEngine();
     }
 

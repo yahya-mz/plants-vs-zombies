@@ -1,15 +1,19 @@
 package com.pvz.plantsvszombies.Domain.Entities;
 
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.AbstractBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 
-public class HypnotizedZombieGameObject extends AbstractGameObject {
+public class HypnotizedZombieGameObject extends AbstractGameObject implements Serializable {
 
 
     protected int _tick;
@@ -24,13 +28,28 @@ public class HypnotizedZombieGameObject extends AbstractGameObject {
     // ( 1 block / 1 sec) * ( 1 pixel / 1 block ) * ( 1 sec / 1 frame ) = ( pixel / frame )
 
 
-    protected final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
+    protected transient final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
-    protected final ArrayList<IEventSubscriber> _eatingEventSubscribers = new ArrayList<>();
+    protected transient final ArrayList<IEventSubscriber> _eatingEventSubscribers = new ArrayList<>();
 
-    protected final ArrayList<IEventSubscriber> _deathEventSubscribers = new ArrayList<>();
+    protected transient final ArrayList<IEventSubscriber> _deathEventSubscribers = new ArrayList<>();
 
-    public int getDamage(){return _damage;}
+    public static HypnotizedZombieGameObject createHypnotizedZombieGameObject(GameEngine gameEngine, String id, AbstractZombieGameObject zombie) {
+        return new HypnotizedZombieGameObject(gameEngine, id, zombie);
+    }
+
+    private HypnotizedZombieGameObject(GameEngine gameEngine, String id, AbstractZombieGameObject zombie) {
+        this._gameEngine = gameEngine;
+        this._ID = id;
+        this._coordinate = zombie.getCoordinate().copy();
+        this._row = zombie.getRow();
+        this._column = zombie.getColumn();
+        this._health = 1000;
+    }
+
+    public int getDamage() {
+        return _damage;
+    }
 
     public void subscribeToMovementEvent(IEventSubscriber eventSubscriber) {
         this._movementEventSubscribers.add(eventSubscriber);
@@ -89,7 +108,7 @@ public class HypnotizedZombieGameObject extends AbstractGameObject {
     }
 
     private void move() {
-        this._coordinate.traverse(-1 * _speed, 0);
+        this._coordinate.traverse(_speed, 0);
         for (IEventSubscriber subscriber : _movementEventSubscribers) {
             subscriber._notify(this);
         }
@@ -108,7 +127,6 @@ public class HypnotizedZombieGameObject extends AbstractGameObject {
 
     private void eat(AbstractZombieGameObject opponentZombie) {
         if (lastBiteMillis == -1) { // Start eating
-            lastBiteMillis = getMilliseconds();
             for (IEventSubscriber subscriber : _eatingEventSubscribers) {
                 subscriber._notify(this);
             }

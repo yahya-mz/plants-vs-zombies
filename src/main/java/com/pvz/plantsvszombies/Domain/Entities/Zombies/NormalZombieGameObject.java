@@ -3,7 +3,13 @@ package com.pvz.plantsvszombies.Domain.Entities.Zombies;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
-public class NormalZombieGameObject extends AbstractZombieGameObject {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class NormalZombieGameObject extends AbstractZombieGameObject implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;  // SAME VALUE
+
     public static NormalZombieGameObject createNormalZombieGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new NormalZombieGameObject(gameEngine, id, coordinate, row, column);
     }

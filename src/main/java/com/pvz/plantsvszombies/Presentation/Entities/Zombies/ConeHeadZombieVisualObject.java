@@ -3,6 +3,7 @@ package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.ConeHeadZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
@@ -66,6 +67,9 @@ public class ConeHeadZombieVisualObject extends AbstractZombieVisualObject {
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> changeStateTo(States.BURNING));
             }
+        });
+        _gameObject.subscribeToDisposeEvent((zombieObj) -> {
+            _engine.disposeObject(this);
         });
     }
 

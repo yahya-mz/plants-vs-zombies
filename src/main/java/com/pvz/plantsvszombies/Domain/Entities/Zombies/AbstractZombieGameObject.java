@@ -1,17 +1,26 @@
 package com.pvz.plantsvszombies.Domain.Entities.Zombies;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.AbstractBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.HypnotizedZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.MapBlock;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.HypnoShroomGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.UUID;
 
-public abstract class AbstractZombieGameObject extends AbstractGameObject {
+public abstract class AbstractZombieGameObject extends AbstractGameObject implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;  // SAME VALUE
 
     public enum ZombieType {
         NORMAL_ZOMBIE,
@@ -26,7 +35,8 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
     public enum GeneralZombieState implements ZombieState {
         EATING,
         MOVING,
-        DEAD
+        DEAD,
+        HYPNOTIZED
     }
 
     protected int _tick;
@@ -45,23 +55,23 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
     protected double _speed = (double) 1 / 4 * MapBlock.BLOCK_SIZE / GlobalSettings.FPS;
     // ( 1 block / 1 sec) * ( 1 pixel / 1 block ) * ( 1 sec / 1 frame ) = ( pixel / frame )
 
-    protected HypnotizedZombieGameObject facingEnemyZombie = null;
-
     public double getDamage() {
         return _damage;
     }
 
-    protected final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
-    protected final ArrayList<IEventSubscriber> _eatingEventSubscribers = new ArrayList<>();
-
-    protected final ArrayList<IEventSubscriber> _burnEventSubscribers = new ArrayList<>();
-
-    protected final ArrayList<IEventSubscriber> _deathEventSubscribers = new ArrayList<>();
-
-    protected final ArrayList<IEventSubscriber> _freezyEventSubscribers = new ArrayList<>();
-
-    protected final ArrayList<IEventSubscriber> _frozenEventSubscribers = new ArrayList<>();
+    @JsonIgnore
+    protected transient ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
+    @JsonIgnore
+    protected transient ArrayList<IEventSubscriber> _eatingEventSubscribers = new ArrayList<>();
+    @JsonIgnore
+    protected transient ArrayList<IEventSubscriber> _burnEventSubscribers = new ArrayList<>();
+    @JsonIgnore
+    protected transient ArrayList<IEventSubscriber> _deathEventSubscribers = new ArrayList<>();
+    @JsonIgnore
+    protected transient ArrayList<IEventSubscriber> _freezyEventSubscribers = new ArrayList<>();
+    @JsonIgnore
+    protected transient ArrayList<IEventSubscriber> _frozenEventSubscribers = new ArrayList<>();
 
     public void subscribeToMovementEvent(IEventSubscriber eventSubscriber) {
         this._movementEventSubscribers.add(eventSubscriber);
@@ -123,13 +133,20 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
                     _remainingFreezyTime = -1000.0 / GlobalSettings.FPS;
                 }
 
+                var facingEnemyZombie = _gameEngine.queryHypnotizedZombie(
+                        z -> z.getCoordinate().equals(_coordinate)
+                );
                 if (facingEnemyZombie != null) {
                     eatZombie(facingEnemyZombie);
+                    _tick++;
                     return;
                 }
 
                 var zombieBlock = _gameEngine.getBlockByCoordinate(this._coordinate);
                 if (zombieBlock != null) {
+                    if (Math.abs(this._column - zombieBlock.getColumn()) > 1) {
+                        var test = 2;
+                    }
                     this._column = zombieBlock.getColumn(); // Update Current Block
                     if (zombieBlock.getPlant() != null) {
                         eatPlant(zombieBlock.getPlant());
@@ -175,7 +192,6 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
     }
 
     public void getHitByZombie(HypnotizedZombieGameObject obj) {
-        facingEnemyZombie = obj;
         _health -= obj.getDamage();
         if (_health <= 0) {
             die();
@@ -231,7 +247,6 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
             eventSubscriber._notify(this);
         }
         super.dispose();
-
     }
 
     private double lastBiteMillis = -1;
@@ -243,6 +258,14 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
             for (IEventSubscriber subscriber : _eatingEventSubscribers) {
                 subscriber._notify(this);
             }
+            if (plant instanceof HypnoShroomGameObject) {
+                plant.getHit(0);
+                var id = "HypnotizedZombie_" + UUID.randomUUID();
+                var hypnotizedZombie = HypnotizedZombieGameObject
+                        .createHypnotizedZombieGameObject(_gameEngine, id, this);
+                super.dispose(true);
+                _gameEngine.spawnObject(hypnotizedZombie);
+            }
         }
         if (getMilliseconds() - lastBiteMillis > _biteCoolDown.toMillis()) {
             plant.getHit(this._damage);
@@ -252,7 +275,6 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
 
     private void eatZombie(HypnotizedZombieGameObject zombie) {
         if (lastBiteMillis == -1) { // Start eating
-            lastBiteMillis = getMilliseconds();
             this._state = GeneralZombieState.EATING;
             for (IEventSubscriber subscriber : _eatingEventSubscribers) {
                 subscriber._notify(this);
@@ -268,4 +290,16 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject {
         return this._tick * 1000.0 / GlobalSettings.FPS;
     }
 
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _movementEventSubscribers = new ArrayList<>();
+        _eatingEventSubscribers = new ArrayList<>();
+        _burnEventSubscribers = new ArrayList<>();
+        _deathEventSubscribers = new ArrayList<>();
+        _freezyEventSubscribers = new ArrayList<>();
+        _frozenEventSubscribers = new ArrayList<>();
+    }
 }

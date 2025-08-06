@@ -7,21 +7,22 @@ import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.UUID;
 
-public class ScaredyShroomGameObject extends AbstractPlantGameObject {
+public class ScaredyShroomGameObject extends AbstractPlantGameObject implements Serializable {
 
     private final Duration _coolDown = Duration.ofMillis(4000);
     private int tick = 1;
 
     public boolean isAwake = true;
 
-    private final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
-    private final ArrayList<IEventSubscriber> _switchAwakenessEventSubscribers = new ArrayList<>();
-    private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _switchAwakenessEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
     public static ScaredyShroomGameObject createScaredyShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new ScaredyShroomGameObject(gameEngine, id, coordinate, row, column);

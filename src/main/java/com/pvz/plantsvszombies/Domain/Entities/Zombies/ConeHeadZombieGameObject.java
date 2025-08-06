@@ -4,9 +4,14 @@ import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Duration;
 
-public class ConeHeadZombieGameObject extends AbstractZombieGameObject {
+public class ConeHeadZombieGameObject extends AbstractZombieGameObject implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;  // SAME VALUE
 
     public final static Duration BITE_COOL_DOWN = Duration.ofMillis(500);
 

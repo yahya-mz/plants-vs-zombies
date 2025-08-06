@@ -21,13 +21,12 @@ public class WallNutVisualObject extends AbstractPlantVisualObject {
 
     private States _currentState = States.FULL_HEALTH;
 
-    private GeneralFadingAnimation _fadingAnimation;
-    private GeneralTransformAnimation _transformAnimation;
-
     private final IVisualEngine _engine;
 
     public WallNutVisualObject(WallNutGameObject gameObject, IVisualEngine engine) {
-        super._gameObject = gameObject;
+        _visualCoordinate = gameObject.getCoordinate();
+        _gameObject = gameObject;
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/WallNut/WallNut_0.png")));
         _engine = engine;
 
         var temp_this = this;
@@ -45,17 +44,13 @@ public class WallNutVisualObject extends AbstractPlantVisualObject {
                 changeStateTo(States.CRACKED2);
             }
         });
-        gameObject.subscribeToEatenEvent(new IEventSubscriber() {
+        gameObject.subscribeToEatenEvent(new IEventSubscriber() {//notify
             @Override
             public void _notify(AbstractGameObject gameObject) {
-                System.out.println("DEAD !");
                 _engine.disposeObject(temp_this);
             }
         });
 
-        _visualCoordinate = gameObject.getCoordinate();
-        _gameObject = gameObject;
-        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/WallNut/WallNut_0.png")));
 
 //        _node.setTranslateY(_visualCoordinate.y());
 //        _node.setTranslateX(_visualCoordinate.x());
@@ -96,6 +91,6 @@ public class WallNutVisualObject extends AbstractPlantVisualObject {
                 }
             }
         }
-        return null;
+        return this;
     }
 }

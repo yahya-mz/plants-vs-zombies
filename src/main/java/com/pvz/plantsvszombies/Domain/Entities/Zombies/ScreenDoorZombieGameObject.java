@@ -5,9 +5,10 @@ import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.AbstractBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
+import java.io.Serializable;
 import java.time.Duration;
 
-public class ScreenDoorZombieGameObject extends AbstractZombieGameObject {
+public class ScreenDoorZombieGameObject extends AbstractZombieGameObject implements Serializable {
 
     public final static Duration BITE_COOL_DOWN = Duration.ofMillis(500);
 

@@ -3,7 +3,9 @@ package com.pvz.plantsvszombies.Domain.Entities;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 
-public class MapBlock {
+import java.io.Serializable;
+
+public class MapBlock implements Serializable {
 
     public final static int BLOCK_SIZE = 90;
 

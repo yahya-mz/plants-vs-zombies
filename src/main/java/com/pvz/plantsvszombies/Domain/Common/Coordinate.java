@@ -1,6 +1,10 @@
 package com.pvz.plantsvszombies.Domain.Common;
 
-public class Coordinate {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.io.Serializable;
+
+public class Coordinate implements Serializable {
     private double _x;
     private double _y;
 
@@ -9,10 +13,12 @@ public class Coordinate {
         this._y = y;
     }
 
+    @JsonProperty("x")
     public double x() {
         return this._x;
     }
 
+    @JsonProperty("y")
     public double y() {
         return this._y;
     }

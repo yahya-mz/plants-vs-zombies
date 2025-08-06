@@ -1,6 +1,7 @@
 package com.pvz.plantsvszombies.Presentation.Engines;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.AbstractLevelView;
 import com.pvz.plantsvszombies.Presentation.Entities.AbstractVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.AbstractPlantVisualObject;
@@ -17,6 +18,8 @@ public interface IVisualEngine {
     void spawnVisualObject(AbstractVisualObject object);
 
     void spawnVisualObject(AbstractVisualObject object, int top_z_index);
+
+    void spawnGameObject(AbstractGameObject gameObject);
 
     void plant(Class<? extends AbstractPlantVisualObject> plantType, int x, int y, Coordinate coordinate);
 

@@ -5,11 +5,12 @@ import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class NormalBulletGameObject extends AbstractBulletGameObject {
-    private final ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
-    private final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
+public class NormalBulletGameObject extends AbstractBulletGameObject implements Serializable {
+    private transient final ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
     public static NormalBulletGameObject createNormalBulletGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row) {
         return new NormalBulletGameObject(gameEngine, id, coordinate, row);

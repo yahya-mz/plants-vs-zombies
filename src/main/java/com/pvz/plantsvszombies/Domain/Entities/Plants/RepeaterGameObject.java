@@ -6,21 +6,23 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class RepeaterGameObject extends AbstractPlantGameObject {
+public class RepeaterGameObject extends AbstractPlantGameObject implements Serializable {
     private final Duration _coolDown = Duration.ofMillis(4000);
     private int tick = 1;
 
-    private final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
-    private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
 
     public static RepeaterGameObject createRepeaterGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new RepeaterGameObject(gameEngine, id, coordinate, row, column);
     }
+
     RepeaterGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;

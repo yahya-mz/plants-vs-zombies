@@ -6,16 +6,17 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class JalapenoGameObject extends AbstractPlantGameObject {
+public class JalapenoGameObject extends AbstractPlantGameObject implements Serializable {
     public final static Duration EXPLOSION_TIME = Duration.ofMillis(1000);
 
     private int _tick;
-    private final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
 
     public static JalapenoGameObject createJalapenoGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new JalapenoGameObject(gameEngine, id, coordinate, row, column);

@@ -14,7 +14,9 @@ public abstract class AbstractPlantGameObject extends AbstractGameObject {
         SNOW_PEA,
         SCAREDY_SHROOM,
         PUFF_SHROOM,
-        ICE_SHROOM
+        ICE_SHROOM,
+        HYPNO_SHROOM,
+        BLOVER
 
     }
 

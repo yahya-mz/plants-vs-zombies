@@ -93,7 +93,6 @@ public abstract class AbstractAnimatedVisualObject extends AbstractVisualObject 
     }
 
     public abstract void playAnimation(IAnimation animation, Duration frameDuration);
-
     public void resumeAnimation() {
         if (_animationTimeLine.getStatus().equals(Animation.Status.PAUSED)) {
             _animationTimeLine.play();

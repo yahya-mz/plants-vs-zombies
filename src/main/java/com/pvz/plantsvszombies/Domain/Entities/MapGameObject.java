@@ -16,10 +16,10 @@ public class MapGameObject extends AbstractGameObject {
 
     private MapBlock[] _blocks;
 
-    private final GameEngine _engine;
+    private transient final GameEngine _engine;
 
-    ArrayList<IEventSubscriber> _plantingEventSubscribers = new ArrayList<>();
-    ArrayList<IEventSubscriber> _spawningObjectEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _plantingEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _blocksReadyEventSubscribers = new ArrayList<>();
 
     public static MapGameObject createMapGameObject(String id, Coordinate coordinate, GameEngine engine) {
         return new MapGameObject(id, coordinate, engine);
@@ -55,6 +55,10 @@ public class MapGameObject extends AbstractGameObject {
 
     public void initBlocks(MapBlock[] blocks) {
         _blocks = blocks;
+
+        for (IEventSubscriber eventSubscriber : _blocksReadyEventSubscribers) {
+            eventSubscriber._notify(this);
+        }
     }
 
     public MapBlock getBlock(int row, int col) {
@@ -86,17 +90,7 @@ public class MapGameObject extends AbstractGameObject {
         }
     }
 
-//    public void spawnByCoordinate(AbstractGameObject obj) {
-//        for (IEventSubscriber subscriber : _spawningObjectEventSubscribers) {
-//            subscriber._notify(obj);
-//        }
-//    }
-
-    public void subscribeToPlantingEvent(IEventSubscriber eventSubscriber) {
-        _plantingEventSubscribers.add(eventSubscriber);
-    }
-
-    public void subscribeToSpawningObjectEvent(IEventSubscriber eventSubscriber) {
-        _spawningObjectEventSubscribers.add(eventSubscriber);
+    public void subscribeToBlocksReadyEvent(IEventSubscriber eventSubscriber) {
+        _blocksReadyEventSubscribers.add(eventSubscriber);
     }
 }

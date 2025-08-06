@@ -5,12 +5,13 @@ import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ShroomBulletGameObject extends AbstractBulletGameObject {
+public class ShroomBulletGameObject extends AbstractBulletGameObject implements Serializable {
 
-    private final ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
-    private final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
     public static ShroomBulletGameObject createShroomBulletGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row) {
         return new ShroomBulletGameObject(gameEngine, id, coordinate, row);

@@ -3,7 +3,9 @@ package com.pvz.plantsvszombies.Domain.Entities.Zombies;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
-public class ImpZombieGameObject extends AbstractZombieGameObject {
+import java.io.Serializable;
+
+public class ImpZombieGameObject extends AbstractZombieGameObject implements Serializable {
 
     public static ImpZombieGameObject createImpZombieGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new ImpZombieGameObject(gameEngine, id, coordinate, row, column);

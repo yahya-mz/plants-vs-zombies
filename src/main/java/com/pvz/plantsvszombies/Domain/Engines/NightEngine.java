@@ -2,10 +2,13 @@ package com.pvz.plantsvszombies.Domain.Engines;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.*;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
+import com.pvz.plantsvszombies.Domain.Services.PersistenceManager;
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Mediator.Mediator;
 
 import java.time.Duration;
 import java.util.*;
@@ -13,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NightEngine extends GameEngine {
     private final Duration _skySunDroppingInterval = Duration.ofSeconds(7);
-    private Duration _zombieSpawnInterval = Duration.ofSeconds(3);
+    private final Duration _zombieSpawnInterval = Duration.ofSeconds(3);
     private final Duration _wave_2_Start = Duration.ofSeconds(15);
     private final Duration _wave_3_Start = Duration.ofSeconds(30);
     private final Duration _wave_4_Start = Duration.ofSeconds(45);
@@ -22,6 +25,8 @@ public class NightEngine extends GameEngine {
     private final Random _zombieSpawnRandom = new Random(System.currentTimeMillis());
     private final Random _skyDroppingRandom = new Random(System.currentTimeMillis() * 100);
     private final Random _zombieTypeRandom = new Random(System.currentTimeMillis() / 1000);
+
+    private final ArrayList<FogGameObject> _fogs = new ArrayList<>();
 
     private final ArrayList<IEventSubscriber> _midAttackEventSubscribers = new ArrayList<>();
     private final ArrayList<IEventSubscriber> _finalAttackEventSubscribers = new ArrayList<>();
@@ -38,12 +43,22 @@ public class NightEngine extends GameEngine {
 
     @Override
     public void start() {
+//        load();
         initMap();
+        _currentMap.subscribeToBlocksReadyEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                initFog();
+            }
+        });
     }
 
     //updates every object
     @Override
     public void update() {
+        if (getMilliseconds() % 3000 == 0) {
+            exportObjects();
+        }
 
         // Checking wave changes:
         if (getMilliseconds() % _gameInterval.toMillis() == 0) {
@@ -62,7 +77,7 @@ public class NightEngine extends GameEngine {
         // Zombie Spawning
         switch (_currentWave) {
             case 1 -> {
-                if (getMilliseconds() % 3000.0 == 0) {
+                if (getMilliseconds() % 10000.0 == 0) {
                     var row = _zombieSpawnRandom.nextInt(0, _rows);
                     spawnZombie(row, _columns - 1, AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE);
                 }
@@ -101,13 +116,20 @@ public class NightEngine extends GameEngine {
                         || gameObject.getCoordinate().x() < 0
                         || gameObject.getCoordinate().y() < 0) {
 //                    toRemove.add(gameObject); // Just mark for removal
-                    gameObject.dispose();
+                    if (gameObject instanceof FogGameObject) {
+                        System.out.println("fog");
+                    }
+                    gameObject.dispose(true);
                 }
             }
 //            _gameObjects.removeAll(toRemove); // Remove after iteration — safe
         }
 
         tick++;
+    }
+
+    public ArrayList<FogGameObject> getFogs() {
+        return this._fogs;
     }
 
     private void initMap() {
@@ -121,6 +143,30 @@ public class NightEngine extends GameEngine {
         for (IEventSubscriber subscriber : _gameObjectSpawnEventSubscribers) {
             subscriber._notify(map);
         }
+    }
+
+    private void initFog() {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 6; j <= 8; j++) {
+                var fogBlock = getBlock(i, j);
+                var coordinate = fogBlock.getTopLeftCoordinate();
+                var fog = FogGameObject.createFogGameObject(this, "Fog_" + UUID.randomUUID(),
+                        coordinate, i, j);
+                spawnObject(fog);
+                _fogs.add(fog);
+            }
+        }
+    }
+
+    private void load() {
+        _gameObjects.clear();
+        _gameObjects.addAll(PersistenceManager.load());
+        _gameObjects.forEach(e -> {
+            if (e instanceof AbstractPlantGameObject) {
+                Mediator.getInstance().getVisualEngine()
+                        .spawnGameObject(e);
+            }
+        });
     }
 
     private double getMilliseconds() {

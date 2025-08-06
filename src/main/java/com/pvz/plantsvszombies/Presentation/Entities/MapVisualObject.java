@@ -26,7 +26,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class MapVisualObject extends AbstractVisualObject {
     MapGameObject _mapObject;
@@ -160,6 +162,17 @@ public class MapVisualObject extends AbstractVisualObject {
                             ImageView preview = createPlantImageView("IceShroom", cellButton);
                             cellButton.setGraphic(preview);
                         });
+                    } else if (selectedType == HypnoShroomVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("HypnoShroom", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
+                    }
+                    else if (selectedType == BloverVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("Blover", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
                     }
                 });
 
@@ -212,7 +225,9 @@ public class MapVisualObject extends AbstractVisualObject {
                         var x = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
                         var y = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
                         blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxY()), i_final, j_final);//putting that block in the blocks array with the upper left cor and the dowen right cor and also with i and j in the grid
-                        _mapObject.initBlocks(blocks);
+                        if (Arrays.stream(blocks).noneMatch(Objects::isNull)){
+                            _mapObject.initBlocks(blocks);
+                        }
                     }
                 });
             }
@@ -294,6 +309,10 @@ public class MapVisualObject extends AbstractVisualObject {
 
     public void spawnByCoordinate(AbstractVisualObject object) {
         _engine.spawnVisualObject(object);
+    }
+    public void spawnByCoordinate(AbstractVisualObject object, double z_index) {
+        _engine.spawnVisualObject(object);
+        object.getNode().setViewOrder(z_index);
     }
 
     private static Node pick(Node node, double sceneX, double sceneY) {

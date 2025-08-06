@@ -46,90 +46,7 @@ public class VisualNightEngine implements IVisualEngine {
         _gameEngine.subscribeToGameObjectSpawnEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
-                if (gameObject instanceof MapGameObject) {
-                    _currentMapVisualObject = new MapVisualObject((MapGameObject) gameObject, temp_this);
-                    spawnVisualObject(_currentMapVisualObject, 1);
-                }
-                if (gameObject instanceof AbstractBulletGameObject) {
-                    if (gameObject instanceof NormalBulletGameObject bullet) {
-                        _currentMapVisualObject.spawnByCoordinate(new NormalBulletVisualObject(bullet, temp_this));
-                    }
-                }
-                if (gameObject instanceof AbstractPlantGameObject) {
-                    AbstractVisualObject visualObject = null; // 'might not have been initialized' occurs if we don't put the = null
-                    switch (gameObject) {
-                        case PeashooterGameObject p -> {
-                            visualObject = new PeashooterVisualObject(p, temp_this);
-                            _currentMapVisualObject.plant(visualObject, p.getRow(), p.getColumn());
-                        }
-                        case RepeaterGameObject rp -> {
-                            visualObject = new RepeaterVisualObject(rp, temp_this);
-                            _currentMapVisualObject.plant(visualObject, rp.getRow(), rp.getColumn());
-                        }
-                        case SnowPeaGameObject sp -> {
-                            visualObject = new SnowPeaVisualObject(sp, temp_this);
-                            _currentMapVisualObject.plant(visualObject, sp.getRow(), sp.getColumn());
-                        }
-                        case WallNutGameObject wn -> {
-                            visualObject = new WallNutVisualObject(wn, temp_this);
-                            _currentMapVisualObject.plant(visualObject, wn.getRow(), wn.getColumn());
-                        }
-                        case SunFlowerGameObject sn -> {
-                            visualObject = new SunFlowerVisualObject(sn, temp_this);
-                            _currentMapVisualObject.plant(visualObject, sn.getRow(), sn.getColumn());
-                        }
-                        case CherryBombGameObject cb -> {
-                            visualObject = new CherryBombVisualObject(cb, temp_this);
-                            _currentMapVisualObject.plant(visualObject, cb.getRow(), cb.getColumn());
-                        }
-                        case TallNutGameObject tl -> {
-                            visualObject = new TallnutVisualObject(tl, temp_this);
-                            _currentMapVisualObject.plant(visualObject, tl.getRow(), tl.getColumn());
-                        }
-                        case JalapenoGameObject jl -> {
-                            visualObject = new JalapenoVisualObject(jl, temp_this);
-                            _currentMapVisualObject.plant(visualObject, jl.getRow(), jl.getColumn());
-                        }
-                        case ScaredyShroomGameObject ss -> {
-                            visualObject = new ScaredyshroomVisualObject(ss, temp_this);
-                            _currentMapVisualObject.plant(visualObject, ss.getRow(), ss.getColumn());
-                        }
-                        case PuffShroomGameObject ps -> {
-                            visualObject = new PuffshroomVisualObject(ps, temp_this);
-                            _currentMapVisualObject.plant(visualObject, ps.getRow(), ps.getColumn());
-                        }
-                        case IceShroomGameObject is -> {
-                            visualObject = new IceshroomVisualObject(is, temp_this);
-                            _currentMapVisualObject.plant(visualObject, is.getRow(), is.getColumn());
-                        }
-                        default -> {
-                        }
-                    }
-                    temp_this._visualObjects.add(visualObject);
-                }
-                if (gameObject instanceof AbstractZombieGameObject) {
-                    switch (gameObject) {
-                        case NormalZombieGameObject no -> {
-                            NormalZombieVisualObject object = new NormalZombieVisualObject(no, temp_this);
-                            spawnVisualObject(object);
-                        }
-                        case ConeHeadZombieGameObject ch -> {
-                            ConeHeadZombieVisualObject object = new ConeHeadZombieVisualObject(ch, temp_this);
-                            spawnVisualObject(object);
-                        }
-                        case ScreenDoorZombieGameObject sd -> {
-                            ScreenDoorZombieVisualObject object = new ScreenDoorZombieVisualObject(sd, temp_this);
-                            spawnVisualObject(object);
-                        }
-                        case ImpZombieGameObject iz -> {
-                            ImpZombieVisualObject object = new ImpZombieVisualObject(iz, temp_this);
-                            spawnVisualObject(object);
-                        }
-
-                        default -> {
-                        }
-                    }
-                }
+                spawnGameObject(gameObject);
             }
         });
         _gameEngine.subscribeToLostEvent(new IEventSubscriber() {
@@ -194,12 +111,10 @@ public class VisualNightEngine implements IVisualEngine {
     }
 
     @Override
-    public void spawnVisualObject(AbstractVisualObject object, int top_z_index) {
+    public void spawnVisualObject(AbstractVisualObject object, int z_index) {
         Platform.runLater(() -> {
             _levelStage.getGameBoxPane().getChildren().add(object.getNode());
-            for (int i = 0; i < top_z_index; i++) {
-                object.getNode().toBack();
-            }
+            object.getNode().setViewOrder(-z_index);
             object.spawn();
             this._visualObjects.add(object);
         });
@@ -252,6 +167,14 @@ public class VisualNightEngine implements IVisualEngine {
                 } else if (plantType == IceshroomVisualObject.class) {
                     String iceShroomObjectId = "IceShroom_" + UUID.randomUUID();
                     var obj = IceShroomGameObject.createIceShroomGameObject(this._gameEngine, iceShroomObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == HypnoShroomVisualObject.class) {
+                    String hypnoShroomObjectId = "HypnoShroom_" + UUID.randomUUID();
+                    var obj = HypnoShroomGameObject.createHypnoShroomGameObject(this._gameEngine, hypnoShroomObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == BloverVisualObject.class) {
+                    String bloverObjectId = "Blover_" + UUID.randomUUID();
+                    var obj = BloverGameObject.createBloverGameObject(this._gameEngine, bloverObjectId, coordinate, x, y);
                     this._gameEngine.plantObject(obj);
                 }
 
@@ -310,7 +233,10 @@ public class VisualNightEngine implements IVisualEngine {
     public void shovelActivation() {
         _isShovelActivated = true;
     }
-    public void shovelDeactivation() {_isShovelActivated = false;}
+
+    public void shovelDeactivation() {
+        _isShovelActivated = false;
+    }
 
     @Override
     public boolean isShovelActivated() {
@@ -347,5 +273,105 @@ public class VisualNightEngine implements IVisualEngine {
                 DayMenu.createLostPopup().show();
             });
         });
+    }
+
+    public void spawnGameObject(AbstractGameObject gameObject) {
+        var temp_this = this;
+        if (gameObject instanceof MapGameObject) {
+            _currentMapVisualObject = new MapVisualObject((MapGameObject) gameObject, temp_this);
+            spawnVisualObject(_currentMapVisualObject, -10);
+        } else if (gameObject instanceof AbstractBulletGameObject) {
+            if (gameObject instanceof NormalBulletGameObject bullet) {
+                _currentMapVisualObject.spawnByCoordinate
+                        (new NormalBulletVisualObject(bullet, temp_this), 5);
+            }
+        } else if (gameObject instanceof HypnotizedZombieGameObject) {
+            HypnotizedZombieVisualObject object = new HypnotizedZombieVisualObject((HypnotizedZombieGameObject) gameObject, temp_this);
+            spawnVisualObject(object);
+        } else if (gameObject instanceof FogGameObject) {
+            var object = new FogVisualObject((FogGameObject) gameObject, temp_this);
+            spawnVisualObject(object, 10);
+        } else if (gameObject instanceof AbstractPlantGameObject) {
+            AbstractVisualObject visualObject = null; // 'might not have been initialized' occurs if we don't put the = null
+            switch (gameObject) {
+                case PeashooterGameObject p -> {
+                    visualObject = new PeashooterVisualObject(p, temp_this);
+                    _currentMapVisualObject.plant(visualObject, p.getRow(), p.getColumn());
+                }
+                case RepeaterGameObject rp -> {
+                    visualObject = new RepeaterVisualObject(rp, temp_this);
+                    _currentMapVisualObject.plant(visualObject, rp.getRow(), rp.getColumn());
+                }
+                case SnowPeaGameObject sp -> {
+                    visualObject = new SnowPeaVisualObject(sp, temp_this);
+                    _currentMapVisualObject.plant(visualObject, sp.getRow(), sp.getColumn());
+                }
+                case WallNutGameObject wn -> {
+                    visualObject = new WallNutVisualObject(wn, temp_this);
+                    _currentMapVisualObject.plant(visualObject, wn.getRow(), wn.getColumn());
+                }
+                case SunFlowerGameObject sn -> {
+                    visualObject = new SunFlowerVisualObject(sn, temp_this);
+                    _currentMapVisualObject.plant(visualObject, sn.getRow(), sn.getColumn());
+                }
+                case CherryBombGameObject cb -> {
+                    visualObject = new CherryBombVisualObject(cb, temp_this);
+                    _currentMapVisualObject.plant(visualObject, cb.getRow(), cb.getColumn());
+                }
+                case TallNutGameObject tl -> {
+                    visualObject = new TallnutVisualObject(tl, temp_this);
+                    _currentMapVisualObject.plant(visualObject, tl.getRow(), tl.getColumn());
+                }
+                case JalapenoGameObject jl -> {
+                    visualObject = new JalapenoVisualObject(jl, temp_this);
+                    _currentMapVisualObject.plant(visualObject, jl.getRow(), jl.getColumn());
+                }
+                case ScaredyShroomGameObject ss -> {
+                    visualObject = new ScaredyshroomVisualObject(ss, temp_this);
+                    _currentMapVisualObject.plant(visualObject, ss.getRow(), ss.getColumn());
+                }
+                case PuffShroomGameObject ps -> {
+                    visualObject = new PuffshroomVisualObject(ps, temp_this);
+                    _currentMapVisualObject.plant(visualObject, ps.getRow(), ps.getColumn());
+                }
+                case IceShroomGameObject is -> {
+                    visualObject = new IceshroomVisualObject(is, temp_this);
+                    _currentMapVisualObject.plant(visualObject, is.getRow(), is.getColumn());
+                }
+                case HypnoShroomGameObject hs -> {
+                    visualObject = new HypnoShroomVisualObject(hs, temp_this);
+                    _currentMapVisualObject.plant(visualObject, hs.getRow(), hs.getColumn());
+                }
+                case BloverGameObject bl -> {
+                    visualObject = new BloverVisualObject(bl, temp_this);
+                    _currentMapVisualObject.plant(visualObject, bl.getRow(), bl.getColumn());
+                }
+                default -> {
+                }
+            }
+            temp_this._visualObjects.add(visualObject);
+        } else if (gameObject instanceof AbstractZombieGameObject) {
+            switch (gameObject) {
+                case NormalZombieGameObject no -> {
+                    NormalZombieVisualObject object = new NormalZombieVisualObject(no, temp_this);
+                    spawnVisualObject(object);
+                }
+                case ConeHeadZombieGameObject ch -> {
+                    ConeHeadZombieVisualObject object = new ConeHeadZombieVisualObject(ch, temp_this);
+                    spawnVisualObject(object);
+                }
+                case ScreenDoorZombieGameObject sd -> {
+                    ScreenDoorZombieVisualObject object = new ScreenDoorZombieVisualObject(sd, temp_this);
+                    spawnVisualObject(object);
+                }
+                case ImpZombieGameObject iz -> {
+                    ImpZombieVisualObject object = new ImpZombieVisualObject(iz, temp_this);
+                    spawnVisualObject(object);
+                }
+
+                default -> {
+                }
+            }
+        }
     }
 }

@@ -8,6 +8,8 @@ public abstract class AbstractZombieVisualObject extends AbstractAnimatedVisualO
 
     protected AbstractZombieGameObject _gameObject;
 
-    public AbstractZombieGameObject getGameObject(){return _gameObject;}
+    public AbstractZombieGameObject getGameObject() {
+        return _gameObject;
+    }
 }
 

@@ -26,11 +26,7 @@ public class PeashooterVisualObject extends AbstractPlantVisualObject {
         gameObject.subscribeToShootingEvent(new IEventSubscriber() {//notify
             @Override
             public void _notify(AbstractGameObject gameObject) {
-                Platform.runLater(() -> {
-                    System.out.println("Shooting: " + gameObject.getCoordinate().x() + "," + gameObject.getCoordinate().y());
-                    var bulletVisualObject = new NormalBulletVisualObject((NormalBulletGameObject) gameObject, engine);
-                    _engine.spawnVisualObject(bulletVisualObject);
-                });
+
             }
         });
         var temp_this = this;

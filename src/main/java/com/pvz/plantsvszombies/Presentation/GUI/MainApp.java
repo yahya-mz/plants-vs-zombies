@@ -22,7 +22,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         StackPane root = new StackPane();
 
-        Image backgroundImage = new Image(GlobalSettings.getResource("graphics/Items/Background/daymenu.jpg").toString());
+        Image backgroundImage = new Image(GlobalSettings.getResource("graphics/Items/Background/daymenu.jpg"));
         ImageView bgImageView = new ImageView(backgroundImage);
 
         bgImageView.setPreserveRatio(true);

@@ -6,16 +6,20 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class PeashooterGameObject extends AbstractPlantGameObject {
+public class PeashooterGameObject extends AbstractPlantGameObject implements Serializable {
     private final Duration _coolDown = Duration.ofMillis(4000);
     private int tick = 1;
 
-    private final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
-    private final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
     public static PeashooterGameObject createPeashooterGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new PeashooterGameObject(gameEngine, id, coordinate, row, column);
@@ -89,5 +93,14 @@ public class PeashooterGameObject extends AbstractPlantGameObject {
 
     private double getMilliseconds() {
         return this.tick * 1000.0 / GlobalSettings.FPS;
+    }
+
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _shootingEventSubscribers = new ArrayList<>();
+        _eatenEventSubscribers = new ArrayList<>();
     }
 }

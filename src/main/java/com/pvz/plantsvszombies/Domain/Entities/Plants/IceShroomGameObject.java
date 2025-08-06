@@ -6,16 +6,17 @@ import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 
-public class IceShroomGameObject extends AbstractPlantGameObject {
+public class IceShroomGameObject extends AbstractPlantGameObject implements Serializable {
     public final static Duration EXPLOSION_TIME = Duration.ofSeconds(1);
     public final static Duration FROZEN_TIME = Duration.ofSeconds(4);
 
 
     private int _tick;
-    private final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
+    private transient final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
 
     public static IceShroomGameObject createIceShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new IceShroomGameObject(gameEngine, id, coordinate, row, column);
