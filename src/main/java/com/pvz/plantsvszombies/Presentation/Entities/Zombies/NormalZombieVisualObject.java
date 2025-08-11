@@ -3,6 +3,8 @@ package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
@@ -13,8 +15,8 @@ import javafx.util.Duration;
 
 public class NormalZombieVisualObject extends AbstractZombieVisualObject {
     public enum States {
-        MOVING,
-        EATING,
+        MOVING_FORWARD,
+        ATTACKING,
         DYING,
         BURNING,
     }
@@ -37,15 +39,15 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
         _node.setManaged(false);
         _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
 
-        _currentState = States.MOVING;
+        _currentState = States.MOVING_FORWARD;
 
         ((NormalZombieGameObject) _gameObject).subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
             Platform.runLater(() -> {
                 _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
             });
-            if (!this._currentState.equals(States.MOVING)) {
-                changeStateTo(States.MOVING);
+            if (!this._currentState.equals(States.MOVING_FORWARD)) {
+                changeStateTo(States.MOVING_FORWARD);
             }
         });
 
@@ -53,7 +55,7 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
-                    changeStateTo(States.EATING);
+                    changeStateTo(States.ATTACKING);
                 });
             }
         });
@@ -84,24 +86,29 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
     public void spawn() {
         _gameObject.spawn();
         playAnimation(NormalZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
+        SoundManager.play(SoundType.ZOMBIE_GROAN);
     }
 
     public NormalZombieVisualObject changeStateTo(NormalZombieVisualObject.States state) {
         switch (state) {
-            case MOVING -> {
-                _currentState = States.MOVING;
+            case MOVING_FORWARD -> {
+                _currentState = States.MOVING_FORWARD;
                 playAnimation(NormalZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
+                SoundManager.stop(SoundType.ZOMBIE_ATTACK);
             }
             case DYING -> {
                 _currentState = States.DYING;
                 playAnimation(NormalZombieAnimations.Animations.DYING, Duration.millis(70), 1);
+                SoundManager.stop(SoundType.ZOMBIE_GROAN);
+                SoundManager.play(SoundType.ZOMBIE_Falling);
                 setOnAnimationFinished(e -> {
                     _engine.disposeObject(this);
                 });
             }
-            case EATING -> {
-                _currentState = States.EATING;
+            case ATTACKING -> {
+                _currentState = States.ATTACKING;
                 playAnimation(NormalZombieAnimations.Animations.ATTACKING, Duration.millis(35));
+                SoundManager.play(SoundType.ZOMBIE_ATTACK);
             }
             case BURNING -> {
                 _currentState = States.BURNING;

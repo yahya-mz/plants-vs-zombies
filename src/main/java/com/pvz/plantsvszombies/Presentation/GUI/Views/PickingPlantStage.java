@@ -1,4 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.GUI.Views;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
 import javafx.geometry.Insets;
@@ -24,6 +26,7 @@ public class PickingPlantStage {
     private Stage primaryStage;
     private Button playBtn;
     private final String _mode;
+    Image backgroundImage;
 
     public PickingPlantStage(String mode){
         this._mode = mode;
@@ -35,16 +38,24 @@ public class PickingPlantStage {
         this.primaryStage = primaryStage;
         VBox root = new VBox(5);
         StackPane mainPickingPane = new StackPane();
-        playBtn = createStartButton();
+        int topMargineForScroll;
 
+        playBtn = createStartButton();
         StackPane.setAlignment(playBtn , Pos.BOTTOM_CENTER);
         StackPane.setMargin(playBtn, new Insets(0, 0, -50, 0));
         playBtn.setDisable(true);
 
         root.setPadding(new Insets(20));
-        Image backgroundImage = new Image(
-                GlobalSettings.getResource("graphics/Items/Background/daypickingstage.png")
-        );
+        if (_mode.equals("day")){
+            backgroundImage = new Image(
+                    GlobalSettings.getResource("graphics/Items/Background/daypickingstage.png")
+            );
+        } else {
+            backgroundImage = new Image(
+                    GlobalSettings.getResource("graphics/Items/Background/nightpickingstage.png")
+            );
+        }
+
         BackgroundSize backgroundSize = new BackgroundSize(
                 100, 100, true, true, true, false
         );
@@ -61,7 +72,9 @@ public class PickingPlantStage {
         loadCardImages();
 
         ScrollPane cardScrollPane = createCardScrollPaneWithCards();
-        VBox.setMargin(cardScrollPane, new Insets(108, 0, 0, 180));
+        if(_mode.equals("day")){topMargineForScroll = 108;}
+        else{topMargineForScroll = 125;}
+        VBox.setMargin(cardScrollPane, new Insets(topMargineForScroll, 0, 0, 180));
         VBox.setMargin(selectedPlantHBox, new Insets(10, 0, 0, 125));
 
         root.getChildren().addAll(cardScrollPane, selectedPlantHBox);
@@ -155,6 +168,11 @@ public class PickingPlantStage {
         cardVBox.setStyle("-fx-background-color: transparent;");
         cardVBox.setFillWidth(true);
         cardVBox.setBackground(Background.EMPTY);
+        int maxhight;
+        int maxwidth;
+
+        if (_mode.equals("day")){maxhight = 200; maxwidth = 510;}
+        else{maxhight = 184; maxwidth = 510; }
 
         int cardsPerRow = 4;
         for (int i = 0; i < cardImages.length; i += cardsPerRow) {
@@ -172,8 +190,8 @@ public class PickingPlantStage {
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setMaxHeight(200);
-        scrollPane.setMaxWidth(510);
+        scrollPane.setMaxHeight(maxhight);
+        scrollPane.setMaxWidth(maxwidth);
         scrollPane.getStyleClass().add("custom-scroll-pane");
 
         String css = """
@@ -222,8 +240,6 @@ public class PickingPlantStage {
 
         return scrollPane;
     }
-
-
 
 
     private ImageView createSelectableCard(int index) {
@@ -359,9 +375,11 @@ public class PickingPlantStage {
             Stage gameStage;
             if (_mode.equals("day")){
                 gameStage = DayView.createStage(selectedPlants);
+//                SoundManager.play(SoundType.BACKGROUND);
             }
             else {
                 gameStage = NightView.createStage(selectedPlants);
+                SoundManager.play(SoundType.NIGHT_BACKGROUND);
             }
             gameStage.show();
             gameStage.setOnHiding(event -> {

@@ -53,6 +53,16 @@ public class FogGameObject extends AbstractGameObject implements Serializable {
         return _row;
     }
 
+    public double getHomeX()        { return _defualtCoordinate.x(); } // (defualt → default)
+
+    public double getOutProgress() {
+        double denom = Math.max(1.0, _gameEngine.getWindowWidth() - _defualtCoordinate.x());
+        return Math.max(0.0, Math.min(1.0, (_coordinate.x() - _defualtCoordinate.x()) / denom));
+    }
+    public double getBackProgress() {
+        return 1.0 - getOutProgress();
+    }
+
     public void subscribeToMovementEvent(IEventSubscriber eventSubscriber) {
         _movementEventSubscribers.add(eventSubscriber);
     }

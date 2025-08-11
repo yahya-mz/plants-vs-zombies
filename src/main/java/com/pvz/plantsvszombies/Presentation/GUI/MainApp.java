@@ -3,6 +3,7 @@ package com.pvz.plantsvszombies.Presentation.GUI;
 
 import com.pvz.plantsvszombies.Presentation.GUI.Views.PickingPlantStage;
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,6 +16,9 @@ import javafx.stage.Stage;
 public class MainApp extends Application {
 
     public static void main(String[] args) {
+        System.out.println("MainApp.main() called");
+        SoundManager.initialize();
+        System.out.println("SoundManager initialized, launching application...");
         launch(args);
     }
 
@@ -22,14 +26,23 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         StackPane root = new StackPane();
 
-        Image backgroundImage = new Image(GlobalSettings.getResource("graphics/Items/Background/daymenu.jpg"));
-        ImageView bgImageView = new ImageView(backgroundImage);
+        Image daybackgroundImage = new Image(GlobalSettings.getResource("graphics/Items/Background/daymenu.jpg"));
+        Image nightbackgroundImage = new Image(GlobalSettings.getResource("graphics/Items/Background/nightmenu.jpg"));
 
-        bgImageView.setPreserveRatio(true);
-        bgImageView.setFitWidth(800);
-        bgImageView.setFitHeight(533);
+        ImageView daybgImageView = new ImageView(daybackgroundImage);
+        ImageView nightbgImageView = new ImageView(nightbackgroundImage);
 
-        root.getChildren().add(bgImageView);
+        daybgImageView.setPreserveRatio(true);
+        daybgImageView.setFitWidth(800);
+        daybgImageView.setFitHeight(533);
+
+        nightbgImageView.setPreserveRatio(true);
+        nightbgImageView.setFitWidth(800);
+        nightbgImageView.setFitHeight(533);
+        nightbgImageView.setVisible(false);
+
+        root.getChildren().addAll(daybgImageView, nightbgImageView);
+
 
         Button dayModeBtn = createHoverButton(
                 "graphics/Items/Buttons/day.png",
@@ -37,14 +50,22 @@ public class MainApp extends Application {
                 250, 100
         );
 
+        dayModeBtn.setOnAction(e -> {
+            launchGame(primaryStage, "day");
+        });
+
         Button nightModeBtn = createHoverButton(
                 "graphics/Items/Buttons/night.png",
                 "graphics/Items/Buttons/night2.png",
                 250, 100
         );
-
-        dayModeBtn.setOnAction(e -> {
-            launchGame(primaryStage, "day");
+        nightModeBtn.setOnMouseEntered(e -> {
+            daybgImageView.setVisible(false);
+            nightbgImageView.setVisible(true);
+        });
+        nightModeBtn.setOnMouseExited(e -> {
+            nightbgImageView.setVisible(false);
+            daybgImageView.setVisible(true);
         });
 
         nightModeBtn.setOnAction(e -> {

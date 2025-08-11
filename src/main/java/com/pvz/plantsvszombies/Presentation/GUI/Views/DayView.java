@@ -27,6 +27,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
+
 
 import java.util.List;
 
@@ -46,6 +49,7 @@ public class DayView extends AbstractLevelView {
     }
 
     public static DayView createStage(List<AbstractPlantGameObject.PlantType> selectedPlants) {
+        System.out.println("DayView.createStage() called");
         var dayView = new DayView();
         dayView.bottommostPlane = new StackPane();//changed
         dayView._gameBoxPane = dayView.bottommostPlane;
@@ -90,21 +94,40 @@ public class DayView extends AbstractLevelView {
 
 
         var scene = new Scene(dayView.bottommostPlane, Width, Height);
+        System.out.println("Requesting BACKGROUND music");
+//        SoundManager.play(SoundType.BACKGROUND);
+
 
 
         dayView.setScene(scene);
         dayView.setResizable(false);
+//        // وقتی پنجره نمایش داده شد، صدا رو پلی کن
+//        scene.windowProperty().addListener((obs, oldWin, newWin) -> {
+//            if (newWin != null) {
+//                newWin.setOnShown(e -> {
+//                    System.out.println("Stage is shown → starting BACKGROUND music");
+//                    SoundManager.play(SoundType.BACKGROUND);
+//                });
+//            }
+//        });
+
+        System.out.println("About to call setupEngines...");
         dayView.setupEngines();
+
 
         return dayView;
 
     }
 
     private void setupEngines() {
+        System.out.println("DayView.setupEngines() called");
         DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);
         _visualEngine = new VisualDayEngine(this, dayEngine);
         Mediator.init(dayEngine, _visualEngine);
         Mediator.getInstance().startGameEngine();
+        System.out.println("About to play background music...");
+//        SoundManager.play(SoundType.BACKGROUND);
+        System.out.println("Background music play command sent");
 
         this.setOnHiding((event) -> {
             System.out.println("Stopping GameEngine");
@@ -309,6 +332,7 @@ public class DayView extends AbstractLevelView {
     }
 
     public void playImageSequenceInBox(Pane targetBox, Runnable onFinished) {
+
         String[] imagePaths = {
                 "graphics/Items/Messages/ready.png",
                 "graphics/Items/Messages/set.png",
@@ -356,6 +380,7 @@ public class DayView extends AbstractLevelView {
 
             sequence.getChildren().addAll(setImage, fadeIn, stay, fadeOut);
         }
+        System.out.println("sequence");
 
         sequence.setOnFinished(e -> {
             targetBox.getChildren().clear();

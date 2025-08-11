@@ -4,6 +4,8 @@ import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.Entities.Bullets.NormalBulletVisualObject;
@@ -47,5 +49,6 @@ public class PeashooterVisualObject extends AbstractPlantVisualObject {
     @Override
     public void spawn() {
         playAnimation(PeashooterAnimation.Animations.STANDING, Duration.millis(20));//standing
+//        SoundManager.play(SoundType.PEASHOOTER_SHOOTING);
     }
 }

@@ -15,7 +15,6 @@ import com.pvz.plantsvszombies.Presentation.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.AbstractLevelView;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.DayMenu;
-import com.pvz.plantsvszombies.Presentation.GUI.Views.DayView;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.NightView;
 import javafx.application.Platform;
 import javafx.scene.layout.Pane;
@@ -26,6 +25,7 @@ import java.util.UUID;
 public class VisualNightEngine implements IVisualEngine {
     private final int _width = 1280;
     private final int _height = 728;
+    private int _currentwave;
     //
     private Class<? extends AbstractPlantVisualObject> selectedPlantType;
     //
@@ -254,7 +254,7 @@ public class VisualNightEngine implements IVisualEngine {
             winnerZombie.getNode().relocate(100, _height / 2.5);
             switch (winnerZombie) {
                 case NormalZombieVisualObject p -> {
-                    p.changeStateTo(NormalZombieVisualObject.States.MOVING);
+                    p.changeStateTo(NormalZombieVisualObject.States.MOVING_FORWARD);
                 }
                 case ConeHeadZombieVisualObject ch -> {
                     ch.changeStateTo(ConeHeadZombieVisualObject.States.MOVING);
@@ -373,5 +373,10 @@ public class VisualNightEngine implements IVisualEngine {
                 }
             }
         }
+    }
+
+    public int get_currentwave() {
+        _currentwave = _gameEngine.get_currentWave();
+        return _currentwave;
     }
 }

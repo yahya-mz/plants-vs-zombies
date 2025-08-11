@@ -22,10 +22,12 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Box;
 import javafx.util.Duration;
 import java.util.List;
 
@@ -39,6 +41,8 @@ public class NightView extends AbstractLevelView {
     private static StackPane bottommostPlane;
     private static final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
     private static Button shovelButton;
+    private ProgressBar waveProgressBar;
+    private static final int TOTAL_WAVES = 4;
 
 
 
@@ -67,6 +71,7 @@ public class NightView extends AbstractLevelView {
 //        addHoverEffectToImages(plantbar);
         Button shoveltool = NightView.createShovelToolButton();
         Button pause = createPauseButton();
+        VBox waveProgressBar = NightView.initWaveProgressUI();
 
         HBox mainbar = new HBox(80);
 //        mainbar.setStyle("-fx-background-color: red;");-debug
@@ -82,10 +87,12 @@ public class NightView extends AbstractLevelView {
         mainbar.setMinWidth(50);
         mainbar.setMinHeight(30);
 
-        bottommostPlane.getChildren().addAll(mainbar , pause);
+        bottommostPlane.getChildren().addAll(mainbar , pause, waveProgressBar);
         //StackPane.setMargin(mainbar, new Insets(20, -40, 200, 60));//dont change this
         StackPane.setAlignment(pause, Pos.BOTTOM_LEFT);
         StackPane.setAlignment(mainbar, Pos.TOP_CENTER);
+        StackPane.setAlignment(waveProgressBar, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(waveProgressBar, new Insets(0, 20, 20, 0));
         StackPane.setMargin(mainbar, new Insets(15, 60, 185,-20));
 
 
@@ -318,10 +325,6 @@ public class NightView extends AbstractLevelView {
         return PauseButton;
     }
 
-
-
-
-
     public static void playImageSequenceInBox(Pane targetBox, Runnable onFinished) {
         String[] imagePaths = {
                 "graphics/Items/Messages/ready.png",
@@ -379,6 +382,84 @@ public class NightView extends AbstractLevelView {
         sequence.play();
     }
 
+
+    // متد کمکی: تبدیل waveIndex (۱..۴) و درصد داخل موج (۰..۱) به ۰..۱
+    private double toOverallProgress(int waveIndex, double withinWave) {
+        int wave = Math.max(1, Math.min(TOTAL_WAVES, waveIndex));
+        double frac = Math.max(0.0, Math.min(1.0, withinWave));
+        return ((wave - 1) + frac) / TOTAL_WAVES;
+    }
+    private VBox initWaveProgressUI() {
+        waveProgressBar = new ProgressBar(0);
+        waveProgressBar.setPrefWidth(300);
+        waveProgressBar.setPrefHeight(16);
+
+        waveProgressBar.setStyle("""
+        -fx-accent: purple;
+        -fx-control-inner-background: saddlebrown;
+        -fx-background-insets: 0;
+        -fx-background-radius: 8;
+        -fx-padding: 0;
+    """);
+
+        // پر شدن از راست به چپ
+        waveProgressBar.setScaleX(-1);
+
+        VBox box = new VBox(waveProgressBar);
+        box.setAlignment(Pos.CENTER);
+        box.setStyle("-fx-background-color: transparent;");
+        box.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+
+        final int[] lastWave = {0}; // برای تشخیص تغییر wave
+
+        javafx.animation.Timeline updater = new javafx.animation.Timeline(
+                new javafx.animation.KeyFrame(Duration.seconds(0.5), e -> {
+                    if (_visualEngine != null) {
+                        int wave = _visualEngine.get_currentwave();
+                        double targetProgress = toOverallProgress(wave, 0.0);
+
+                        // شروع wave اول با یک چهارم پر
+                        if (wave == 1 && targetProgress < 0.25) {
+                            targetProgress = 0.25;
+                        }
+
+                        // اگر wave عوض شده بود → انیمیشن پر شدن
+                        if (wave != lastWave[0]) {
+                            animateProgress(waveProgressBar, waveProgressBar.getProgress(), targetProgress);
+                            lastWave[0] = wave;
+                        } else {
+                            // فقط مقدار رو sync نگه می‌داریم
+                            waveProgressBar.setProgress(targetProgress);
+                        }
+                    }
+                })
+        );
+        updater.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        updater.play();
+
+        return box;
+    }
+
+    private void animateProgress(ProgressBar bar, double from, double to) {
+        javafx.animation.Timeline timeline = new javafx.animation.Timeline(
+                new javafx.animation.KeyFrame(Duration.ZERO, new javafx.animation.KeyValue(bar.progressProperty(), from)),
+                new javafx.animation.KeyFrame(Duration.seconds(1), new javafx.animation.KeyValue(bar.progressProperty(), to))
+        );
+        timeline.play();
+    }
+
+
+//
+//    // اگر بعداً خواستی در طول بازی آپدیتش کنی:
+//    public void setWaveProgress(int waveIndex, double withinWave) {
+//        if (waveProgressBar == null) return;
+//        waveProgressBar.setProgress(toOverallProgress(waveIndex, withinWave));
+//    }
+//    public void setWaveProgressPercent(double percent) {
+//        if (waveProgressBar == null) return;
+//        waveProgressBar.setProgress(Math.max(0.0, Math.min(1.0, percent)));
+//    }
+//
 
     public void showWave1(){
         showWaveImages(bottommostPlane , "wave1");

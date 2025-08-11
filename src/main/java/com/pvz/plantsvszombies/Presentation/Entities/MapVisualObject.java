@@ -57,6 +57,7 @@ public class MapVisualObject extends AbstractVisualObject {
                         new BackgroundSize(100, 100, true, true, false, true)
                 )
         ));
+        mainContainer.setViewOrder(1);
 
         //
         for (int row = 0; row < 5; row++) {
@@ -109,68 +110,68 @@ public class MapVisualObject extends AbstractVisualObject {
                     var selectedType = _engine.getSelectedPlantType();
                     if (selectedType == PeashooterVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("Peashooter", cellButton);
+                            ImageView preview = createPlantImageViewForHover("Peashooter", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == WallNutVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("WallNut", cellButton);
+                            ImageView preview = createPlantImageViewForHover("WallNut", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == SunFlowerVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("SunFlower", cellButton);
+                            ImageView preview = createPlantImageViewForHover("SunFlower", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == SnowPeaVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("SnowPea", cellButton);
+                            ImageView preview = createPlantImageViewForHover("SnowPea", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == JalapenoVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("Jalapeno", cellButton);
+                            ImageView preview = createPlantImageViewForHover("Jalapeno", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == RepeaterVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("Repeater", cellButton);
+                            ImageView preview = createPlantImageViewForHover("Repeater", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == TallnutVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("Tallnut", cellButton);
+                            ImageView preview = createPlantImageViewForHover("Tallnut", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == CherryBombVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("CherryBomb", cellButton);
+                            ImageView preview = createPlantImageViewForHover("CherryBomb", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == ScaredyshroomVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("ScaredyShroom", cellButton);
+                            ImageView preview = createPlantImageViewForHover("ScaredyShroom", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == PuffshroomVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("PuffShroom", cellButton);
+                            ImageView preview = createPlantImageViewForHover("PuffShroom", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == IceshroomVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("IceShroom", cellButton);
+                            ImageView preview = createPlantImageViewForHover("IceShroom", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     } else if (selectedType == HypnoShroomVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("HypnoShroom", cellButton);
+                            ImageView preview = createPlantImageViewForHover("HypnoShroom", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     }
                     else if (selectedType == BloverVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("Blover", cellButton);
+                            ImageView preview = createPlantImageViewForHover("Blover", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     }
@@ -205,8 +206,7 @@ public class MapVisualObject extends AbstractVisualObject {
 //                });
                 cell.getChildren().add(cellButton);
                 if (_engine.isShovelActivated()) {
-                    applyShovelHoverEffect(cell, cellButton); // ✅ چون نیاز داریم cell رو هم بشناسیم
-
+                    applyShovelHoverEffect(cell, cellButton);
                 }
                 visualGrid[row][col] = cell;
                 rowBox.getChildren().add(cell);
@@ -269,7 +269,7 @@ public class MapVisualObject extends AbstractVisualObject {
         return button;
     }
 
-    public ImageView createPlantImageView(String plantName, Button referenceButton) {
+    public ImageView createPlantImageViewForHover(String plantName, Button referenceButton) {
         String imagePath = String.format("graphics/Plants/%s/%s_0.png", plantName, plantName);
         Image image = new Image(GlobalSettings.getResource(imagePath));
         ImageView imageView = new ImageView(image);

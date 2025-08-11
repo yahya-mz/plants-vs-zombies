@@ -169,6 +169,7 @@ public class NightEngine extends GameEngine {
         });
     }
 
+    public int get_currentWave() {return _currentWave;}
     private double getMilliseconds() {
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }

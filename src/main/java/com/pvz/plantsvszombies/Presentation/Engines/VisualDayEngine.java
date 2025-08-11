@@ -311,7 +311,7 @@ public class VisualDayEngine implements IVisualEngine {
             winnerZombie.getNode().relocate(100, _height / 2.5);
             switch (winnerZombie) {
                 case NormalZombieVisualObject p -> {
-                    p.changeStateTo(NormalZombieVisualObject.States.MOVING);
+                    p.changeStateTo(NormalZombieVisualObject.States.MOVING_FORWARD);
                 }
                 case ConeHeadZombieVisualObject ch -> {
                     ch.changeStateTo(ConeHeadZombieVisualObject.States.MOVING);
