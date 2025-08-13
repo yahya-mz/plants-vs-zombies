@@ -1,12 +1,10 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Bullets;
 
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralFadingAnimation;
 import com.pvz.plantsvszombies.Presentation.Entities.AbstractVisualObject;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,10 +16,10 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
         COLLIDED
     }
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
     private States _state;
 
-    public NormalBulletVisualObject(NormalBulletGameObject gameObject, IVisualEngine engine) {
+    public NormalBulletVisualObject(NormalBulletGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         this._engine = engine;
 
@@ -29,37 +27,20 @@ public class NormalBulletVisualObject extends AbstractVisualObject {
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Bullets/PeaNormal/PeaNormal_0.png")));
         _node.setManaged(false);
 
-        var height = ((Image) ((ImageView) _node).getImage()).getHeight();
-        var width = ((Image) ((ImageView) _node).getImage()).getWidth();
+        var height = (((ImageView) _node).getImage()).getHeight();
+        var width = (((ImageView) _node).getImage()).getWidth();
 
         _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
 
-        ((NormalBulletGameObject) _gameObject).subscribeToMovementEvent(new IEventSubscriber() {
-            @Override
-            public void _notify(AbstractGameObject gameObject) {
-                Platform.runLater(() -> {
-                    _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
-                });
-//                System.out.println(gameObject.getCoordinate().x());
+        ((NormalBulletGameObject) _gameObject).subscribeToMovementEvent(bulletObj -> Platform.runLater(() -> {
+            _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
+        }));
 
-//                _node.setLayoutY(gameObject.getCoordinate().y());
-//                _node.setTranslateX(_node.getTranslateX() + gameObject.getCoordinate().x() - old_x);
-            }
-        });
-
-        ((NormalBulletGameObject) _gameObject).subscribeToCollisionEvent(new IEventSubscriber() {
-            @Override
-            public void _notify(AbstractGameObject gameObject) {
-                changeStateTo(States.COLLIDED);
-            }
-        });
+        ((NormalBulletGameObject) _gameObject).subscribeToCollisionEvent(gameObject1 -> changeStateTo(States.COLLIDED));
 
         var temp_this = this;
-        ((NormalBulletGameObject) _gameObject).subscribeToDisposeEvent(new IEventSubscriber() {
-            @Override
-            public void _notify(AbstractGameObject gameObject) {
-//                _engine.disposeObject(temp_this); // Needs to be edited
-            }
+        _gameObject.subscribeToDisposeEvent(bulletObj -> {
+                _engine.disposeObject(temp_this);
         });
     }
 

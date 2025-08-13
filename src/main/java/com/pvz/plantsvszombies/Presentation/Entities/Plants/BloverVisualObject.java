@@ -3,11 +3,10 @@ package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.BloverGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.CherryBombGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,9 +21,9 @@ public class BloverVisualObject extends AbstractPlantVisualObject {
     private BloverVisualObject.States _currentState = BloverVisualObject.States.STANDING;
 
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public BloverVisualObject(BloverGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
+    public BloverVisualObject(BloverGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی
         super._gameObject = gameObject;
         _engine = engine;
 

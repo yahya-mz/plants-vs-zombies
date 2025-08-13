@@ -1,6 +1,8 @@
 package com.pvz.plantsvszombies.Presentation.GUI.Views;
+import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualNightEngine;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -86,69 +88,6 @@ public class PickingPlantStage {
         }
     }
 
-//    public HBox createCardRow(int from, int to) {
-//        HBox row = new HBox(8);
-//        for (int i = from; i <= to; i++) {
-//            ImageView card = new ImageView(cardImages[i]);
-//            card.setFitWidth(100);
-//            card.setPreserveRatio(true);
-//            card.setCursor(Cursor.HAND);
-//
-//            final int index = i;
-//            card.setOnMouseClicked(e -> {
-//                if (selectedPlants.size() < 6) {
-//                    String imgPath = cardImages[index].getUrl();
-//                    String imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1, imgPath.lastIndexOf('.'));
-//                    AbstractPlantGameObject.PlantType type = AbstractPlantGameObject.PlantType.valueOf(imgName);
-//                    selectedPlants.add(type);
-//                    playBtn.setDisable(selectedPlants.size() != 6);
-//
-//                    ImageView clonedCard = new ImageView(cardImages[index]);
-//                    clonedCard.setFitWidth(100);
-//                    clonedCard.setPreserveRatio(true);
-//                    clonedCard.setCursor(Cursor.HAND);
-//
-//                    clonedCard.setOnMouseEntered(ev -> {
-//                        clonedCard.setTranslateY(-10);
-//                        clonedCard.setScaleX(1.05);
-//                        clonedCard.setScaleY(1.05);
-//                    });
-//                    clonedCard.setOnMouseExited(ev -> {
-//                        clonedCard.setTranslateY(0);
-//                        clonedCard.setScaleX(1);
-//                        clonedCard.setScaleY(1);
-//                    });
-//
-//
-//                    clonedCard.setOnMouseClicked(event -> {
-//                        if (event.getButton().equals(MouseButton.PRIMARY)) {
-//                            selectedPlantHBox.getChildren().remove(selectedPlants.indexOf(type));
-//                            selectedPlants.remove(type);
-//
-//                            updateCardMargins();
-//
-//                            card.setOpacity(1);
-//                            card.setDisable(false);
-//                            playBtn.setDisable(selectedPlants.size() != 6);
-//                        }
-//                    });
-//
-//                    selectedPlantHBox.getChildren().add(clonedCard);
-//                    updateCardMargins();
-//
-//
-//                    card.setDisable(true);
-//                    card.setOpacity(0.5);
-//                    playBtn.setDisable(selectedPlants.size() != 6);
-//                }
-//            });
-//
-//            row.getChildren().add(card);
-//        }
-//        return row;
-//    }
-
-
     public ScrollPane createCardScrollPaneWithCards() {
         VBox cardVBox = new VBox(10);
         cardVBox.setPadding(new Insets(20, 0, 0, 0));
@@ -222,9 +161,6 @@ public class PickingPlantStage {
 
         return scrollPane;
     }
-
-
-
 
     private ImageView createSelectableCard(int index) {
         ImageView card = new ImageView(cardImages[index]);
@@ -373,4 +309,16 @@ public class PickingPlantStage {
 
         return button;
     }
+
+//    private void setupEngines() {
+//        NightEngine NightEngine = new NightEngine(NightView.Width, NightView.Height);
+//        _visualEngine = new VisualNightEngine(this, NightEngine);
+//        Mediator.init(NightEngine, _visualEngine);
+//        Mediator.getInstance().startGameEngine();
+//
+//        this.setOnHiding((event) -> {
+//            System.out.println("Stopping GameEngine");
+//            Mediator.getInstance().stopGameEngine();
+//        });
+//    }
 }

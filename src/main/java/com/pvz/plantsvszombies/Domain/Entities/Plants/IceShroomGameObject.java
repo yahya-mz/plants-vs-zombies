@@ -1,14 +1,17 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Duration;
+import java.util.ArrayList;
+
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
-
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.ArrayList;
 
 public class IceShroomGameObject extends AbstractPlantGameObject implements Serializable {
     public final static Duration EXPLOSION_TIME = Duration.ofSeconds(1);
@@ -16,7 +19,7 @@ public class IceShroomGameObject extends AbstractPlantGameObject implements Seri
 
 
     private int _tick;
-    private transient final ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
 
     public static IceShroomGameObject createIceShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new IceShroomGameObject(gameEngine, id, coordinate, row, column);
@@ -77,5 +80,13 @@ public class IceShroomGameObject extends AbstractPlantGameObject implements Seri
 
     private double getMilliseconds() {
         return this._tick * 1000.0 / GlobalSettings.FPS;
+    }
+    
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _explosionEventSubscribers = new ArrayList<>();
     }
 }

@@ -1,31 +1,39 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
-import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.GlobalSettings;
-
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.UUID;
 
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
+
 public class PuffShroomGameObject extends AbstractPlantGameObject implements Serializable {
+    public enum PuffshroomState {
+        STANDING,
+        SLEEPING
+    }
 
-    private final Duration _coolDown = Duration.ofMillis(4000);
+    private PuffshroomState _visualState = PuffshroomState.STANDING;
+    private final Duration _coolDown = Duration.ofMillis(3000);
     private int tick = 1;
+    private int _lastShootTick = 0;
 
-    private transient final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
     public static PuffShroomGameObject createPuffShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new PuffShroomGameObject(gameEngine, id, coordinate, row, column);
     }
 
-    private PuffShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
+    PuffShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
@@ -33,36 +41,55 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
         this._column = column;
 
         this._cost = 0;
+        this._health = 100;
+        
+        // Set initial visual state based on engine type
+        if (_gameEngine instanceof NightEngine) {
+            this._visualState = PuffshroomState.STANDING;
+        } else {
+            this._visualState = PuffshroomState.SLEEPING;
+        }
+    }
+
+    public PuffshroomState getVisualState() {
+        return _visualState;
+    }
+
+    public void setVisualState(PuffshroomState state) {
+        _visualState = state;
     }
 
     public void subscribeToShootingEvent(IEventSubscriber event) {
         this._shootingEventSubscribers.add(event);
     }
+
     public void subscribeToEatenEvent(IEventSubscriber event) {
         this._eatenEventSubscribers.add(event);
     }
 
     @Override
     public void spawn() {
-        System.out.println("dude?");
+        if (_gameEngine instanceof NightEngine) {
+            _visualState = PuffshroomState.STANDING;
+        } else {
+            _visualState = PuffshroomState.SLEEPING;
+        }
     }
-
-    private double _lastShootTick = 0;
 
     @Override
     public void update() {
-        if (!this._isDisposed) {
+        if (!this._isDisposed && !_visualState.equals(PuffshroomState.SLEEPING)) {
             tick++;
             var rowsZombies = _gameEngine.getZombiesByRow(_row);
             if (!rowsZombies.isEmpty()) {
                 var frontZombie = rowsZombies.getFirst(); // Most front zombie
-
-                if ((_lastShootTick * 1000 / GlobalSettings.FPS) % _coolDown.toMillis() == 0
-                        && frontZombie.getColumn() - 4 >= _column) {
-                    shoot();
-                    _lastShootTick = 0;
+                if (frontZombie.getColumn() - _column < 4) {
+                    if ((_lastShootTick * 1000 / GlobalSettings.FPS) % _coolDown.toMillis() == 0) {
+                        shoot();
+                        _lastShootTick = 0;
+                    }
+                    _lastShootTick++;
                 }
-                _lastShootTick++;
             } else {
                 _lastShootTick = 0;
             }
@@ -75,7 +102,13 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
         if (_health <= 0) {
             eaten();
         }
+    }
 
+    private void eaten() {
+        for (IEventSubscriber eventSubscriber : _eatenEventSubscribers) {
+            eventSubscriber._notify(this);
+        }
+        super.dispose();
     }
 
     private void shoot() {
@@ -87,15 +120,12 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
         }
     }
 
-    private void eaten() {
-        for (IEventSubscriber eventSubscriber : _eatenEventSubscribers) {
-            eventSubscriber._notify(this);
-        }
-        super.dispose();
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _shootingEventSubscribers = new ArrayList<>();
+        _eatenEventSubscribers = new ArrayList<>();
     }
-
-    private double getMilliseconds() {
-        return this.tick * 1000.0 / GlobalSettings.FPS;
-    }
-
 }

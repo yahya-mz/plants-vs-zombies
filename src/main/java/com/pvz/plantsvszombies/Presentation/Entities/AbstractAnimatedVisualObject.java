@@ -20,55 +20,16 @@ public abstract class AbstractAnimatedVisualObject extends AbstractVisualObject 
     }
 
     protected void playAnimation(Image[] frames, Duration frameDuration, int cycleCount) {
-        if (_animationTimeLine.getStatus().equals(Animation.Status.RUNNING)) {
-            stopAnimation();
+        try {
+            _animationTimeLine.stop();
             _animationTimeLine.getKeyFrames().clear();
+        } catch (Exception e) {
+            System.out.println("Exception on animations");
         }
-//        var keyFrames = Arrays.stream(frames)
-//                .map(image -> {
-//                    return new KeyFrame(Duration.millis(index * 17), (e) -> {
-//                        ((ImageView) super.getNode()).setImage(image);
-//                    });
-//                });
-
-//        var keyFrames = new KeyFrame[frames.length];
-//        for (int i = 0; i < frames.length; i++) {
-//            System.out.println(i);
-//            final int index = i;
-//            keyFrames[i] = new KeyFrame(frameDuration.multiply(i), new KeyValue(((ImageView) super.getNode()).imageProperty(), frames[index]));
-//            keyFrames[i] = new KeyFrame(frameDuration.multiply(i), (e) -> {
-//                ((ImageView) super.getNode()).setImage();
-//            });
-//        }
-//        _animationTimeLine.getKeyFrames().setAll(keyFrames);
-//        _animationTimeLine.setCycleCount(Animation.INDEFINITE);
-//        _animationTimeLine.setAutoReverse(true);
-//        _animationTimeLine.setOnFinished((e) -> {
-//            _animationTimeLine.playFromStart();
-//        });
-//        _animationTimeLine.playFromStart();
-
-
-        // With TimeLine:
 
         var node = (ImageView) super.getNode();
-//        Timer timer = new Timer();
-//        timer.schedule(
-//                new TimerTask() {
-//                    int index = 0;
-//                    @Override
-//                    public void run() {
-//                        Platform.runLater(() -> {
-//                            node.setImage(frames[index]);
-//                        });
-//                        index++;
-//                        if (index== frames.length){
-//                            index=1;
-//                        }
-//                    }
-//                }
-//                , 0, (long) frameDuration.toMillis()
-//        );
+
+
         int[] index = {0}; // Using array to allow modification in lambda
         _animationTimeLine.getKeyFrames().add(
                 new KeyFrame(
@@ -85,7 +46,7 @@ public abstract class AbstractAnimatedVisualObject extends AbstractVisualObject 
                 )
         );
         _animationTimeLine.setCycleCount(cycleCount == Timeline.INDEFINITE ? Timeline.INDEFINITE : cycleCount * frames.length);
-        _animationTimeLine.play();
+        _animationTimeLine.playFromStart();
     }
 
     protected void playAnimation(Image[] frames, Duration frameDuration) {
@@ -93,6 +54,7 @@ public abstract class AbstractAnimatedVisualObject extends AbstractVisualObject 
     }
 
     public abstract void playAnimation(IAnimation animation, Duration frameDuration);
+
     public void resumeAnimation() {
         if (_animationTimeLine.getStatus().equals(Animation.Status.PAUSED)) {
             _animationTimeLine.play();

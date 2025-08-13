@@ -9,4 +9,6 @@ public abstract class AbstractLevelView extends Stage {
     public Pane getGameBoxPane() {
         return this._gameBoxPane;
     }
+
+    public abstract void setIsShovelMode(boolean value);
 }

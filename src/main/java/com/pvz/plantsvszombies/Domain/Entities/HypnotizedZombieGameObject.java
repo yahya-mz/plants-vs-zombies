@@ -1,20 +1,24 @@
 package com.pvz.plantsvszombies.Domain.Entities;
 
-import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.AbstractBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.PeashooterGameObject;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Duration;
+import java.util.ArrayList;
+
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.ArrayList;
-
 public class HypnotizedZombieGameObject extends AbstractGameObject implements Serializable {
 
+    public enum HypnotizedZombieStates {
+        MOVING_FORWARD,
+        EATING,
+        DYING,
+    }
 
     protected int _tick;
 
@@ -27,12 +31,15 @@ public class HypnotizedZombieGameObject extends AbstractGameObject implements Se
     protected double _speed = (double) 1 / 4 * MapBlock.BLOCK_SIZE / GlobalSettings.FPS;
     // ( 1 block / 1 sec) * ( 1 pixel / 1 block ) * ( 1 sec / 1 frame ) = ( pixel / frame )
 
+    protected final AbstractZombieGameObject.ZombieType _zombieType;
+    protected HypnotizedZombieStates _currentState = HypnotizedZombieStates.MOVING_FORWARD;
 
-    protected transient final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
-    protected transient final ArrayList<IEventSubscriber> _eatingEventSubscribers = new ArrayList<>();
+    protected transient ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
-    protected transient final ArrayList<IEventSubscriber> _deathEventSubscribers = new ArrayList<>();
+    protected transient ArrayList<IEventSubscriber> _eatingEventSubscribers = new ArrayList<>();
+
+    protected transient ArrayList<IEventSubscriber> _deathEventSubscribers = new ArrayList<>();
 
     public static HypnotizedZombieGameObject createHypnotizedZombieGameObject(GameEngine gameEngine, String id, AbstractZombieGameObject zombie) {
         return new HypnotizedZombieGameObject(gameEngine, id, zombie);
@@ -45,6 +52,7 @@ public class HypnotizedZombieGameObject extends AbstractGameObject implements Se
         this._row = zombie.getRow();
         this._column = zombie.getColumn();
         this._health = 1000;
+        _zombieType = zombie.getZombieType();
     }
 
     public int getDamage() {
@@ -100,6 +108,14 @@ public class HypnotizedZombieGameObject extends AbstractGameObject implements Se
         return this._speed;
     }
 
+    public HypnotizedZombieStates getCurrentState() {
+        return _currentState;
+    }
+
+    public AbstractZombieGameObject.ZombieType getZombieType() {
+        return _zombieType;
+    }
+
     public void getHit(AbstractZombieGameObject zombie) {
         _health -= zombie.getDamage();
         if (_health <= 0) {
@@ -112,10 +128,13 @@ public class HypnotizedZombieGameObject extends AbstractGameObject implements Se
         for (IEventSubscriber subscriber : _movementEventSubscribers) {
             subscriber._notify(this);
         }
+        this._currentState = HypnotizedZombieStates.MOVING_FORWARD;
+
     }
 
     private void die() {
 //        this._gameEngine = null; Believe it or not but this makes the _engine property null for all the existing ZombieGameObjects in the App
+        _currentState = HypnotizedZombieStates.DYING;
         for (IEventSubscriber eventSubscriber : _deathEventSubscribers) {
             eventSubscriber._notify(this);
         }
@@ -130,6 +149,7 @@ public class HypnotizedZombieGameObject extends AbstractGameObject implements Se
             for (IEventSubscriber subscriber : _eatingEventSubscribers) {
                 subscriber._notify(this);
             }
+            this._currentState = HypnotizedZombieStates.EATING;
         }
         if (getMilliseconds() - lastBiteMillis > _biteCoolDown.toMillis()) {
             opponentZombie.getHitByZombie(this);
@@ -139,5 +159,15 @@ public class HypnotizedZombieGameObject extends AbstractGameObject implements Se
 
     private double getMilliseconds() {
         return this._tick * 1000.0 / GlobalSettings.FPS;
+    }
+
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _movementEventSubscribers = new ArrayList<>();
+        _eatingEventSubscribers = new ArrayList<>();
+        _deathEventSubscribers = new ArrayList<>();
     }
 }

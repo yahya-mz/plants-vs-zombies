@@ -27,6 +27,8 @@ public class ConeHeadZombieGameObject extends AbstractZombieGameObject implement
         this._column = column;
 
         this._health = 175;
+
+        _zombieType = ZombieType.CONE_HEAD_ZOMBIE;
     }
 
     @Override

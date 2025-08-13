@@ -5,7 +5,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Plants.JalapenoGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -13,9 +13,9 @@ import javafx.util.Duration;
 
 public class JalapenoVisualObject extends AbstractPlantVisualObject {
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public JalapenoVisualObject(JalapenoGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی  change object
+    public JalapenoVisualObject(JalapenoGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی  change object
         super._gameObject = gameObject;
         _engine = engine;
 

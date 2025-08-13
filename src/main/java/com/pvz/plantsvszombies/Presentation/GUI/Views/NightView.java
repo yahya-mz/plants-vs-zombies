@@ -171,7 +171,7 @@ public class NightView extends AbstractLevelView {
                         case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
                         case SNOW_PEA -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
                         case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
-                        case PUFF_SHROOM -> _visualEngine.setSelectedPlantType(ScaredyshroomVisualObject.class);
+                        case PUFF_SHROOM -> _visualEngine.setSelectedPlantType(ScaredyShroomVisualObject.class);
                         case SCAREDY_SHROOM -> _visualEngine.setSelectedPlantType(PuffshroomVisualObject.class);
                         case ICE_SHROOM -> _visualEngine.setSelectedPlantType(IceshroomVisualObject.class);
                         case HYPNO_SHROOM -> _visualEngine.setSelectedPlantType(HypnoShroomVisualObject.class);
@@ -237,18 +237,18 @@ public class NightView extends AbstractLevelView {
         });
 
         shovelButton.setOnAction(e -> {
-            NightView.setIsShovelMode(true); // ✅ به‌جای isShovelMode = true;
+            NightView.isShovelMode.set(true); // ✅ به‌جای isShovelMode = true;
 
             Scene scene = shovelButton.getScene();
             if (scene != null && NightView.getIsShovelMode()) {
                 scene.setCursor(new ImageCursor(shovelCursorImage, 32, 32));
-                _visualEngine.shovelActivation();
+                _visualEngine.ActivateShovel();
                 shovelBarView(shovelButton, new ImageView(shovelEmptyImage));
 
                 scene.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
                     if (event.getButton() == MouseButton.SECONDARY && NightView.getIsShovelMode()) {
-                        _visualEngine.shovelDeactivation();
-                        NightView.setIsShovelMode(false);
+                        _visualEngine.DeactivateShovel();
+                        NightView.isShovelMode.set(false);
                     }
                 });
             }
@@ -278,7 +278,7 @@ public class NightView extends AbstractLevelView {
         return isShovelMode;
     }
 
-    public static void setIsShovelMode(boolean value) {
+    public void setIsShovelMode(boolean value) {
         isShovelMode.set(value);
     }
 

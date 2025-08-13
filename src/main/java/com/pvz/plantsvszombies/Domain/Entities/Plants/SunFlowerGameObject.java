@@ -1,22 +1,25 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
-import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
-import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
-import com.pvz.plantsvszombies.GlobalSettings;
-
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.SunGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.GlobalSettings;
+
 public class SunFlowerGameObject extends AbstractPlantGameObject implements Serializable {
     private final Duration _coolDown = Duration.ofMillis(3000);
     private int tick = 1;
 
-    private transient final ArrayList<IEventSubscriber> _glowingEventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _glowingEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
 
     public static SunFlowerGameObject createSunFlowerGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
@@ -80,4 +83,12 @@ public class SunFlowerGameObject extends AbstractPlantGameObject implements Seri
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }
 
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _glowingEventSubscribers = new ArrayList<>();
+        _eatenEventSubscribers = new ArrayList<>();
+    }
 }

@@ -43,6 +43,10 @@ public class MainApp extends Application {
                 250, 100
         );
 
+        Button loadBtn = new Button();
+        loadBtn.setPrefWidth(250);
+        loadBtn.setPrefHeight(100);
+
         dayModeBtn.setOnAction(e -> {
             launchGame(primaryStage, "day");
         });
@@ -51,8 +55,11 @@ public class MainApp extends Application {
             launchGame(primaryStage, "night");
         });
 
+        loadBtn.setOnAction(e -> {
+            loadGame(primaryStage);
+        });
 
-        VBox buttonContainer = new VBox(-30, dayModeBtn, nightModeBtn);//VBox for mode btn
+        VBox buttonContainer = new VBox(-30, dayModeBtn, nightModeBtn, loadBtn);//VBox for mode btn
         buttonContainer.setAlignment(Pos.CENTER);
 
         root.getChildren().add(buttonContainer);
@@ -96,17 +103,21 @@ public class MainApp extends Application {
     }
 
 
-        private void launchGame(Stage primaryStage, String mode) {//for launching game
-            try {
-                PickingPlantStage pickingStageBuilder = new PickingPlantStage(mode);
-                Stage pickingPlantStage = pickingStageBuilder.createStage(primaryStage);
-                pickingPlantStage.show();
-                pickingPlantStage.setOnCloseRequest(e -> primaryStage.show());
-                primaryStage.hide();
+    private void launchGame(Stage primaryStage, String mode) {//for launching game
+        try {
+            PickingPlantStage pickingStageBuilder = new PickingPlantStage(mode);
+            Stage pickingPlantStage = pickingStageBuilder.createStage(primaryStage);
+            pickingPlantStage.show();
+            pickingPlantStage.setOnCloseRequest(e -> primaryStage.show());
+            primaryStage.hide();
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                primaryStage.show();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            primaryStage.show();
         }
     }
+
+    private void loadGame(Stage primaryStage) {
+
+    }
+}

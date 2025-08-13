@@ -1,5 +1,12 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Duration;
+import java.util.ArrayList;
+
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.Domain.Entities.FogGameObject;
@@ -7,16 +14,12 @@ import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.ArrayList;
-
 public class BloverGameObject extends AbstractPlantGameObject implements Serializable {
     public final static Duration EXPLOSION_TIME = Duration.ofSeconds(1);
 
 
     private int _tick;
-    private transient final ArrayList<IEventSubscriber> _blowingEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _blowingEventSubscribers = new ArrayList<>();
 
     public static BloverGameObject createBloverGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new BloverGameObject(gameEngine, id, coordinate, row, column);
@@ -80,5 +83,13 @@ public class BloverGameObject extends AbstractPlantGameObject implements Seriali
 
     private double getMilliseconds() {
         return this._tick * 1000.0 / GlobalSettings.FPS;
+    }
+
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _blowingEventSubscribers = new ArrayList<>();
     }
 }

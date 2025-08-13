@@ -9,6 +9,7 @@ import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Services.PersistenceManager;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
+import javafx.application.Platform;
 
 import java.time.Duration;
 import java.util.*;
@@ -39,6 +40,11 @@ public class NightEngine extends GameEngine {
         this._gameObjects = new CopyOnWriteArrayList<>();
     }
 
+    public NightEngine(double windowWidth, double windowHeight, List<AbstractGameObject> gameObjects) {
+        new NightEngine(windowWidth, windowHeight);
+        _gameObjects.addAll(gameObjects);
+    }
+
     private int _currentWave = 1;
 
     @Override
@@ -48,7 +54,7 @@ public class NightEngine extends GameEngine {
         _currentMap.subscribeToBlocksReadyEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
-                initFog();
+//                initFog();
             }
         });
     }
@@ -56,8 +62,8 @@ public class NightEngine extends GameEngine {
     //updates every object
     @Override
     public void update() {
-        if (getMilliseconds() % 3000 == 0) {
-            exportObjects();
+        if (getMilliseconds() % 30000 == 0) {
+//            exportObjects();
         }
 
         // Checking wave changes:
@@ -103,6 +109,15 @@ public class NightEngine extends GameEngine {
                     var row = _zombieSpawnRandom.nextInt(0, _rows);
                     spawnZombie(row, _columns - 1, AbstractZombieGameObject.ZombieType.values()[_zombieTypeRandom.nextInt(AbstractZombieGameObject.ZombieType.values().length)]);
                 }
+
+                // Stop zombie spawning
+                _currentWave = -1;
+                System.out.println("Zombie spawning stopped");
+            }
+            case -1 -> {
+                if (_gameObjects.stream().noneMatch(z -> z instanceof AbstractZombieGameObject)) {
+                    System.out.println("You Won");
+                }
             }
         }
 
@@ -140,6 +155,7 @@ public class NightEngine extends GameEngine {
         MapGameObject map = MapGameObject.createMapGameObject(objectId, coordinate, this);
         _currentMap = map;
 
+        _gameObjects.add(map);
         for (IEventSubscriber subscriber : _gameObjectSpawnEventSubscribers) {
             subscriber._notify(map);
         }
@@ -158,15 +174,39 @@ public class NightEngine extends GameEngine {
         }
     }
 
-    private void load() {
+    @Override
+    public void load() {
         _gameObjects.clear();
-        _gameObjects.addAll(PersistenceManager.load());
-        _gameObjects.forEach(e -> {
-            if (e instanceof AbstractPlantGameObject) {
-                Mediator.getInstance().getVisualEngine()
-                        .spawnGameObject(e);
-            }
+        var objects = PersistenceManager.load();
+        objects.forEach(e -> {
+            Platform.runLater(() -> {
+                e.setGameEngine(this);
+                _gameObjects.add(e);
+                switch (e) {
+                    case MapGameObject mapGameObject -> {
+                        Mediator.getInstance().getVisualEngine()
+                                .spawnGameObject(e);
+
+//                        for (IEventSubscriber subscriber : _gameObjectSpawnEventSubscribers) {
+//                            subscriber._notify(e);
+//                        }
+
+                        _currentMap = mapGameObject;
+
+                    }
+//                    case AbstractPlantGameObject plant -> {
+//                        try {
+//                            plantObject(plant);
+//                        } catch (Exception _) {
+//
+//                        }
+//                    }
+                    default -> Mediator.getInstance().getVisualEngine()
+                            .spawnGameObject(e);
+                }
+            });
         });
+
     }
 
     private double getMilliseconds() {

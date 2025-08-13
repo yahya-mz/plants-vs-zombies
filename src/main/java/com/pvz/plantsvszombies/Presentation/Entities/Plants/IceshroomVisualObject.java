@@ -6,8 +6,9 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.IceshroomAnimations;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualNightEngine;
+
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,9 +23,9 @@ public class IceshroomVisualObject extends AbstractPlantVisualObject{
 
     private IceshroomVisualObject.States _currentState;
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public IceshroomVisualObject(IceShroomGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
+    public IceshroomVisualObject(IceShroomGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی
         super._gameObject = gameObject;
         this._engine = engine;
 

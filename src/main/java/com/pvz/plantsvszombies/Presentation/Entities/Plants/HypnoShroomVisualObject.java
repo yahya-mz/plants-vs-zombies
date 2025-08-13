@@ -5,9 +5,10 @@ import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.HypnoShroomGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Presentation.Animations.HypnoShroomAnimations;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
-import com.pvz.plantsvszombies.Presentation.Animations.WallNutAnimations;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
@@ -21,9 +22,9 @@ public class HypnoShroomVisualObject extends AbstractPlantVisualObject {
 
     private States _currentState;
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public HypnoShroomVisualObject(HypnoShroomGameObject gameObject, IVisualEngine engine) {
+    public HypnoShroomVisualObject(HypnoShroomGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         _engine = engine;
 
@@ -48,12 +49,12 @@ public class HypnoShroomVisualObject extends AbstractPlantVisualObject {
 
     @Override
     public void playAnimation(IAnimation animation, Duration frameDuration) {
-        super.playAnimation(WallNutAnimations.getFrames((WallNutAnimations.Animations) animation), frameDuration);
+        super.playAnimation(HypnoShroomAnimations.getFrames((HypnoShroomAnimations.Animations) animation), frameDuration);
     }
 
     @Override
     public void spawn() {
-//        playAnimation(WallNutAnimations.Animations.FULL_HEALTH);
+        playAnimation(HypnoShroomAnimations.Animations.STANDING, Duration.millis(80));
     }
 
     public HypnoShroomVisualObject changeStateTo(States state) {

@@ -1,19 +1,22 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
-import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
-import com.pvz.plantsvszombies.GlobalSettings;
-
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.GlobalSettings;
 
 public class TallNutGameObject extends AbstractPlantGameObject implements Serializable {
     private int tick = 1;
 
-    private transient final ArrayList<IEventSubscriber> _cracked_1_EventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _cracked_2_EventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _cracked_1_EventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _cracked_2_EventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
 
     public static TallNutGameObject createTallNutGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
@@ -74,4 +77,13 @@ public class TallNutGameObject extends AbstractPlantGameObject implements Serial
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }
 
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _cracked_1_EventSubscribers = new ArrayList<>();
+        _cracked_2_EventSubscribers = new ArrayList<>();
+        _eatenEventSubscribers = new ArrayList<>();
+    }
 }

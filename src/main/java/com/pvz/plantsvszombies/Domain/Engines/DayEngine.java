@@ -116,6 +116,11 @@ public class DayEngine extends GameEngine {
         tick++;
     }
 
+    @Override
+    public void load() {
+
+    }
+
     private void dropSunFromSky() {
         String sunObjectId = "SKY-SUN_" + UUID.randomUUID();
         Coordinate coordinate = new Coordinate(

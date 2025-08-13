@@ -2,7 +2,6 @@ package com.pvz.plantsvszombies.Presentation.Entities;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
 import javafx.scene.Node;
 
 public abstract class AbstractVisualObject {

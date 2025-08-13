@@ -1,12 +1,9 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Bullets;
 
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -19,10 +16,10 @@ public class ShroomBulletVisualObject  extends AbstractAnimatedVisualObject {
             COLLIDED
         }
 
-        private final IVisualEngine _engine;
+        private final VisualEngine _engine;
         private ShroomBulletVisualObject.States _state;
 
-    public ShroomBulletVisualObject(ShroomBulletGameObject gameObject, IVisualEngine engine) {
+    public ShroomBulletVisualObject(ShroomBulletGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         this._engine = engine;
 

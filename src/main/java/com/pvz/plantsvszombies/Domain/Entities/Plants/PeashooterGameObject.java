@@ -48,20 +48,20 @@ public class PeashooterGameObject extends AbstractPlantGameObject implements Ser
 
     }
 
-    private double _lastShootTick = 0;
+    private double _lastShotTick = 0;
 
     @Override
     public void update() {
         if (!this._isDisposed) {
             tick++;
             if (_gameEngine.doesRowHaveZombie(_row)) {
-                if ((_lastShootTick * 1000 / GlobalSettings.FPS) % _coolDown.toMillis() == 0) {
+                if ((_lastShotTick * 1000 / GlobalSettings.FPS) % _coolDown.toMillis() == 0) {
                     shoot();
-                    _lastShootTick = 0;
+                    _lastShotTick = 0;
                 }
-                _lastShootTick++;
+                _lastShotTick++;
             } else {
-                _lastShootTick = 0;
+                _lastShotTick = 0;
             }
         }
     }

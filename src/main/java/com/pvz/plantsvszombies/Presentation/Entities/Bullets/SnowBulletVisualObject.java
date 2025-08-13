@@ -6,7 +6,7 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralFadingAnimation;
 import com.pvz.plantsvszombies.Presentation.Entities.AbstractVisualObject;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,10 +18,10 @@ public class SnowBulletVisualObject extends AbstractVisualObject {
         COLLIDED
     }
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
     private States _state;
 
-    public SnowBulletVisualObject(SnowBulletGameObject gameObject, IVisualEngine engine) {
+    public SnowBulletVisualObject(SnowBulletGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         this._engine = engine;
 
@@ -32,6 +32,9 @@ public class SnowBulletVisualObject extends AbstractVisualObject {
         var height = ((Image) ((ImageView) _node).getImage()).getHeight();
         var width = ((Image) ((ImageView) _node).getImage()).getWidth();
 
+        ((ImageView) _node).setFitWidth(width);
+        ((ImageView) _node).setFitHeight(height);
+
         _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
 
         ((SnowBulletGameObject) _gameObject).subscribeToMovementEvent(new IEventSubscriber() {
@@ -40,10 +43,6 @@ public class SnowBulletVisualObject extends AbstractVisualObject {
                 Platform.runLater(() -> {
                     _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
                 });
-//                System.out.println(gameObject.getCoordinate().x());
-
-//                _node.setLayoutY(gameObject.getCoordinate().y());
-//                _node.setTranslateX(_node.getTranslateX() + gameObject.getCoordinate().x() - old_x);
             }
         });
 

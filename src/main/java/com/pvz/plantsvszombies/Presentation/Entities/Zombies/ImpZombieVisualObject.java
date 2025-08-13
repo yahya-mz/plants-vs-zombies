@@ -1,33 +1,24 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.ImpZombieGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
+import com.pvz.plantsvszombies.Presentation.Animations.Zombies.ImpZombieAnimations;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
+
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
 public class ImpZombieVisualObject extends AbstractZombieVisualObject {
-    public enum States {
-        MOVING,
-        EATING,
-        DYING,
-        Burning,
-    }
 
-    private final IVisualEngine _engine;
-
-    private States _currentState;
-    private GeneralTransformAnimation _transformAnimation;
+    private final VisualEngine _engine;
+    private AbstractZombieGameObject.GeneralZombieState _currentVisualState;
 
 
-    public ImpZombieVisualObject(ImpZombieGameObject gameObject, IVisualEngine engine) {
+    public ImpZombieVisualObject(ImpZombieGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         _engine = engine;
         _visualCoordinate = gameObject.getCoordinate();
@@ -39,38 +30,44 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
         _node.setManaged(false);
         _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
 
-        _currentState = States.MOVING;
+        _currentVisualState = _gameObject.getCurrentState();
 
-        _gameObject.subscribeToMovementEvent((zombieObj) -> {
+        (_gameObject).subscribeToMovementEvent((zombieObj) -> {
             _visualCoordinate = zombieObj.getCoordinate();
             Platform.runLater(() -> {
                 _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - height * 0.5);
             });
-            if (!this._currentState.equals(States.MOVING)) {
-                changeStateTo(States.MOVING);
+            if (_gameObject.isFreezy()) {
+                if (!_currentVisualState.equals(AbstractZombieGameObject.GeneralZombieState.FREEZY_MOVING_FORWARD)) {
+                    changeStateTo(AbstractZombieGameObject.GeneralZombieState.FREEZY_MOVING_FORWARD);
+                }
+            } else if (!_currentVisualState.equals(AbstractZombieGameObject.GeneralZombieState.MOVING_FORWARD)) {
+                changeStateTo(AbstractZombieGameObject.GeneralZombieState.MOVING_FORWARD);
             }
         });
 
-        _gameObject.subscribeToEatingEvent(new IEventSubscriber() {
-            @Override
-            public void _notify(AbstractGameObject gameObject) {
-                Platform.runLater(() -> {
-                    changeStateTo(States.EATING);
-                });
+        _gameObject.subscribeToEatingEvent(zombieObj -> {
+            if (_gameObject.isFreezy()) {
+                if (!_currentVisualState.equals(AbstractZombieGameObject.GeneralZombieState.FREEZY_EATING)) {
+                    changeStateTo(AbstractZombieGameObject.GeneralZombieState.FREEZY_EATING);
+                }
+            } else if (!_currentVisualState.equals(AbstractZombieGameObject.GeneralZombieState.EATING)) {
+                changeStateTo(AbstractZombieGameObject.GeneralZombieState.EATING);
             }
         });
 
-        _gameObject.subscribeToDeathEvent((zombieObj) -> {//we have to change this
-            Platform.runLater(() -> changeStateTo(States.DYING));
+        _gameObject.subscribeToDeathEvent((zombieObj) -> {
+            changeStateTo(AbstractZombieGameObject.GeneralZombieState.DYING);
         });
 
-        _gameObject.subscribeToBurnEvent((zombieObj) -> {//we have to change this
-            Platform.runLater(() -> changeStateTo(States.Burning));
+        _gameObject.subscribeToBurnEvent((zombieObj) -> {
+            changeStateTo(AbstractZombieGameObject.GeneralZombieState.BURNING);
         });
 
         _gameObject.subscribeToDisposeEvent((zombieObj) -> {
             _engine.disposeObject(this);
         });
+
     }
 
     @Override
@@ -85,34 +82,45 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
     @Override
     public void spawn() {
         _gameObject.spawn();
-        playAnimation(ImpZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
+        changeStateTo(_gameObject.getCurrentState());
     }
 
-    public ImpZombieVisualObject changeStateTo(ImpZombieVisualObject.States state) {
-        switch (state) {
-            case MOVING -> {
-                _currentState = States.MOVING;
-                playAnimation(ImpZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
+    public ImpZombieVisualObject changeStateTo(AbstractZombieGameObject.GeneralZombieState state) {
+        Platform.runLater(() -> {
+            switch (state) {
+                case MOVING_FORWARD -> {
+                    _currentVisualState = AbstractZombieGameObject.GeneralZombieState.MOVING_FORWARD;
+                    playAnimation(ImpZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(30));
+                }
+                case FREEZY_MOVING_FORWARD -> {
+                    _currentVisualState = AbstractZombieGameObject.GeneralZombieState.FREEZY_MOVING_FORWARD;
+                    playAnimation(ImpZombieAnimations.Animations.FROZEN_MOVING_FORWARD, Duration.millis(60));
+                }
+                case DYING -> {
+                    _currentVisualState = AbstractZombieGameObject.GeneralZombieState.DYING;
+                    playAnimation(ImpZombieAnimations.Animations.DYING, Duration.millis(60), 1);
+                    setOnAnimationFinished(e -> {
+                        _engine.disposeObject(this);
+                    });
+                }
+                case EATING -> {
+                    _currentVisualState = AbstractZombieGameObject.GeneralZombieState.EATING;
+                    playAnimation(ImpZombieAnimations.Animations.ATTACKING, Duration.millis(30));
+                }
+                case FREEZY_EATING -> {
+                    _currentVisualState = AbstractZombieGameObject.GeneralZombieState.FREEZY_EATING;
+                    playAnimation(ImpZombieAnimations.Animations.FROZEN_ATTACKING, Duration.millis(60));
+                }
+                case BURNING -> {
+                    _currentVisualState = AbstractZombieGameObject.GeneralZombieState.BURNING;
+                    playAnimation(ImpZombieAnimations.Animations.BURNING, Duration.millis(70), 1);
+                    setOnAnimationFinished(e -> {
+                        _engine.disposeObject(this);
+                    });
+                }
             }
-            case DYING -> {
-                _currentState = States.DYING;
-                playAnimation(ImpZombieAnimations.Animations.DYING, Duration.millis(35), 1);
-                setOnAnimationFinished(e -> {
-                    _engine.disposeObject(this);
-                });
-            }
-            case EATING -> {
-                _currentState = States.EATING;
-                playAnimation(ImpZombieAnimations.Animations.ATTACKING, Duration.millis(35));
-            }
-            case Burning -> {
-                _currentState = States.Burning;
-                playAnimation(ImpZombieAnimations.Animations.BURNING, Duration.millis(35), 1);
-                setOnAnimationFinished(e -> {
-                    _engine.disposeObject(this);
-                });
-            }
-        }
-        return null;
+
+        });
+        return this;
     }
 }

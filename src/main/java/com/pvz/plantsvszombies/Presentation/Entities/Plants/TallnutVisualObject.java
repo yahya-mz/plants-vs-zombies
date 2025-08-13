@@ -4,9 +4,8 @@ package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.TallNutGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.SkySunVisualObject;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,9 +23,9 @@ public class TallnutVisualObject extends AbstractPlantVisualObject {
     private GeneralFadingAnimation _fadingAnimation;
     private GeneralTransformAnimation _transformAnimation;
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public TallnutVisualObject(TallNutGameObject gameObject, IVisualEngine engine) {
+    public TallnutVisualObject(TallNutGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         _engine = engine;
 //

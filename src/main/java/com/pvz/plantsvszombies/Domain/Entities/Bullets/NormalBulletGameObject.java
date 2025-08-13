@@ -5,12 +5,15 @@ import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class NormalBulletGameObject extends AbstractBulletGameObject implements Serializable {
-    private transient final ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
     public static NormalBulletGameObject createNormalBulletGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row) {
         return new NormalBulletGameObject(gameEngine, id, coordinate, row);
@@ -58,5 +61,13 @@ public class NormalBulletGameObject extends AbstractBulletGameObject implements 
 
     public void subscribeToMovementEvent(IEventSubscriber eventSubscriber) {
         _movementEventSubscribers.add(eventSubscriber);
+    }
+
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _movementEventSubscribers = new ArrayList<>();
+        _collisionEventSubscribers = new ArrayList<>();
     }
 }

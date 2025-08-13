@@ -1,23 +1,25 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
-import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Bullets.SnowBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
-import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
-import com.pvz.plantsvszombies.GlobalSettings;
-
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.Bullets.SnowBulletGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.GlobalSettings;
+
 public class SnowPeaGameObject extends AbstractPlantGameObject implements Serializable {
     private final Duration _coolDown = Duration.ofMillis(4000);
     private int tick = 1;
 
-    private transient final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
     public static SnowPeaGameObject createSnowPeaGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new SnowPeaGameObject(gameEngine, id, coordinate, row, column);
@@ -44,12 +46,20 @@ public class SnowPeaGameObject extends AbstractPlantGameObject implements Serial
     public void spawn() {
 
     }
+
+    private double _lastShotTick = 0;
     @Override
     public void update() {
         if (!this._isDisposed) {
             tick++;
-            if (getMilliseconds() % _coolDown.toMillis() == 0) {
-                shoot();
+            if (_gameEngine.doesRowHaveZombie(_row)) {
+                if ((_lastShotTick * 1000 / GlobalSettings.FPS) % _coolDown.toMillis() == 0) {
+                    shoot();
+                    _lastShotTick = 0;
+                }
+                _lastShotTick++;
+            } else {
+                _lastShotTick = 0;
             }
         }
     }
@@ -80,4 +90,12 @@ public class SnowPeaGameObject extends AbstractPlantGameObject implements Serial
         super.dispose();
     }
 
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _shootingEventSubscribers = new ArrayList<>();
+        _eatenEventSubscribers = new ArrayList<>();
+    }
 }

@@ -20,6 +20,8 @@ public class ImpZombieGameObject extends AbstractZombieGameObject implements Ser
 
         this._health = 75;
         this._speed = super._speed * 2;
+
+        _zombieType = ZombieType.IMP_ZOMBIE;
     }
 
     @Override

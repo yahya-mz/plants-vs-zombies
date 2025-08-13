@@ -1,14 +1,16 @@
-package com.pvz.plantsvszombies.Presentation.Animations;
-import com.pvz.plantsvszombies.GlobalSettings;
-import javafx.scene.image.Image;
-
+package com.pvz.plantsvszombies.Presentation.Animations.Zombies;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class ImpZombieAnimations {
+import com.pvz.plantsvszombies.GlobalSettings;
+
+import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
+import javafx.scene.image.Image;
+
+public class ScreenDoorZombieAnimations {
     public enum Animations implements IAnimation {
         MOVING_FORWARD,
         DYING,
@@ -16,13 +18,14 @@ public class ImpZombieAnimations {
         BURNING
     }
 
+
     private final static ArrayList<Image[]> animations;
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/ImpZombie"));
-        for (int i = 0; i < ImpZombieAnimations.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + ImpZombieAnimations.Animations.values()[i].name()).listFiles();
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/ScreenDoorZombie"));
+        for (int i = 0; i < ScreenDoorZombieAnimations.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + ScreenDoorZombieAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
                 String name = f.getName();
                 int dotIndex = name.lastIndexOf('.');
@@ -40,7 +43,7 @@ public class ImpZombieAnimations {
         }
     }
 
-    public static Image[] getFrames(ImpZombieAnimations.Animations animation) {
+    public static Image[] getFrames(ScreenDoorZombieAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
 }

@@ -7,7 +7,7 @@ import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.PuffshroomAnimations;
 import com.pvz.plantsvszombies.Presentation.Animations.ScaredyShroomAnimations;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualNightEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -22,9 +22,9 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
 
     private States _currentState;
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public PuffshroomVisualObject(PuffShroomGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
+    public PuffshroomVisualObject(PuffShroomGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی
         super._gameObject = gameObject;
         _engine = engine;
 

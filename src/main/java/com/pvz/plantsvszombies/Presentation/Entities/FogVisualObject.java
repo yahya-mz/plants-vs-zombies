@@ -2,20 +2,17 @@ package com.pvz.plantsvszombies.Presentation.Entities;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.FogGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.FogGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.BloverGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
-import javafx.application.Platform;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class FogVisualObject extends AbstractVisualObject {
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public FogVisualObject(FogGameObject gameObject, IVisualEngine engine) {
+    public FogVisualObject(FogGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         _engine = engine;
 

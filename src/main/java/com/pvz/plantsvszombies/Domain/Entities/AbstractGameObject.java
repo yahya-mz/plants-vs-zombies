@@ -57,6 +57,10 @@ public abstract class AbstractGameObject implements IDisposable, Serializable {
         }
     }
 
+    public void setGameEngine(GameEngine gameEngine){
+        _gameEngine = gameEngine;
+    }
+
     // Serialization
     @Serial
     private void readObject(ObjectInputStream in)

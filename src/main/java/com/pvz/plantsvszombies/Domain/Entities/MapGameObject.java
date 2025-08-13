@@ -5,9 +5,13 @@ import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class MapGameObject extends AbstractGameObject {
+public class MapGameObject extends AbstractGameObject implements Serializable {
 
     private final int _rows;
     private final int _columns;
@@ -18,8 +22,9 @@ public class MapGameObject extends AbstractGameObject {
 
     private transient final GameEngine _engine;
 
-    private transient final ArrayList<IEventSubscriber> _plantingEventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _blocksReadyEventSubscribers = new ArrayList<>();
+    public boolean isBlocksInstantiated = false;
+
+    private transient ArrayList<IEventSubscriber> _blocksReadyEventSubscribers = new ArrayList<>();
 
     public static MapGameObject createMapGameObject(String id, Coordinate coordinate, GameEngine engine) {
         return new MapGameObject(id, coordinate, engine);
@@ -53,8 +58,13 @@ public class MapGameObject extends AbstractGameObject {
 
     }
 
+    public boolean isBlocksInstantiated() {
+        return isBlocksInstantiated;
+    }
+
     public void initBlocks(MapBlock[] blocks) {
         _blocks = blocks;
+        isBlocksInstantiated = true;
 
         for (IEventSubscriber eventSubscriber : _blocksReadyEventSubscribers) {
             eventSubscriber._notify(this);
@@ -83,14 +93,18 @@ public class MapGameObject extends AbstractGameObject {
     }
 
     public void plant(AbstractPlantGameObject plant) {//calling visual
-        System.out.println("Planting");
         this._blocks[plant.getRow() * _columns + plant.getColumn()].setPlant(plant);
-        for (IEventSubscriber eventSubscriber : _plantingEventSubscribers) {
-            eventSubscriber._notify(plant);
-        }
     }
 
     public void subscribeToBlocksReadyEvent(IEventSubscriber eventSubscriber) {
         _blocksReadyEventSubscribers.add(eventSubscriber);
+    }
+
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _blocksReadyEventSubscribers = new ArrayList<>();
     }
 }

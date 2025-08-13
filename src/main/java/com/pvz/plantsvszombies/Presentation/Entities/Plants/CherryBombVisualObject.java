@@ -1,11 +1,13 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.CherryBombGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Animations.CherryBombAnimations;
+import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
+
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -13,9 +15,9 @@ import javafx.util.Duration;
 
 public class CherryBombVisualObject extends AbstractPlantVisualObject {
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public CherryBombVisualObject(CherryBombGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
+    public CherryBombVisualObject(CherryBombGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی
         super._gameObject = gameObject;
         this._engine = engine;
 

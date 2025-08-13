@@ -24,6 +24,8 @@ public class NormalZombieGameObject extends AbstractZombieGameObject implements 
 
         this._health = 125;
 
+        _zombieType = ZombieType.NORMAL_ZOMBIE;
+
     }
 
     @Override

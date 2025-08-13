@@ -1,31 +1,21 @@
 package com.pvz.plantsvszombies.Mediator;
 
-import com.pvz.plantsvszombies.Domain.Entities.Events.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
-import com.pvz.plantsvszombies.Presentation.EventHandlers.*;
-import javafx.application.Platform;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 
 import java.time.Duration;
-import java.util.Hashtable;
 
 public class Mediator {
 
-//    public static Mediator Init(VisualEngine ve, ){
-//
-//    }
-
-    private GameEngine _gameEngine;
-    private IVisualEngine _visualEngine;
+    private final GameEngine _gameEngine;
+    private final VisualEngine _visualEngine;
 
     private boolean _engineThreadRunning = false;
 
-    private static final Hashtable<Class, EventHandler> handlers = new Hashtable<>();
-
     private static Mediator _instance;
 
-    public static void init(GameEngine gameEngine, IVisualEngine visualEngine) {
+    public static void init(GameEngine gameEngine, VisualEngine visualEngine) {
         _instance = new Mediator(gameEngine, visualEngine);
     }
 
@@ -33,7 +23,7 @@ public class Mediator {
         return _instance;
     }
 
-    public Mediator(GameEngine gameEngine, IVisualEngine visualEngine) {
+    public Mediator(GameEngine gameEngine, VisualEngine visualEngine) {
         this._gameEngine = gameEngine;
         this._visualEngine = visualEngine;
     }
@@ -64,7 +54,7 @@ public class Mediator {
         stopVisualEngine();
     }
 
-    public IVisualEngine getVisualEngine() {
+    public VisualEngine getVisualEngine() {
         return _visualEngine;
     }
 
@@ -72,4 +62,7 @@ public class Mediator {
         _visualEngine.stopEngine();
     }
 
+    public void loadGame(){
+
+    }
 }

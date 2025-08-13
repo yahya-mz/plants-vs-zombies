@@ -1,28 +1,36 @@
 package com.pvz.plantsvszombies.Domain.Entities.Plants;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.UUID;
+
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.UUID;
-
 public class ScaredyShroomGameObject extends AbstractPlantGameObject implements Serializable {
+
+    public enum ScaredyShroomState {
+        CRYING,
+        SLEEPING,
+        STANDING
+    }
 
     private final Duration _coolDown = Duration.ofMillis(4000);
     private int tick = 1;
 
-    public boolean isAwake = true;
+    public ScaredyShroomState _state;
 
-    private transient final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _switchAwakenessEventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _switchAwakenessEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
     public static ScaredyShroomGameObject createScaredyShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new ScaredyShroomGameObject(gameEngine, id, coordinate, row, column);
@@ -52,20 +60,24 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
 
     @Override
     public void spawn() {
-
+        if (_gameEngine instanceof NightEngine) {
+            _state = ScaredyShroomState.STANDING;
+        } else {
+            _state = ScaredyShroomState.SLEEPING;
+        }
     }
 
     private double _lastShootTick = 0;
 
     @Override
     public void update() {
-        if (!this._isDisposed) {
+        if (!this._isDisposed && !_state.equals(ScaredyShroomState.SLEEPING)) {
             tick++;
             var rowsZombies = _gameEngine.getZombiesByRow(_row);
             if (!rowsZombies.isEmpty()) {
                 var frontZombie = rowsZombies.getFirst(); // Most front zombie
                 if (frontZombie.getColumn() - _column < 2) {
-                    isAwake = false;
+                    _state = ScaredyShroomState.CRYING;
                     for (IEventSubscriber eventSubscriber : _switchAwakenessEventSubscribers) {
                         eventSubscriber._notify(this);
                     }
@@ -82,7 +94,7 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
                 _lastShootTick = 0;
             }
 
-            isAwake = true;
+            _state = ScaredyShroomState.STANDING;
         }
     }
 
@@ -115,4 +127,13 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }
 
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _shootingEventSubscribers = new ArrayList<>();
+        _switchAwakenessEventSubscribers = new ArrayList<>();
+        _eatenEventSubscribers = new ArrayList<>();
+    }
 }

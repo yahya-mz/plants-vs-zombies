@@ -6,6 +6,9 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -15,8 +18,8 @@ public class RepeaterGameObject extends AbstractPlantGameObject implements Seria
     private final Duration _coolDown = Duration.ofMillis(4000);
     private int tick = 1;
 
-    private transient final ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
 
 
     public static RepeaterGameObject createRepeaterGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
@@ -36,6 +39,7 @@ public class RepeaterGameObject extends AbstractPlantGameObject implements Seria
     public void subscribeToShootingEvent(IEventSubscriber event) {
         this._shootingEventSubscribers.add(event);
     }
+
     public void subscribeToEatenEvent(IEventSubscriber event) {
         this._eatenEventSubscribers.add(event);
     }
@@ -44,22 +48,27 @@ public class RepeaterGameObject extends AbstractPlantGameObject implements Seria
     public void spawn() {
 
     }
+
     private int lastShotTick = Integer.MIN_VALUE;
+
     @Override
     public void update() {
-        if (!super._isDisposed){
+        if (!super._isDisposed) {
             tick++;
-            if (getMilliseconds() % _coolDown.toMillis() == 0) {
-                shoot();
-                lastShotTick = tick;
-            }
-            // Second shot:
-            if (tick - lastShotTick == GlobalSettings.FPS / 2) {
-                shoot();
-                lastShotTick = 0;
+            if (_gameEngine.doesRowHaveZombie(_row)) {
+                if (getMilliseconds() % _coolDown.toMillis() == 0) {
+                    shoot();
+                    lastShotTick = tick;
+                }
+                // Second shot:
+                if (tick - lastShotTick == GlobalSettings.FPS / 2) {
+                    shoot();
+                    lastShotTick = 0;
+                }
             }
         }
     }
+
     @Override
     public void getHit(int damage) {
         _health -= damage;
@@ -70,20 +79,29 @@ public class RepeaterGameObject extends AbstractPlantGameObject implements Seria
 
     private void shoot() {
         String BulletObjectId = "NormalBullet" + UUID.randomUUID();
-        var bulletObj = NormalBulletGameObject.createNormalBulletGameObject(_gameEngine, BulletObjectId,new Coordinate(this._coordinate.x() + 30, this._coordinate.y() - 20),getRow());
+        var bulletObj = NormalBulletGameObject.createNormalBulletGameObject(_gameEngine, BulletObjectId, new Coordinate(this._coordinate.x() + 30, this._coordinate.y() - 20), getRow());
         _gameEngine.spawnObject(bulletObj);
         for (IEventSubscriber eventSubscriber : _shootingEventSubscribers) {
             eventSubscriber._notify(bulletObj);
         }
     }
+
     private void eaten() {
         for (IEventSubscriber eventSubscriber : _eatenEventSubscribers) {
             eventSubscriber._notify(this);
         }
         super.dispose();
     }
+
     private double getMilliseconds() {
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }
 
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _shootingEventSubscribers = new ArrayList<>();
+        _eatenEventSubscribers = new ArrayList<>();
+    }
 }

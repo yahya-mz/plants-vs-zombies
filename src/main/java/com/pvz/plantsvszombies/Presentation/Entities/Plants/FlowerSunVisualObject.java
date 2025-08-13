@@ -9,7 +9,7 @@ import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.SunAnimations;
 import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
@@ -32,15 +32,15 @@ public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
     private GeneralFadingAnimation _fadingAnimation;
     private GeneralTransformAnimation _transformAnimation;
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public FlowerSunVisualObject(SunGameObject gameObject, IVisualEngine engine) {
+    public FlowerSunVisualObject(SunGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         _engine = engine;
         _visualCoordinate = gameObject.getCoordinate();
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Sun/Sun_0.png")));
-        ((ImageView) _node).setFitWidth(50);
-        ((ImageView) _node).setFitHeight(50);
+//        ((ImageView) _node).setFitWidth(50);
+//        ((ImageView) _node).setFitHeight(50);
         ((ImageView) _node).setPreserveRatio(true);
 
         _node.setCursor(Cursor.HAND);

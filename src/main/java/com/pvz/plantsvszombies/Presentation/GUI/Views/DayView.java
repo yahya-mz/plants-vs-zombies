@@ -235,12 +235,12 @@ public class DayView extends AbstractLevelView {
             Scene scene = shovelButton.getScene();
             if (scene != null && getIsShovelMode()) {
                 scene.setCursor(new ImageCursor(shovelCursorImage, 32, 32));
-                _visualEngine.shovelActivation();
+                _visualEngine.ActivateShovel();
                 shovelBarView(shovelButton, new ImageView(shovelEmptyImage));
 
                 scene.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
                     if (event.getButton() == MouseButton.SECONDARY && getIsShovelMode()) {
-                        _visualEngine.shovelDeactivation();
+                        _visualEngine.DeactivateShovel();
                         setIsShovelMode(false);
                     }
                 });

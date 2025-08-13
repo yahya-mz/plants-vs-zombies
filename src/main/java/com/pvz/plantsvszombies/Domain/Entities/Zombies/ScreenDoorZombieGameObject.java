@@ -30,6 +30,8 @@ public class ScreenDoorZombieGameObject extends AbstractZombieGameObject impleme
         this._column = column;
 
         this._health = 250;
+
+        _zombieType = ZombieType.SCREEN_DOOR_ZOMBIE;
     }
 
     @Override

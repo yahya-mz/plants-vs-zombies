@@ -1,17 +1,20 @@
 package com.pvz.plantsvszombies.Domain.Entities.Bullets;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 public class ShroomBulletGameObject extends AbstractBulletGameObject implements Serializable {
 
-    private transient final ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
-    private transient final ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _collisionEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
     public static ShroomBulletGameObject createShroomBulletGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row) {
         return new ShroomBulletGameObject(gameEngine, id, coordinate, row);
@@ -59,5 +62,14 @@ public class ShroomBulletGameObject extends AbstractBulletGameObject implements 
 
     public void subscribeToMovementEvent(IEventSubscriber eventSubscriber) {
         _movementEventSubscribers.add(eventSubscriber);
+    }
+
+    // Serialization
+    @Serial
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _movementEventSubscribers = new ArrayList<>();
+        _collisionEventSubscribers = new ArrayList<>();
     }
 }

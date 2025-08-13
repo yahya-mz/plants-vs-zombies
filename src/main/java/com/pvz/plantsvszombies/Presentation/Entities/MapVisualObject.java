@@ -3,7 +3,7 @@ package com.pvz.plantsvszombies.Presentation.Entities;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.WallNutVisualObject;
@@ -31,12 +31,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class MapVisualObject extends AbstractVisualObject {
-    MapGameObject _mapObject;
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
     private final StackPane[][] visualGrid = new StackPane[5][9];
 
-    public MapVisualObject(MapGameObject object, IVisualEngine engine) {
-        this._mapObject = object;
+    MapGameObject _gameObject;
+
+    public MapVisualObject(MapGameObject object, VisualEngine engine) {
+        this._gameObject = object;
         this._engine = engine;
 
         VBox mainContainer = new VBox();
@@ -147,7 +148,7 @@ public class MapVisualObject extends AbstractVisualObject {
                             ImageView preview = createPlantImageView("CherryBomb", cellButton);
                             cellButton.setGraphic(preview);
                         });
-                    } else if (selectedType == ScaredyshroomVisualObject.class) {
+                    } else if (selectedType == ScaredyShroomVisualObject.class) {
                         Platform.runLater(() -> {
                             ImageView preview = createPlantImageView("ScaredyShroom", cellButton);
                             cellButton.setGraphic(preview);
@@ -167,8 +168,7 @@ public class MapVisualObject extends AbstractVisualObject {
                             ImageView preview = createPlantImageView("HypnoShroom", cellButton);
                             cellButton.setGraphic(preview);
                         });
-                    }
-                    else if (selectedType == BloverVisualObject.class) {
+                    } else if (selectedType == BloverVisualObject.class) {
                         Platform.runLater(() -> {
                             ImageView preview = createPlantImageView("Blover", cellButton);
                             cellButton.setGraphic(preview);
@@ -214,22 +214,24 @@ public class MapVisualObject extends AbstractVisualObject {
             mainContainer.getChildren().add(rowBox);
         }
         mainContainer.layout();
-        var blocks = new MapBlock[_mapObject.getRows() * _mapObject.getColumns()];
-        for (int i = 0; i < _mapObject.getRows(); i++) {
-            for (int j = 0; j < _mapObject.getColumns(); j++) {
-                var n = ((StackPane) ((HBox) (mainContainer.getChildren().get(i))).getChildren().get(j));
-                final int i_final = i;
-                final int j_final = j;
-                n.needsLayoutProperty().addListener((obs2, oldVal, newVal) -> { // When needsLayout is set to false, it means everything about layout bounds is set
-                    if (!newVal && blocks[_mapObject.getColumns() * i_final + j_final] == null) {//need layout is false and also we havent created a mapblock
-                        var x = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
-                        var y = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
-                        blocks[_mapObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxY()), i_final, j_final);//putting that block in the blocks array with the upper left cor and the dowen right cor and also with i and j in the grid
-                        if (Arrays.stream(blocks).noneMatch(Objects::isNull)){
-                            _mapObject.initBlocks(blocks);
+        if (!((MapGameObject) _gameObject).isBlocksInstantiated()) {
+            var blocks = new MapBlock[_gameObject.getRows() * _gameObject.getColumns()];
+            for (int i = 0; i < _gameObject.getRows(); i++) {
+                for (int j = 0; j < _gameObject.getColumns(); j++) {
+                    var n = ((StackPane) ((HBox) (mainContainer.getChildren().get(i))).getChildren().get(j));
+                    final int i_final = i;
+                    final int j_final = j;
+                    n.needsLayoutProperty().addListener((obs2, oldVal, newVal) -> { // When needsLayout is set to false, it means everything about layout bounds is set
+                        if (!newVal && blocks[_gameObject.getColumns() * i_final + j_final] == null) {//need layout is false and also we havent created a mapblock
+                            var x = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
+                            var y = (n.getChildren().get(0)).localToScene(n.getLayoutBounds());
+                            blocks[_gameObject.getColumns() * i_final + j_final] = new MapBlock(new Coordinate(x.getMinX(), y.getMinY()), new Coordinate(x.getMaxX(), y.getMaxY()), i_final, j_final);//putting that block in the blocks array with the upper left cor and the dowen right cor and also with i and j in the grid
+                            if (Arrays.stream(blocks).noneMatch(Objects::isNull)) {
+                                _gameObject.initBlocks(blocks);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
         this._node = mainContainer;
@@ -310,9 +312,10 @@ public class MapVisualObject extends AbstractVisualObject {
     public void spawnByCoordinate(AbstractVisualObject object) {
         _engine.spawnVisualObject(object);
     }
+
     public void spawnByCoordinate(AbstractVisualObject object, double z_index) {
         _engine.spawnVisualObject(object);
-        object.getNode().setViewOrder(z_index);
+        object.getNode().setViewOrder(-z_index);
     }
 
     private static Node pick(Node node, double sceneX, double sceneY) {

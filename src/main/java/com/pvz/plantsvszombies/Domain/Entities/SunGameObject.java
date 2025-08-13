@@ -4,6 +4,7 @@ import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -69,5 +70,10 @@ public class SunGameObject extends AbstractGameObject implements Serializable {
         _timeOutSubscribers.add(eventSubscriber);
     }
 
-
+    @Serial
+    private void readObject(java.io.ObjectInputStream in)
+            throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        _timeOutSubscribers = new ArrayList<>();
+    }
 }

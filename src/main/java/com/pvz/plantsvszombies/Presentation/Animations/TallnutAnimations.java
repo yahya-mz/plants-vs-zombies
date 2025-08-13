@@ -1,5 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.Animations;
 
+import com.pvz.plantsvszombies.Presentation.Animations.Zombies.ImpZombieAnimations;
 import javafx.scene.image.Image;
 
 import java.io.File;

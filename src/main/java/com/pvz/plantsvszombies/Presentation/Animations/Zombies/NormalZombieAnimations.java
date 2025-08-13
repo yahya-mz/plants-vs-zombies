@@ -1,5 +1,7 @@
-package com.pvz.plantsvszombies.Presentation.Animations;
+package com.pvz.plantsvszombies.Presentation.Animations.Zombies;
+
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import javafx.scene.image.Image;
 
 import java.io.File;
@@ -8,23 +10,23 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class ConeHeadZombieAnimations {
+public class NormalZombieAnimations {
     public enum Animations implements IAnimation {
         MOVING_FORWARD,
+        FROZEN_MOVING_FORWARD,
         DYING,
-//        LOSTCONE,
         ATTACKING,
+        FROZEN_ATTACKING,
         BURNING
     }
-
 
     private final static ArrayList<Image[]> animations;
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/ConeHeadZombie"));
-        for (int i = 0; i < ConeHeadZombieAnimations.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + ConeHeadZombieAnimations.Animations.values()[i].name()).listFiles();
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/NormalZombie"));
+        for (int i = 0; i < NormalZombieAnimations.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + NormalZombieAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
                 String name = f.getName();
                 int dotIndex = name.lastIndexOf('.');
@@ -42,7 +44,7 @@ public class ConeHeadZombieAnimations {
         }
     }
 
-    public static Image[] getFrames(ConeHeadZombieAnimations.Animations animation) {
+    public static Image[] getFrames(NormalZombieAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
 }
