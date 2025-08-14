@@ -1,7 +1,6 @@
 package com.pvz.plantsvszombies.Multiplayer.Events;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 
 /**
  * Event for synchronized zombie spawning across all clients
@@ -9,7 +8,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 public class ZombieSpawnEvent extends SharedEvent {
     private int row;
     private int column;
-    private AbstractZombieGameObject.ZombieType zombieType;
+    private String zombieType; // Changed from enum to String for network serialization
     private String zombieId;
     private Coordinate spawnCoordinate;
     
@@ -18,7 +17,7 @@ public class ZombieSpawnEvent extends SharedEvent {
     }
     
     public ZombieSpawnEvent(long gameTick, int row, int column, 
-                           AbstractZombieGameObject.ZombieType zombieType, 
+                           String zombieType, 
                            String zombieId, Coordinate coordinate) {
         super(gameTick);
         this.row = row;
@@ -40,8 +39,8 @@ public class ZombieSpawnEvent extends SharedEvent {
     public int getColumn() { return column; }
     public void setColumn(int column) { this.column = column; }
     
-    public AbstractZombieGameObject.ZombieType getZombieType() { return zombieType; }
-    public void setZombieType(AbstractZombieGameObject.ZombieType zombieType) { this.zombieType = zombieType; }
+    public String getZombieType() { return zombieType; }
+    public void setZombieType(String zombieType) { this.zombieType = zombieType; }
     
     public String getZombieId() { return zombieId; }
     public void setZombieId(String zombieId) { this.zombieId = zombieId; }

@@ -204,11 +204,11 @@ public class ServerGameEngine extends GameEngine {
         
         // Create and broadcast zombie spawn event
         ZombieSpawnEvent event = new ZombieSpawnEvent(
-            tick, row, column, zombieType, zombieId, spawnCoordinate
+            tick, row, column, zombieType.name(), zombieId, spawnCoordinate
         );
         
         networkManager.sendEvent(event);
-        System.out.println("Spawned zombie: " + zombieType + " at row " + row);
+        System.out.println("Spawned zombie: " + zombieType.name() + " at row " + row);
     }
     
     private void dropSunFromSky() {

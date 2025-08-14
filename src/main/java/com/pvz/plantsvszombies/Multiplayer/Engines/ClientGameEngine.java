@@ -127,14 +127,15 @@ public class ClientGameEngine extends GameEngine {
         
         // Create zombie locally using server data
         AbstractZombieGameObject zombie = switch (event.getZombieType()) {
-            case NORMAL_ZOMBIE -> NormalZombieGameObject.createNormalZombieGameObject(
+            case "NORMAL_ZOMBIE" -> NormalZombieGameObject.createNormalZombieGameObject(
                 this, event.getZombieId(), event.getSpawnCoordinate(), event.getRow(), event.getColumn());
-            case CONE_HEAD_ZOMBIE -> ConeHeadZombieGameObject.createConeHeadZombieGameObject(
+            case "CONE_HEAD_ZOMBIE" -> ConeHeadZombieGameObject.createConeHeadZombieGameObject(
                 this, event.getZombieId(), event.getSpawnCoordinate(), event.getRow(), event.getColumn());
-            case IMP_ZOMBIE -> ImpZombieGameObject.createImpZombieGameObject(
+            case "IMP_ZOMBIE" -> ImpZombieGameObject.createImpZombieGameObject(
                 this, event.getZombieId(), event.getSpawnCoordinate(), event.getRow(), event.getColumn());
-            case SCREEN_DOOR_ZOMBIE -> ScreenDoorZombieGameObject.createScreenDoorZombieGameObject(
+            case "SCREEN_DOOR_ZOMBIE" -> ScreenDoorZombieGameObject.createScreenDoorZombieGameObject(
                 this, event.getZombieId(), event.getSpawnCoordinate(), event.getRow(), event.getColumn());
+            default -> throw new IllegalArgumentException("Unknown zombie type: " + event.getZombieType());
         };
         
         // Subscribe to zombie death events to track kills
