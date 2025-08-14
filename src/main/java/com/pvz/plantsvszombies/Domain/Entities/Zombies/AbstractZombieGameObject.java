@@ -29,14 +29,13 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
         IMP_ZOMBIE
     }
 
-    protected interface ZombieState {
-    }
-
-    public enum GeneralZombieState implements ZombieState {
+    public enum GeneralZombieState {
+        MOVING_FORWARD,
         EATING,
-        MOVING,
-        DEAD,
-        HYPNOTIZED
+        DYING,
+        BURNING,
+        FREEZY_MOVING_FORWARD,
+        FREEZY_EATING,
     }
 
     protected int _tick;
@@ -44,21 +43,19 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
     protected int _row;
     protected int _column;
 
+    protected ZombieType _zombieType;
+
     protected double _health;
     protected int _damage = 25;
-    protected ZombieState _state = GeneralZombieState.MOVING;
+    protected GeneralZombieState _currentState = GeneralZombieState.MOVING_FORWARD;
     protected Duration _biteCoolDown = Duration.ofMillis(500);
+    protected Duration _freezyTime = Duration.ofSeconds(5);
     protected boolean _isFrozen = false;
-    protected double _remainingFrozenTime = 0;
+    protected double _remainingFrozenTime = 0.0;
     protected boolean _isFreezy = false;
-    protected double _remainingFreezyTime = 0;
+    protected double _remainingFreezyTime = 0.0;
     protected double _speed = (double) 1 / 4 * MapBlock.BLOCK_SIZE / GlobalSettings.FPS;
     // ( 1 block / 1 sec) * ( 1 pixel / 1 block ) * ( 1 sec / 1 frame ) = ( pixel / frame )
-
-    public double getDamage() {
-        return _damage;
-    }
-
 
     @JsonIgnore
     protected transient ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
@@ -105,37 +102,41 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
     public void update() {
         if (!_isDisposed) {
             checkCollision();
-            if (_state.equals(GeneralZombieState.DEAD)) {
+            if (_currentState.equals(GeneralZombieState.DYING)) {
                 return;
             }
             if (_isFrozen) {
-                if (_remainingFrozenTime < 0) {
+                if (_remainingFrozenTime < 0.0) {
                     _isFrozen = false;
 
                     for (IEventSubscriber eventSubscriber : _frozenEventSubscribers) {
                         eventSubscriber._notify(this);
                     }
-                    _remainingFrozenTime = 0;
+                    _remainingFrozenTime = 0.0;
 
                 } else {
                     _remainingFrozenTime -= 1000.0 / GlobalSettings.FPS;
                 }
             } else {
-                if (_remainingFreezyTime < 0) {
-                    _isFreezy = false;
+                if (_isFreezy) {
+                    if (_remainingFreezyTime < 0.0) {
+                        _isFreezy = false;
 
-                    for (IEventSubscriber eventSubscriber : _freezyEventSubscribers) {
-                        eventSubscriber._notify(this);
+                        for (IEventSubscriber eventSubscriber : _freezyEventSubscribers) {
+                            eventSubscriber._notify(this);
+                        }
+                        _remainingFreezyTime = 0.0;
+                        _speed *= 2;
+
+                    } else {
+                        _remainingFreezyTime -= 1000.0 / GlobalSettings.FPS;
                     }
-                    _remainingFreezyTime = 0;
-
-                } else {
-                    _remainingFreezyTime = -1000.0 / GlobalSettings.FPS;
                 }
 
                 var facingEnemyZombie = _gameEngine.queryHypnotizedZombie(
                         z -> z.getCoordinate().equals(_coordinate)
                 );
+
                 if (facingEnemyZombie != null) {
                     eatZombie(facingEnemyZombie);
                     _tick++;
@@ -143,11 +144,12 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
                 }
 
                 var zombieBlock = _gameEngine.getBlockByCoordinate(this._coordinate);
+
                 if (zombieBlock != null) {
                     if (Math.abs(this._column - zombieBlock.getColumn()) > 1) {
-                        var test = 2;
+
                     }
-                    this._column = zombieBlock.getColumn(); // Update Current Block
+                    this._column = zombieBlock.getColumn();
                     if (zombieBlock.getPlant() != null) {
                         eatPlant(zombieBlock.getPlant());
                         _tick++;
@@ -159,12 +161,12 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
                     }
                 }
                 lastBiteMillis = -1;
-                this._state = GeneralZombieState.MOVING;
                 move();
             }
         }
         _tick++;
     }
+
 
     public int getRow() {
         return this._row;
@@ -178,14 +180,33 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
         return this._health;
     }
 
+    public GeneralZombieState getCurrentState() {
+        return _currentState;
+    }
+
     public double getSpeed() {
         return this._speed;
     }
 
+    public double getDamage() {
+        return _damage;
+    }
+
+    public ZombieType getZombieType() {
+        return _zombieType;
+    }
+
+    public boolean isFreezy() {
+        return _isFreezy;
+    }
+
     public void getHit(AbstractBulletGameObject bullet) {
-        if (bullet.getBulletType().equals(AbstractBulletGameObject.BulletType.NORMAL_BULLET)) {
-            _health -= bullet.getDamage();
+        if (bullet.getBulletType().equals(AbstractBulletGameObject.BulletType.SNOW_BULLET)) {
+            if (!(this instanceof ScreenDoorZombieGameObject)) {
+                this.getFreezy(_freezyTime);
+            }
         }
+        _health -= bullet.getDamage();
         if (_health <= 0) {
             die();
         }
@@ -199,6 +220,7 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
     }
 
     public void getBurned() {
+        _currentState = GeneralZombieState.BURNING;
         for (IEventSubscriber eventSubscriber : _burnEventSubscribers) {
             eventSubscriber._notify(this);
         }
@@ -206,11 +228,15 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
     }
 
     public void getFreezy(Duration duration) {
-        this._isFreezy = true;
-        _remainingFreezyTime = duration.toMillis();
-        for (IEventSubscriber eventSubscriber : _freezyEventSubscribers) {
-            eventSubscriber._notify(this);
+        if (!_isFreezy) {
+            this._isFreezy = true;
+            _speed = 0.5 * _speed;
+            for (IEventSubscriber eventSubscriber : _freezyEventSubscribers) {
+                eventSubscriber._notify(this);
+            }
         }
+        _remainingFreezyTime = duration.toMillis();
+
     }
 
     public void getFrozen(Duration duration) {
@@ -225,6 +251,11 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
         this._coordinate.traverse(-1 * _speed, 0);
         for (IEventSubscriber subscriber : _movementEventSubscribers) {
             subscriber._notify(this);
+        }
+        if (!_isFreezy) {
+            this._currentState = GeneralZombieState.MOVING_FORWARD;
+        } else {
+            this._currentState = GeneralZombieState.FREEZY_MOVING_FORWARD;
         }
     }
 
@@ -242,7 +273,7 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
 
     private void die() {
 //        this._gameEngine = null; Believe it or not but this makes the _engine property null for all the existing ZombieGameObjects in the App
-        _state = GeneralZombieState.DEAD;
+        _currentState = GeneralZombieState.DYING;
         for (IEventSubscriber eventSubscriber : _deathEventSubscribers) {
             eventSubscriber._notify(this);
         }
@@ -254,9 +285,13 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
     private void eatPlant(AbstractPlantGameObject plant) {
         if (lastBiteMillis == -1) { // Start eating
             lastBiteMillis = getMilliseconds();
-            this._state = GeneralZombieState.EATING;
             for (IEventSubscriber subscriber : _eatingEventSubscribers) {
                 subscriber._notify(this);
+            }
+            if (!_isFreezy) {
+                this._currentState = GeneralZombieState.EATING;
+            } else {
+                this._currentState = GeneralZombieState.FREEZY_EATING;
             }
             if (plant instanceof HypnoShroomGameObject) {
                 plant.getHit(0);
@@ -275,9 +310,13 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
 
     private void eatZombie(HypnotizedZombieGameObject zombie) {
         if (lastBiteMillis == -1) { // Start eating
-            this._state = GeneralZombieState.EATING;
             for (IEventSubscriber subscriber : _eatingEventSubscribers) {
                 subscriber._notify(this);
+            }
+            if (!_isFreezy) {
+                this._currentState = GeneralZombieState.EATING;
+            } else {
+                this._currentState = GeneralZombieState.FREEZY_EATING;
             }
         }
         if (getMilliseconds() - lastBiteMillis > _biteCoolDown.toMillis()) {
