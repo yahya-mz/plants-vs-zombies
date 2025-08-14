@@ -1,15 +1,18 @@
 //}
 package com.pvz.plantsvszombies.Presentation.GUI;
 
-import com.pvz.plantsvszombies.Presentation.GUI.Views.PickingPlantStage;
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.MultiplayerMenuView;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.PickingPlantStage;
+
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class MainApp extends Application {
@@ -43,6 +46,12 @@ public class MainApp extends Application {
                 250, 100
         );
 
+        Button multiplayerBtn = createHoverButton(
+                "graphics/Items/Buttons/day.png", // Using day button as placeholder
+                "graphics/Items/Buttons/day2.png", // Using day button as placeholder
+                250, 100
+        );
+        
         Button loadBtn = new Button();
         loadBtn.setPrefWidth(250);
         loadBtn.setPrefHeight(100);
@@ -54,12 +63,16 @@ public class MainApp extends Application {
         nightModeBtn.setOnAction(e -> {
             launchGame(primaryStage, "night");
         });
+        
+        multiplayerBtn.setOnAction(e -> {
+            launchMultiplayerMenu(primaryStage);
+        });
 
         loadBtn.setOnAction(e -> {
             loadGame(primaryStage);
         });
 
-        VBox buttonContainer = new VBox(-30, dayModeBtn, nightModeBtn, loadBtn);//VBox for mode btn
+        VBox buttonContainer = new VBox(-30, dayModeBtn, nightModeBtn, multiplayerBtn, loadBtn);//VBox for mode btn
         buttonContainer.setAlignment(Pos.CENTER);
 
         root.getChildren().add(buttonContainer);
@@ -111,6 +124,19 @@ public class MainApp extends Application {
             pickingPlantStage.setOnCloseRequest(e -> primaryStage.show());
             primaryStage.hide();
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            primaryStage.show();
+        }
+    }
+
+    private void launchMultiplayerMenu(Stage primaryStage) {
+        try {
+            MultiplayerMenuView multiplayerMenu = new MultiplayerMenuView();
+            Stage multiplayerStage = multiplayerMenu.createStage(primaryStage);
+            multiplayerStage.show();
+            multiplayerStage.setOnCloseRequest(e -> primaryStage.show());
+            primaryStage.hide();
         } catch (Exception e) {
             e.printStackTrace();
             primaryStage.show();

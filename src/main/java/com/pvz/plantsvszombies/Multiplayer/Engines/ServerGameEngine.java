@@ -1,0 +1,362 @@
+package com.pvz.plantsvszombies.Multiplayer.Engines;
+
+import java.time.Duration;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
+import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Multiplayer.Events.ClientStatusEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.GameEndEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.GameStartEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.SharedEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.SunDropEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.WaveChangeEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.ZombieSpawnEvent;
+import com.pvz.plantsvszombies.Multiplayer.Network.ServerNetworkManager;
+
+/**
+ * Server-side game engine that handles shared events like zombie spawning and sun dropping
+ * This engine is authoritative and broadcasts events to all clients
+ */
+public class ServerGameEngine extends GameEngine {
+    private final Duration _skySunDroppingInterval = Duration.ofSeconds(7);
+    private final Duration _wave_2_Start = Duration.ofSeconds(15);
+    private final Duration _wave_3_Start = Duration.ofSeconds(30);
+    private final Duration _wave_4_Start = Duration.ofSeconds(45);
+    private final Duration _gameInterval = Duration.ofSeconds(90); // Extended for multiplayer
+    
+    private final Random _zombieSpawnRandom = new Random(System.currentTimeMillis());
+    private final Random _skyDroppingRandom = new Random(System.currentTimeMillis() * 100);
+    private final Random _zombieTypeRandom = new Random(System.currentTimeMillis() / 1000);
+    
+    private final ServerNetworkManager networkManager;
+    private int _currentWave = 1;
+    private boolean _gameStarted = false;
+    private boolean _gameEnded = false;
+    private final int _requiredClients;
+    
+    // Track client status
+    private final CopyOnWriteArrayList<String> _connectedClients = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<String> _aliveClients = new CopyOnWriteArrayList<>();
+    
+    public ServerGameEngine(double windowWidth, double windowHeight, int requiredClients) {
+        this._windowWidth = windowWidth;
+        this._windowHeight = windowHeight;
+        this._requiredClients = requiredClients;
+        this._gameObjects = new CopyOnWriteArrayList<>();
+        
+        // Initialize network manager
+        this.networkManager = new ServerNetworkManager(12345, requiredClients);
+        
+        // Listen for client status events
+        this.networkManager.addEventListener(this::handleClientEvent);
+    }
+    
+    @Override
+    public void start() {
+        System.out.println("Starting server game engine...");
+        networkManager.start();
+        
+        // Wait for required number of clients
+        waitForClients();
+        
+        // Check if we have enough players (including host if they're playing)
+        int currentPlayers = networkManager.getConnectedClientCount();
+        System.out.println("Current players: " + currentPlayers + "/" + _requiredClients);
+        
+        if (currentPlayers >= _requiredClients) {
+            _gameStarted = true;
+            _aliveClients.addAll(_connectedClients);
+            
+            // Stop accepting new connections
+            networkManager.stopAcceptingConnections();
+            
+            System.out.println("Game started with " + currentPlayers + " players!");
+            
+            // Broadcast game start
+            broadcastWaveChange(1, (long)getMilliseconds());
+            
+            // Notify all clients that game is starting
+            GameStartEvent startEvent = new GameStartEvent(tick, currentPlayers);
+            networkManager.sendEvent(startEvent);
+        }
+    }
+    
+    private void waitForClients() {
+        System.out.println("Waiting for " + _requiredClients + " clients to connect...");
+        while (networkManager.getConnectedClientCount() < _requiredClients && !_gameEnded) {
+            try {
+                Thread.sleep(1000);
+                System.out.println("Connected clients: " + networkManager.getConnectedClientCount() + "/" + _requiredClients);
+            } catch (InterruptedException e) {
+                return;
+            }
+        }
+    }
+    
+    @Override
+    public void update() {
+        if (!_gameStarted || _gameEnded) {
+            return;
+        }
+        
+        // Process incoming client events
+        networkManager.processEvents();
+        
+        // Check for game end conditions
+        checkGameEndConditions();
+        
+        if (_gameEnded) {
+            return;
+        }
+        
+        // Handle wave progression
+        handleWaveProgression();
+        
+        // Handle sun dropping
+        handleSunDropping();
+        
+        // Handle zombie spawning
+        handleZombieSpawning();
+        
+        tick++;
+    }
+    
+    private void handleWaveProgression() {
+        long currentTime = (long)getMilliseconds();
+        
+        if (currentTime == _wave_4_Start.toMillis() && _currentWave < 4) {
+            _currentWave = 4;
+            broadcastWaveChange(4, (long)currentTime);
+        } else if (currentTime == _wave_3_Start.toMillis() && _currentWave < 3) {
+            _currentWave = 3;
+            broadcastWaveChange(3, (long)currentTime);
+        } else if (currentTime == _wave_2_Start.toMillis() && _currentWave < 2) {
+            _currentWave = 2;
+            broadcastWaveChange(2, (long)currentTime);
+        }
+        
+        // Check if all waves completed and no zombies left
+        if (_currentWave >= 4 && currentTime > _gameInterval.toMillis()) {
+            // Find the first client that completed all waves
+            String winner = findWinnerClient();
+            if (winner != null) {
+                endGame(winner, GameEndEvent.EndReason.WAVES_COMPLETED);
+            }
+        }
+    }
+    
+    private void handleSunDropping() {
+        if (getMilliseconds() % _skySunDroppingInterval.toMillis() == 0) {
+            dropSunFromSky();
+        }
+    }
+    
+    private void handleZombieSpawning() {
+        switch (_currentWave) {
+            case 1 -> {
+                if (getMilliseconds() % 4000.0 == 0) { // Slower for multiplayer
+                    spawnRandomZombie(AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE);
+                }
+            }
+            case 2 -> {
+                if (getMilliseconds() % 3000.0 == 0) {
+                    var zombieTypes = new AbstractZombieGameObject.ZombieType[]{
+                        AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE,
+                        AbstractZombieGameObject.ZombieType.CONE_HEAD_ZOMBIE
+                    };
+                    spawnRandomZombie(zombieTypes[_zombieTypeRandom.nextInt(zombieTypes.length)]);
+                }
+            }
+            case 3 -> {
+                if (getMilliseconds() % 2500.0 == 0) {
+                    var zombieTypes = new AbstractZombieGameObject.ZombieType[]{
+                        AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE,
+                        AbstractZombieGameObject.ZombieType.CONE_HEAD_ZOMBIE,
+                        AbstractZombieGameObject.ZombieType.SCREEN_DOOR_ZOMBIE
+                    };
+                    spawnRandomZombie(zombieTypes[_zombieTypeRandom.nextInt(zombieTypes.length)]);
+                }
+            }
+            case 4 -> {
+                if (getMilliseconds() % 2000.0 == 0) {
+                    var allTypes = AbstractZombieGameObject.ZombieType.values();
+                    spawnRandomZombie(allTypes[_zombieTypeRandom.nextInt(allTypes.length)]);
+                }
+            }
+        }
+    }
+    
+    private void spawnRandomZombie(AbstractZombieGameObject.ZombieType zombieType) {
+        int row = _zombieSpawnRandom.nextInt(0, _rows);
+        int column = _columns - 1;
+        String zombieId = "Server_Zombie_" + UUID.randomUUID();
+        
+        // Calculate spawn coordinate
+        Coordinate spawnCoordinate = new Coordinate(
+            column * 90.0 + 45.0, // MapBlock.BLOCK_SIZE center
+            row * 90.0 + 45.0
+        );
+        
+        // Create and broadcast zombie spawn event
+        ZombieSpawnEvent event = new ZombieSpawnEvent(
+            tick, row, column, zombieType, zombieId, spawnCoordinate
+        );
+        
+        networkManager.sendEvent(event);
+        System.out.println("Spawned zombie: " + zombieType + " at row " + row);
+    }
+    
+    private void dropSunFromSky() {
+        String sunId = "Server_Sun_" + UUID.randomUUID();
+        Coordinate dropCoordinate = new Coordinate(
+            _skyDroppingRandom.nextDouble(0.2 * _windowWidth, 0.8 * _windowWidth),
+            0
+        );
+        
+        // Create and broadcast sun drop event
+        SunDropEvent event = new SunDropEvent(tick, sunId, dropCoordinate, 25);
+        networkManager.sendEvent(event);
+        System.out.println("Sun dropped at: " + dropCoordinate.x());
+    }
+    
+    private void broadcastWaveChange(int wave, long startTime) {
+        WaveChangeEvent event = new WaveChangeEvent(tick, wave, startTime);
+        networkManager.sendEvent(event);
+        System.out.println("Wave " + wave + " started!");
+    }
+    
+    private void handleClientEvent(SharedEvent event) {
+        if (event instanceof ClientStatusEvent statusEvent) {
+            String clientId = statusEvent.getClientId();
+            
+            switch (statusEvent.getStatus()) {
+                case "CONNECTED" -> {
+                    if (!_connectedClients.contains(clientId)) {
+                        _connectedClients.add(clientId);
+                        if (!_gameStarted) {
+                            _aliveClients.add(clientId); // Add to alive list when connecting before game starts
+                        }
+                        System.out.println("Client connected: " + clientId + " (" + _connectedClients.size() + "/" + _requiredClients + ")");
+                    }
+                }
+                case "LOST" -> {
+                    if (_gameStarted) { // Only handle loss after game has started
+                        _aliveClients.remove(clientId);
+                        System.out.println("Client lost: " + clientId + " (Alive: " + _aliveClients.size() + "/" + _connectedClients.size() + ")");
+                        checkGameEndConditions();
+                    }
+                }
+                case "WON" -> {
+                    System.out.println("Client completed all waves: " + clientId);
+                    // First client to complete all waves wins
+                    if (_gameStarted && !_gameEnded) {
+                        endGame(clientId, GameEndEvent.EndReason.WAVES_COMPLETED);
+                    }
+                }
+                case "DISCONNECTED" -> {
+                    _connectedClients.remove(clientId);
+                    _aliveClients.remove(clientId);
+                    System.out.println("Client disconnected: " + clientId + " (" + _connectedClients.size() + "/" + _requiredClients + ")");
+                    
+                    // Only check end conditions if game has started
+                    if (_gameStarted) {
+                        checkGameEndConditions();
+                    } else if (_connectedClients.isEmpty()) {
+                        // If no clients left before game starts, stop server
+                        endGame(null, GameEndEvent.EndReason.SERVER_SHUTDOWN);
+                    }
+                }
+            }
+        }
+    }
+    
+    private void checkGameEndConditions() {
+        if (_gameStarted && !_gameEnded) {
+            if (_aliveClients.isEmpty()) {
+                // All clients lost
+                endGame(null, GameEndEvent.EndReason.PLAYER_LOST);
+            } else if (_aliveClients.size() == 1) {
+                // Only one player left - they win!
+                endGame(_aliveClients.get(0), GameEndEvent.EndReason.LAST_SURVIVOR);
+            }
+        }
+    }
+    
+    private String findWinnerClient() {
+        // Return the first alive client (simplified - could be enhanced with more criteria)
+        return _aliveClients.isEmpty() ? null : _aliveClients.get(0);
+    }
+    
+    private void endGame(String winnerId, GameEndEvent.EndReason reason) {
+        if (_gameEnded) return;
+        
+        _gameEnded = true;
+        String winnerName = winnerId != null ? winnerId : "No winner";
+        
+        // Create descriptive winner message
+        String winnerMessage = switch (reason) {
+            case WAVES_COMPLETED -> winnerName + " completed all waves first!";
+            case LAST_SURVIVOR -> winnerName + " is the last survivor!";
+            case PLAYER_LOST -> "All players were defeated!";
+            case DISCONNECTION -> "Connection lost!";
+            case SERVER_SHUTDOWN -> "Server shutting down...";
+        };
+        
+        GameEndEvent event = new GameEndEvent(tick, winnerId, winnerMessage, reason, (long)getMilliseconds());
+        networkManager.sendEvent(event);
+        
+        System.out.println("Game ended - " + winnerMessage + " (Reason: " + reason + ")");
+        
+        // Stop server after a delay
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000); // Give clients time to receive the event
+                stop();
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }).start();
+    }
+    
+    public void stop() {
+        _gameEnded = true;
+        if (networkManager != null) {
+            networkManager.stop();
+        }
+        System.out.println("Server stopped.");
+    }
+    
+    @Override
+    public void load() {
+        // Server doesn't load game state
+    }
+    
+    private double getMilliseconds() {
+        return this.tick * 1000.0 / GlobalSettings.FPS;
+    }
+    
+    public boolean isGameStarted() {
+        return _gameStarted;
+    }
+    
+    public boolean isGameEnded() {
+        return _gameEnded;
+    }
+    
+    public int getCurrentWave() {
+        return _currentWave;
+    }
+    
+    public int getConnectedClientCount() {
+        return _connectedClients.size();
+    }
+    
+    public int getAliveClientCount() {
+        return _aliveClients.size();
+    }
+}
