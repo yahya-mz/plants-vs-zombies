@@ -44,20 +44,13 @@ public class MultiplayerPickingStage {
     // Status display
     private Label statusLabel;
     
-    // Client engine for sending ready status
+    // Client engine for sending ready status (created only when needed)
     private ClientGameEngine clientEngine;
     
     public MultiplayerPickingStage(String serverAddress, String gameMode) {
         this.serverAddress = serverAddress;
         this.gameMode = gameMode;
-        
-        // Initialize client engine for sending ready status
-        try {
-            this.clientEngine = new ClientGameEngine(900, 600, serverAddress, gameMode);
-            this.clientEngine.start();
-        } catch (Exception e) {
-            System.err.println("Failed to initialize client engine: " + e.getMessage());
-        }
+        // Don't create ClientGameEngine here - wait until start button is clicked
     }
     
     public Stage createStage(Stage primaryStage) {
@@ -66,8 +59,8 @@ public class MultiplayerPickingStage {
         StackPane mainPickingPane = new StackPane();
         
         // Status label for connection info
-        statusLabel = new Label("🔗 Connecting to server: " + serverAddress);
-        statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #2196F3; -fx-padding: 10;");
+        statusLabel = new Label("🌱 Select 6 plants to start multiplayer game");
+        statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #FF9800; -fx-padding: 10;");
         
         playBtn = createStartButton();
         
@@ -111,21 +104,15 @@ public class MultiplayerPickingStage {
     }
     
     private void updateConnectionStatus() {
-        // Check connection status and update UI
-        if (clientEngine != null && clientEngine.isConnected()) {
-            if (selectedPlants.size() == 6) {
-                playBtn.setDisable(false);
-                statusLabel.setText("✅ Connected! Ready to start with all plants selected.");
-                statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #4CAF50; -fx-padding: 10;");
-            } else {
-                playBtn.setDisable(true);
-                statusLabel.setText("🌱 Connected! Selected: " + selectedPlants.size() + "/6 plants");
-                statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #FF9800; -fx-padding: 10;");
-            }
+        // Update status based on plant selection only
+        if (selectedPlants.size() == 6) {
+            playBtn.setDisable(false);
+            statusLabel.setText("✅ Ready to start! All plants selected. Click START to connect and join game.");
+            statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #4CAF50; -fx-padding: 10;");
         } else {
             playBtn.setDisable(true);
-            statusLabel.setText("🔄 Connecting to server: " + serverAddress);
-            statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #2196F3; -fx-padding: 10;");
+            statusLabel.setText("🌱 Selected: " + selectedPlants.size() + "/6 plants");
+            statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #FF9800; -fx-padding: 10;");
         }
     }
     
@@ -353,25 +340,74 @@ public class MultiplayerPickingStage {
     private void handleStartButtonClick() {
         // Send ready status to server with selected plants
         if (selectedPlants.size() == 6) {
-            // Send ready status to server
-            if (clientEngine != null) {
-                clientEngine.sendReadyStatus(selectedPlants);
-                System.out.println("Sent ready status to server with plants: " + selectedPlants);
-            }
-            
-            // Launch multiplayer game
-            Stage gameStage = MultiplayerGameView.createStage(selectedPlants, serverAddress, gameMode);
-            gameStage.show();
-            gameStage.setOnHiding(event -> {
-                if (primaryStage != null) {
-                    primaryStage.show();
+            try {
+                // Update status to show connecting
+                statusLabel.setText("🔄 Connecting to server...");
+                statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #2196F3; -fx-padding: 10;");
+                
+                // Create client engine and connect to server
+                clientEngine = new ClientGameEngine(900, 600, serverAddress, gameMode);
+                clientEngine.start();
+                
+                // Wait for connection to be established
+                int attempts = 0;
+                while (!clientEngine.isConnected() && attempts < 50) { // Wait up to 5 seconds
+                    try {
+                        Thread.sleep(100);
+                        attempts++;
+                    } catch (InterruptedException e) {
+                        break;
+                    }
                 }
-            });
-            
-            // Close the current stage
-            Stage currentStage = (Stage) playBtn.getScene().getWindow();
-            if (currentStage != null) {
-                currentStage.close();
+                
+                if (clientEngine.isConnected()) {
+                    // Send ready status to server
+                    clientEngine.sendReadyStatus(selectedPlants);
+                    System.out.println("Sent ready status to server with plants: " + selectedPlants);
+                    
+                    // Update status
+                    statusLabel.setText("✅ Connected! Ready status sent. Starting game...");
+                    statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #4CAF50; -fx-padding: 10;");
+                    
+                    // Small delay to show the status
+                    Thread.sleep(1000);
+                    
+                    // Launch multiplayer game
+                    Stage gameStage = MultiplayerGameView.createStage(selectedPlants, serverAddress, gameMode);
+                    gameStage.show();
+                    gameStage.setOnHiding(event -> {
+                        if (primaryStage != null) {
+                            primaryStage.show();
+                        }
+                    });
+                    
+                    // Close the current stage
+                    Stage currentStage = (Stage) playBtn.getScene().getWindow();
+                    if (currentStage != null) {
+                        currentStage.close();
+                    }
+                } else {
+                    // Connection failed
+                    statusLabel.setText("❌ Failed to connect to server. Please try again.");
+                    statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #F44336; -fx-padding: 10;");
+                    
+                    // Clean up failed connection
+                    if (clientEngine != null) {
+                        clientEngine.disconnect();
+                        clientEngine = null;
+                    }
+                }
+                
+            } catch (Exception e) {
+                System.err.println("Error connecting to server: " + e.getMessage());
+                statusLabel.setText("❌ Error connecting to server: " + e.getMessage());
+                statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #F44336; -fx-padding: 10;");
+                
+                // Clean up failed connection
+                if (clientEngine != null) {
+                    clientEngine.disconnect();
+                    clientEngine = null;
+                }
             }
         } else {
             // Show error message
