@@ -41,7 +41,7 @@ public class ClientNetworkManager extends NetworkManager {
             out = new ObjectOutputStream(serverSocket.getOutputStream());
             in = new ObjectInputStream(serverSocket.getInputStream());
             
-            clientId = "Client_" + java.util.UUID.randomUUID().toString().substring(0, 8);
+            // Don't overwrite the clientId - use the one already set
             System.out.println("Connected to server as " + clientId);
             
             super.start();
@@ -134,6 +134,10 @@ public class ClientNetworkManager extends NetworkManager {
     
     public String getClientId() {
         return clientId;
+    }
+    
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 }
 

@@ -48,11 +48,12 @@ public class ClientGameEngine extends GameEngine {
         this._gameMode = gameMode;
         this._gameObjects = new CopyOnWriteArrayList<>();
         
-        // Generate client ID first
-        this.clientId = "Client_" + java.util.UUID.randomUUID().toString().substring(0, 8);
-        
-        // Initialize network manager
+        // Initialize network manager first
         this.networkManager = new ClientNetworkManager(serverHost);
+        
+        // Generate client ID and set it in both places
+        this.clientId = "Client_" + java.util.UUID.randomUUID().toString().substring(0, 8);
+        this.networkManager.setClientId(this.clientId);
         
         // Listen for server events
         this.networkManager.addEventListener(this::handleServerEvent);
