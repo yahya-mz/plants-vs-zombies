@@ -82,6 +82,9 @@ public class MultiplayerGameView {
             // Start game engines
             Mediator.getInstance().startGameEngine();
             
+            // Send ready status to server with selected plants
+            clientEngine.sendReadyStatus(selectedPlants);
+            
             // Setup close handler
             stage.setOnCloseRequest(e -> {
                 if (clientEngine != null) {

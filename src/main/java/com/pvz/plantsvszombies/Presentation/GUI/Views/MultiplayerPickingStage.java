@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -304,13 +305,23 @@ public class MultiplayerPickingStage {
         });
         
         button.setOnAction(e -> {
-            // Launch multiplayer game
-            Stage gameStage = MultiplayerGameView.createStage(selectedPlants, serverAddress, gameMode);
-            gameStage.show();
-            gameStage.setOnHiding(event -> {
-                primaryStage.show();
-            });
-            ((Stage) button.getScene().getWindow()).close();
+            // Send ready status to server with selected plants
+            if (selectedPlants.size() == 6) {
+                // Launch multiplayer game
+                Stage gameStage = MultiplayerGameView.createStage(selectedPlants, serverAddress, gameMode);
+                gameStage.show();
+                gameStage.setOnHiding(event -> {
+                    primaryStage.show();
+                });
+                ((Stage) button.getScene().getWindow()).close();
+            } else {
+                // Show error message
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Plant Selection Required");
+                alert.setHeaderText("Please select 6 plants");
+                alert.setContentText("You must select exactly 6 plants before starting the game.");
+                alert.showAndWait();
+            }
         });
         
         return button;

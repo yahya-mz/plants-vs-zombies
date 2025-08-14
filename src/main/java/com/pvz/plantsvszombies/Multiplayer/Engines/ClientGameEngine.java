@@ -7,9 +7,17 @@ import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Multiplayer.Events.*;
+import com.pvz.plantsvszombies.Multiplayer.Events.ClientReadyEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.ClientStatusEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.GameEndEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.GameStartEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.SharedEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.SunDropEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.WaveChangeEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.ZombieSpawnEvent;
 import com.pvz.plantsvszombies.Multiplayer.Network.ClientNetworkManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -30,6 +38,9 @@ public class ClientGameEngine extends GameEngine {
     // Track game state for win condition
     private int _zombiesKilled = 0;
     private long _gameStartTime = 0;
+    
+    // Plant selection
+    private ArrayList<AbstractPlantGameObject.PlantType> _selectedPlants;
     
     public ClientGameEngine(double windowWidth, double windowHeight, String serverHost, String gameMode) {
         this._windowWidth = windowWidth;
@@ -251,6 +262,26 @@ public class ClientGameEngine extends GameEngine {
         networkManager.sendEvent(event);
     }
     
+    /**
+     * Send ready status to server with selected plants
+     */
+    public void sendReadyStatus(ArrayList<AbstractPlantGameObject.PlantType> selectedPlants) {
+        if (!networkManager.isConnected()) return;
+        
+        this._selectedPlants = selectedPlants;
+        
+        // Convert PlantType enum to strings for network transmission
+        ArrayList<String> plantTypeStrings = new ArrayList<>();
+        for (AbstractPlantGameObject.PlantType plantType : selectedPlants) {
+            plantTypeStrings.add(plantType.name());
+        }
+        
+        ClientReadyEvent event = new ClientReadyEvent(tick, clientId, plantTypeStrings);
+        networkManager.sendEvent(event);
+        
+        System.out.println("Sent ready status to server with plants: " + plantTypeStrings);
+    }
+    
     @Override
     public void plantObject(AbstractPlantGameObject object) throws Exception {
         // Handle local planting (this is client-specific)
@@ -320,4 +351,5 @@ public class ClientGameEngine extends GameEngine {
     public int getZombiesKilled() { return _zombiesKilled; }
     public boolean isConnected() { return networkManager.isConnected(); }
     public String getGameMode() { return _gameMode; }
+    public ArrayList<AbstractPlantGameObject.PlantType> getSelectedPlants() { return _selectedPlants; }
 }

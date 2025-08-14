@@ -1,15 +1,16 @@
 package com.pvz.plantsvszombies.Multiplayer.Engines;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Multiplayer.Events.ClientStatusEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.ClientReadyEvent;
 import com.pvz.plantsvszombies.Multiplayer.Events.GameEndEvent;
 import com.pvz.plantsvszombies.Multiplayer.Events.GameStartEvent;
 import com.pvz.plantsvszombies.Multiplayer.Events.SharedEvent;
@@ -18,34 +19,38 @@ import com.pvz.plantsvszombies.Multiplayer.Events.WaveChangeEvent;
 import com.pvz.plantsvszombies.Multiplayer.Events.ZombieSpawnEvent;
 import com.pvz.plantsvszombies.Multiplayer.Network.ServerNetworkManager;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 /**
- * Server-side game engine that handles shared events like zombie spawning and sun dropping
- * This engine is authoritative and broadcasts events to all clients
+ * Server-side game engine that manages multiplayer game state
  */
-public class ServerGameEngine extends GameEngine {
-    private final Duration _skySunDroppingInterval = Duration.ofSeconds(7);
-    private final Duration _wave_2_Start = Duration.ofSeconds(15);
-    private final Duration _wave_3_Start = Duration.ofSeconds(30);
-    private final Duration _wave_4_Start = Duration.ofSeconds(45);
-    private final Duration _gameInterval = Duration.ofSeconds(90); // Extended for multiplayer
-    
-    private final Random _zombieSpawnRandom = new Random(System.currentTimeMillis());
-    private final Random _skyDroppingRandom = new Random(System.currentTimeMillis() * 100);
-    private final Random _zombieTypeRandom = new Random(System.currentTimeMillis() / 1000);
-    
+public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.DayEngine {
     private final ServerNetworkManager networkManager;
-    private int _currentWave = 1;
-    private boolean _gameStarted = false;
-    private boolean _gameEnded = false;
     private final int _requiredClients;
     
     // Track client status
     private final CopyOnWriteArrayList<String> _connectedClients = new CopyOnWriteArrayList<>();
     private final CopyOnWriteArrayList<String> _aliveClients = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<String> _readyClients = new CopyOnWriteArrayList<>();
+    private final Map<String, java.util.List<String>> _clientPlants = new HashMap<>(); // Client ID -> Plant types
+    
+    // Game state
+    private boolean _gameStarted = false;
+    private boolean _gameEnded = false;
+    private int _currentWave = 0;
+    
+    // Wave timing
+    private final Duration _wave_2_Start = Duration.ofSeconds(30);
+    private final Duration _wave_3_Start = Duration.ofSeconds(60);
+    private final Duration _wave_4_Start = Duration.ofSeconds(90);
+    
+    // Random generators
+    private final Random _zombieSpawnRandom = new Random();
+    private final Random _zombieTypeRandom = new Random();
+    private final Random _skyDroppingRandom = new Random();
     
     public ServerGameEngine(double windowWidth, double windowHeight, int requiredClients) {
-        this._windowWidth = windowWidth;
-        this._windowHeight = windowHeight;
+        super(windowWidth, windowHeight);
         this._requiredClients = requiredClients;
         this._gameObjects = new CopyOnWriteArrayList<>();
         
@@ -69,10 +74,13 @@ public class ServerGameEngine extends GameEngine {
         System.out.println("Current players: " + currentPlayers + "/" + _requiredClients);
         
         if (currentPlayers >= _requiredClients) {
+            // Wait for all clients to be ready with plant selection
+            waitForClientsReady();
+            
             _gameStarted = true;
             _aliveClients.addAll(_connectedClients);
             
-            // Stop accepting new connections
+            // Stop accepting new client connections
             networkManager.stopAcceptingConnections();
             
             System.out.println("Game started with " + currentPlayers + " players!");
@@ -96,6 +104,19 @@ public class ServerGameEngine extends GameEngine {
                 return;
             }
         }
+    }
+    
+    private void waitForClientsReady() {
+        System.out.println("Waiting for all clients to be ready with plant selection...");
+        while (_readyClients.size() < _requiredClients && !_gameEnded) {
+            try {
+                Thread.sleep(1000);
+                System.out.println("Ready clients: " + _readyClients.size() + "/" + _requiredClients);
+            } catch (InterruptedException e) {
+                return;
+            }
+        }
+        System.out.println("All clients are ready! Starting game...");
     }
     
     @Override
@@ -139,42 +160,33 @@ public class ServerGameEngine extends GameEngine {
             _currentWave = 2;
             broadcastWaveChange(2, (long)currentTime);
         }
-        
-        // Check if all waves completed and no zombies left
-        if (_currentWave >= 4 && currentTime > _gameInterval.toMillis()) {
-            // Find the first client that completed all waves
-            String winner = findWinnerClient();
-            if (winner != null) {
-                endGame(winner, GameEndEvent.EndReason.WAVES_COMPLETED);
-            }
-        }
     }
     
     private void handleSunDropping() {
-        if (getMilliseconds() % _skySunDroppingInterval.toMillis() == 0) {
+        if (getMilliseconds() % 10000.0 == 0) { // Drop sun every 10 seconds
             dropSunFromSky();
         }
     }
     
     private void handleZombieSpawning() {
         switch (_currentWave) {
-            case 1 -> {
-                if (getMilliseconds() % 4000.0 == 0) { // Slower for multiplayer
+            case 0 -> {
+                if (getMilliseconds() % 5000.0 == 0) { // Spawn zombie every 5 seconds
                     spawnRandomZombie(AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE);
                 }
             }
-            case 2 -> {
-                if (getMilliseconds() % 3000.0 == 0) {
-                    var zombieTypes = new AbstractZombieGameObject.ZombieType[]{
+            case 1 -> {
+                if (getMilliseconds() % 4000.0 == 0) { // Spawn zombie every 4 seconds
+                    AbstractZombieGameObject.ZombieType[] zombieTypes = {
                         AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE,
                         AbstractZombieGameObject.ZombieType.CONE_HEAD_ZOMBIE
                     };
                     spawnRandomZombie(zombieTypes[_zombieTypeRandom.nextInt(zombieTypes.length)]);
                 }
             }
-            case 3 -> {
-                if (getMilliseconds() % 2500.0 == 0) {
-                    var zombieTypes = new AbstractZombieGameObject.ZombieType[]{
+            case 2 -> {
+                if (getMilliseconds() % 3000.0 == 0) { // Spawn zombie every 3 seconds
+                    AbstractZombieGameObject.ZombieType[] zombieTypes = {
                         AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE,
                         AbstractZombieGameObject.ZombieType.CONE_HEAD_ZOMBIE,
                         AbstractZombieGameObject.ZombieType.SCREEN_DOOR_ZOMBIE
@@ -182,8 +194,8 @@ public class ServerGameEngine extends GameEngine {
                     spawnRandomZombie(zombieTypes[_zombieTypeRandom.nextInt(zombieTypes.length)]);
                 }
             }
-            case 4 -> {
-                if (getMilliseconds() % 2000.0 == 0) {
+            case 3 -> {
+                if (getMilliseconds() % 2000.0 == 0) { // Spawn zombie every 2 seconds
                     var allTypes = AbstractZombieGameObject.ZombieType.values();
                     spawnRandomZombie(allTypes[_zombieTypeRandom.nextInt(allTypes.length)]);
                 }
@@ -238,9 +250,6 @@ public class ServerGameEngine extends GameEngine {
                 case "CONNECTED" -> {
                     if (!_connectedClients.contains(clientId)) {
                         _connectedClients.add(clientId);
-                        if (!_gameStarted) {
-                            _aliveClients.add(clientId); // Add to alive list when connecting before game starts
-                        }
                         System.out.println("Client connected: " + clientId + " (" + _connectedClients.size() + "/" + _requiredClients + ")");
                     }
                 }
@@ -261,6 +270,8 @@ public class ServerGameEngine extends GameEngine {
                 case "DISCONNECTED" -> {
                     _connectedClients.remove(clientId);
                     _aliveClients.remove(clientId);
+                    _readyClients.remove(clientId);
+                    _clientPlants.remove(clientId);
                     System.out.println("Client disconnected: " + clientId + " (" + _connectedClients.size() + "/" + _requiredClients + ")");
                     
                     // Only check end conditions if game has started
@@ -271,6 +282,14 @@ public class ServerGameEngine extends GameEngine {
                         endGame(null, GameEndEvent.EndReason.SERVER_SHUTDOWN);
                     }
                 }
+            }
+        } else if (event instanceof ClientReadyEvent readyEvent) {
+            String clientId = readyEvent.getClientId();
+            if (!_readyClients.contains(clientId)) {
+                _readyClients.add(clientId);
+                _clientPlants.put(clientId, readyEvent.getSelectedPlants());
+                System.out.println("Client ready: " + clientId + " with plants: " + readyEvent.getSelectedPlants());
+                System.out.println("Ready clients: " + _readyClients.size() + "/" + _requiredClients);
             }
         }
     }
@@ -340,23 +359,12 @@ public class ServerGameEngine extends GameEngine {
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }
     
-    public boolean isGameStarted() {
-        return _gameStarted;
-    }
-    
-    public boolean isGameEnded() {
-        return _gameEnded;
-    }
-    
-    public int getCurrentWave() {
-        return _currentWave;
-    }
-    
-    public int getConnectedClientCount() {
-        return _connectedClients.size();
-    }
-    
-    public int getAliveClientCount() {
-        return _aliveClients.size();
-    }
+    // Getters for server monitoring
+    public boolean isGameStarted() { return _gameStarted; }
+    public boolean isGameEnded() { return _gameEnded; }
+    public int getCurrentWave() { return _currentWave; }
+    public int getConnectedClientCount() { return _connectedClients.size(); }
+    public int getAliveClientCount() { return _aliveClients.size(); }
+    public int getReadyClientCount() { return _readyClients.size(); }
+    public int getRequiredClients() { return _requiredClients; }
 }
