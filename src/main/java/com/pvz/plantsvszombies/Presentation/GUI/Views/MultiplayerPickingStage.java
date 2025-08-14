@@ -129,19 +129,24 @@ public class MultiplayerPickingStage {
     }
     
     private void loadCardImages() {
-        // Load plant card images
+        // Load plant card images using correct paths
         cardImages = new Image[6];
         String[] imagePaths = {
-            "graphics/Items/Plants/peashooter/peashooter.png",
-            "graphics/Items/Plants/sunflower/sunflower.png",
-            "graphics/Items/Plants/wallnut/wallnut.png",
-            "graphics/Items/Plants/chomper/chomper.png",
-            "graphics/Items/Plants/repeater/repeater.png",
-            "graphics/Items/Plants/snowpea/snowpea.png"
+            "graphics/Plants/Peashooter/Peashooter_0.png",
+            "graphics/Plants/SunFlower/SunFlower_0.png",
+            "graphics/Plants/WallNut/WallNut_0.png",
+            "graphics/Plants/CherryBomb/CherryBomb_0.png",
+            "graphics/Plants/Repeater/Repeater_0.png",
+            "graphics/Plants/SnowPea/SnowPea_0.png"
         };
         
         for (int i = 0; i < 6; i++) {
-            cardImages[i] = new Image(GlobalSettings.getResource(imagePaths[i]));
+            try {
+                cardImages[i] = new Image(GlobalSettings.getResource(imagePaths[i]));
+            } catch (Exception e) {
+                System.err.println("Failed to load image: " + imagePaths[i] + " - " + e.getMessage());
+                // Create a placeholder image or skip this one
+            }
         }
     }
     
@@ -272,12 +277,27 @@ public class MultiplayerPickingStage {
         double width = 250;
         double height = 250;
         String[] imagePath = {
-            "graphics/Items/Buttons/play/normalplay.png",
-            "graphics/Items/Buttons/play/onactionplay.png"
+            "graphics/Items/Buttons/day.png",
+            "graphics/Items/Buttons/day2.png"
         };
         
-        Image defaultImage = new Image(GlobalSettings.getResource(imagePath[0]));
-        Image hoverImage = new Image(GlobalSettings.getResource(imagePath[1]));
+        Image defaultImage;
+        Image hoverImage;
+        
+        try {
+            defaultImage = new Image(GlobalSettings.getResource(imagePath[0]));
+            hoverImage = new Image(GlobalSettings.getResource(imagePath[1]));
+        } catch (Exception e) {
+            System.err.println("Failed to load button images, using text button instead");
+            // Create a simple text button if images fail to load
+            Button textButton = new Button("START GAME");
+            textButton.setMinSize(width, height);
+            textButton.setMaxSize(width, height);
+            textButton.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-background-color: #4CAF50; -fx-text-fill: white;");
+            
+            textButton.setOnAction(event -> handleStartButtonClick());
+            return textButton;
+        }
         
         ImageView imageView = new ImageView(defaultImage);
         imageView.setFitWidth(width);
@@ -290,7 +310,7 @@ public class MultiplayerPickingStage {
         button.setGraphic(imageView);
         button.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
         
-        button.setOnMouseEntered(e -> {
+        button.setOnMouseEntered(event -> {
             ImageView hoverImageView = new ImageView(hoverImage);
             hoverImageView.setFitWidth(width);
             hoverImageView.setFitHeight(height);
@@ -298,7 +318,7 @@ public class MultiplayerPickingStage {
             button.setGraphic(hoverImageView);
         });
         
-        button.setOnMouseExited(e -> {
+        button.setOnMouseExited(event -> {
             ImageView normalImageView = new ImageView(defaultImage);
             normalImageView.setFitWidth(width);
             normalImageView.setFitHeight(height);
@@ -306,33 +326,42 @@ public class MultiplayerPickingStage {
             button.setGraphic(normalImageView);
         });
         
-        button.setOnAction(e -> {
-            // Send ready status to server with selected plants
-            if (selectedPlants.size() == 6) {
-                // Send ready status to server
-                if (clientEngine != null) {
-                    clientEngine.sendReadyStatus(selectedPlants);
-                    System.out.println("Sent ready status to server with plants: " + selectedPlants);
-                }
-                
-                // Launch multiplayer game
-                Stage gameStage = MultiplayerGameView.createStage(selectedPlants, serverAddress, gameMode);
-                gameStage.show();
-                gameStage.setOnHiding(event -> {
-                    primaryStage.show();
-                });
-                ((Stage) button.getScene().getWindow()).close();
-            } else {
-                // Show error message
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Plant Selection Required");
-                alert.setHeaderText("Please select 6 plants");
-                alert.setContentText("You must select exactly 6 plants before starting the game.");
-                alert.showAndWait();
-            }
-        });
+        button.setOnAction(event -> handleStartButtonClick());
         
         return button;
+    }
+    
+    private void handleStartButtonClick() {
+        // Send ready status to server with selected plants
+        if (selectedPlants.size() == 6) {
+            // Send ready status to server
+            if (clientEngine != null) {
+                clientEngine.sendReadyStatus(selectedPlants);
+                System.out.println("Sent ready status to server with plants: " + selectedPlants);
+            }
+            
+            // Launch multiplayer game
+            Stage gameStage = MultiplayerGameView.createStage(selectedPlants, serverAddress, gameMode);
+            gameStage.show();
+            gameStage.setOnHiding(event -> {
+                if (primaryStage != null) {
+                    primaryStage.show();
+                }
+            });
+            
+            // Close the current stage
+            Stage currentStage = (Stage) playBtn.getScene().getWindow();
+            if (currentStage != null) {
+                currentStage.close();
+            }
+        } else {
+            // Show error message
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Plant Selection Required");
+            alert.setHeaderText("Please select 6 plants");
+            alert.setContentText("You must select exactly 6 plants before starting the game.");
+            alert.showAndWait();
+        }
     }
 }
 
