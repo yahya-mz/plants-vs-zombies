@@ -65,10 +65,25 @@ public class MultiplayerGameView {
         return stage;
     }
     
+    /**
+     * Create stage with an already-connected ClientGameEngine
+     */
+    public static Stage createStage(ClientGameEngine connectedClientEngine, 
+                                   ArrayList<AbstractPlantGameObject.PlantType> selectedPlants, 
+                                   String serverAddress, String gameMode) {
+        MultiplayerGameView view = new MultiplayerGameView(selectedPlants, serverAddress, gameMode);
+        view.clientEngine = connectedClientEngine; // Use the already-connected engine
+        Stage stage = new Stage();
+        view.setupStage(stage);
+        return stage;
+    }
+    
     private void setupStage(Stage stage) {
         try {
-            // Initialize client engine
-            clientEngine = new ClientGameEngine(Width, Height, serverAddress, gameMode);
+            // Don't create a new client engine - use the one passed in
+            if (clientEngine == null) {
+                throw new IllegalStateException("ClientGameEngine must be provided and connected before creating MultiplayerGameView");
+            }
             
             // Initialize visual engine based on game mode (simplified for now)
             // TODO: Properly integrate with visual engines
@@ -82,8 +97,7 @@ public class MultiplayerGameView {
             // Start game engines
             Mediator.getInstance().startGameEngine();
             
-            // Send ready status to server with selected plants
-            clientEngine.sendReadyStatus(selectedPlants);
+            // Don't send ready status here - it should already be sent from MultiplayerPickingStage
             
             // Setup close handler
             stage.setOnCloseRequest(e -> {
@@ -149,7 +163,7 @@ public class MultiplayerGameView {
         statusBar.setAlignment(Pos.CENTER_LEFT);
         statusBar.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-text-fill: white;");
         
-        connectionStatusLabel = new Label("🔗 Connecting...");
+        connectionStatusLabel = new Label("🔗 Connected");
         connectionStatusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
         
         gameStatusLabel = new Label("⏳ Waiting for game to start");
@@ -158,101 +172,89 @@ public class MultiplayerGameView {
         waveLabel = new Label("Wave: --");
         waveLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
         
-        statusBar.getChildren().addAll(connectionStatusLabel, gameStatusLabel, waveLabel);
+        playerStatusLabel = new Label("Plants: " + selectedPlants.size());
+        playerStatusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
+        
+        statusBar.getChildren().addAll(connectionStatusLabel, gameStatusLabel, waveLabel, playerStatusLabel);
         return statusBar;
     }
     
     private VBox createPlantPanel() {
         VBox plantPanel = new VBox(5);
         plantPanel.setPadding(new Insets(10));
-        plantPanel.setPrefWidth(100);
-        plantPanel.setStyle("-fx-background-color: rgba(139, 69, 19, 0.8);");
+        plantPanel.setPrefWidth(150);
+        plantPanel.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7); -fx-text-fill: white;");
         
-        Label titleLabel = new Label("🌱 Plants");
-        titleLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
-        plantPanel.getChildren().add(titleLabel);
+        Label titleLabel = new Label("Selected Plants");
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: white;");
         
-        // Add selected plants (simplified for now)
+        VBox plantList = new VBox(5);
         for (AbstractPlantGameObject.PlantType plantType : selectedPlants) {
-            Label plantLabel = new Label(plantType.name());
-            plantLabel.setStyle("-fx-text-fill: white; -fx-font-size: 10px;");
-            plantPanel.getChildren().add(plantLabel);
+            Label plantLabel = new Label("• " + plantType.name().replace("_", " "));
+            plantLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
+            plantList.getChildren().add(plantLabel);
         }
         
+        plantPanel.getChildren().addAll(titleLabel, plantList);
         return plantPanel;
     }
     
     private VBox createPlayerInfoPanel() {
-        VBox playerPanel = new VBox(10);
+        VBox playerPanel = new VBox(5);
         playerPanel.setPadding(new Insets(10));
-        playerPanel.setPrefWidth(100);
-        playerPanel.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
+        playerPanel.setPrefWidth(150);
+        playerPanel.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7); -fx-text-fill: white;");
         
-        Label titleLabel = new Label("👥 Player Info");
-        titleLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+        Label titleLabel = new Label("Player Info");
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: white;");
         
-        playerStatusLabel = new Label("Status: --");
-        playerStatusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
+        Label clientIdLabel = new Label("ID: " + (clientEngine != null ? clientEngine.getClientId() : "Unknown"));
+        clientIdLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
         
-        playerPanel.getChildren().addAll(titleLabel, playerStatusLabel);
+        Label gameModeLabel = new Label("Mode: " + gameMode);
+        gameModeLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
+        
+        playerPanel.getChildren().addAll(titleLabel, clientIdLabel, gameModeLabel);
         return playerPanel;
     }
     
     private void startStatusUpdates() {
+        // Update status every second
         Thread statusThread = new Thread(() -> {
-            while (clientEngine != null && !clientEngine.isGameEnded()) {
-                Platform.runLater(this::updateStatusLabels);
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    Thread.sleep(1000); // Update every second
+                    Platform.runLater(() -> {
+                        if (clientEngine != null) {
+                            // Update connection status
+                            if (clientEngine.isConnected()) {
+                                connectionStatusLabel.setText("🔗 Connected");
+                                connectionStatusLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-size: 12px;");
+                            } else {
+                                connectionStatusLabel.setText("❌ Disconnected");
+                                connectionStatusLabel.setStyle("-fx-text-fill: #F44336; -fx-font-size: 12px;");
+                            }
+                            
+                            // Update game status
+                            if (clientEngine.isGameStarted()) {
+                                gameStatusLabel.setText("🎮 Game in progress");
+                                gameStatusLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-size: 12px;");
+                                waveLabel.setText("Wave: " + clientEngine.getCurrentWave());
+                            } else if (clientEngine.isGameEnded()) {
+                                gameStatusLabel.setText("🏁 Game ended");
+                                gameStatusLabel.setStyle("-fx-text-fill: #FF9800; -fx-font-size: 12px;");
+                            }
+                        }
+                    });
+                    
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     break;
                 }
             }
         });
+        
         statusThread.setDaemon(true);
         statusThread.start();
-    }
-    
-    private void updateStatusLabels() {
-        if (clientEngine == null) return;
-        
-        // Update connection status
-        if (clientEngine.isConnected()) {
-            connectionStatusLabel.setText("✅ Connected");
-            connectionStatusLabel.setStyle("-fx-text-fill: lime; -fx-font-size: 12px;");
-        } else {
-            connectionStatusLabel.setText("❌ Disconnected");
-            connectionStatusLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
-        }
-        
-        // Update game status
-        if (clientEngine.isGameEnded()) {
-            if (clientEngine.isPlayerLost()) {
-                gameStatusLabel.setText("💀 You Lost");
-                gameStatusLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
-            } else {
-                gameStatusLabel.setText("🎉 Game Completed");
-                gameStatusLabel.setStyle("-fx-text-fill: lime; -fx-font-size: 12px;");
-            }
-        } else if (clientEngine.isGameStarted()) {
-            gameStatusLabel.setText("🎮 Playing");
-            gameStatusLabel.setStyle("-fx-text-fill: lime; -fx-font-size: 12px;");
-        } else {
-            gameStatusLabel.setText("⏳ Waiting for players");
-            gameStatusLabel.setStyle("-fx-text-fill: yellow; -fx-font-size: 12px;");
-        }
-        
-        // Update wave
-        waveLabel.setText("Wave: " + clientEngine.getCurrentWave());
-        
-        // Update player info
-        String clientIdDisplay = clientEngine.getClientId() != null ? 
-            clientEngine.getClientId().substring(0, Math.min(8, clientEngine.getClientId().length())) + "..." : 
-            "Unknown";
-        String playerInfo = String.format("ID: %s\nZombies Killed: %d", 
-            clientIdDisplay, 
-            clientEngine.getZombiesKilled());
-        playerStatusLabel.setText(playerInfo);
     }
     
     public Pane getGameBoxPane() {

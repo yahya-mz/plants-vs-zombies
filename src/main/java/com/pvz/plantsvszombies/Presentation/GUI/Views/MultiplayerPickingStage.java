@@ -372,8 +372,8 @@ public class MultiplayerPickingStage {
                     // Small delay to show the status
                     Thread.sleep(1000);
                     
-                    // Launch multiplayer game
-                    Stage gameStage = MultiplayerGameView.createStage(selectedPlants, serverAddress, gameMode);
+                    // Launch multiplayer game with the already-connected client engine
+                    Stage gameStage = MultiplayerGameView.createStage(clientEngine, selectedPlants, serverAddress, gameMode);
                     gameStage.show();
                     gameStage.setOnHiding(event -> {
                         if (primaryStage != null) {
