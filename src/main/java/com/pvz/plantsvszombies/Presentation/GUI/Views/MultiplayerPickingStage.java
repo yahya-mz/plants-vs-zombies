@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
+import com.pvz.plantsvszombies.Multiplayer.Engines.ClientGameEngine;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -42,9 +43,20 @@ public class MultiplayerPickingStage {
     // Status display
     private Label statusLabel;
     
+    // Client engine for sending ready status
+    private ClientGameEngine clientEngine;
+    
     public MultiplayerPickingStage(String serverAddress, String gameMode) {
         this.serverAddress = serverAddress;
         this.gameMode = gameMode;
+        
+        // Initialize client engine for sending ready status
+        try {
+            this.clientEngine = new ClientGameEngine(900, 600, serverAddress, gameMode);
+            this.clientEngine.start();
+        } catch (Exception e) {
+            System.err.println("Failed to initialize client engine: " + e.getMessage());
+        }
     }
     
     public Stage createStage(Stage primaryStage) {
@@ -98,140 +110,130 @@ public class MultiplayerPickingStage {
     }
     
     private void updateConnectionStatus() {
-        // This would be updated by the actual connection logic
-        statusLabel.setText("✅ Connected! Select 6 plants and wait for other players.");
-        statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: green; -fx-padding: 10;");
+        // Check connection status and update UI
+        if (clientEngine != null && clientEngine.isConnected()) {
+            if (selectedPlants.size() == 6) {
+                playBtn.setDisable(false);
+                statusLabel.setText("✅ Connected! Ready to start with all plants selected.");
+                statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #4CAF50; -fx-padding: 10;");
+            } else {
+                playBtn.setDisable(true);
+                statusLabel.setText("🌱 Connected! Selected: " + selectedPlants.size() + "/6 plants");
+                statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #FF9800; -fx-padding: 10;");
+            }
+        } else {
+            playBtn.setDisable(true);
+            statusLabel.setText("🔄 Connecting to server: " + serverAddress);
+            statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #2196F3; -fx-padding: 10;");
+        }
     }
     
     private void loadCardImages() {
-        File cardsDirectory = new File(GlobalSettings.getDir("graphics/Cards"));
-        File[] cardFiles = cardsDirectory.listFiles();
-        cardImages = new Image[cardFiles.length];
-        for (int j = 0; j < cardImages.length; j++) {
-            cardImages[j] = new Image(cardFiles[j].getPath());
+        // Load plant card images
+        cardImages = new Image[6];
+        String[] imagePaths = {
+            "graphics/Items/Plants/peashooter/peashooter.png",
+            "graphics/Items/Plants/sunflower/sunflower.png",
+            "graphics/Items/Plants/wallnut/wallnut.png",
+            "graphics/Items/Plants/chomper/chomper.png",
+            "graphics/Items/Plants/repeater/repeater.png",
+            "graphics/Items/Plants/snowpea/snowpea.png"
+        };
+        
+        for (int i = 0; i < 6; i++) {
+            cardImages[i] = new Image(GlobalSettings.getResource(imagePaths[i]));
         }
     }
     
-    public ScrollPane createCardScrollPaneWithCards() {
-        VBox cardVBox = new VBox(10);
-        cardVBox.setPadding(new Insets(20, 0, 0, 0));
-        cardVBox.setStyle("-fx-background-color: transparent;");
-        cardVBox.setFillWidth(true);
-        cardVBox.setBackground(Background.EMPTY);
-        
-        int cardsPerRow = 4;
-        for (int i = 0; i < cardImages.length; i += cardsPerRow) {
-            HBox row = new HBox(8);
-            row.setAlignment(Pos.CENTER);
-            for (int j = i; j < i + cardsPerRow && j < cardImages.length; j++) {
-                ImageView card = createSelectableCard(j);
-                row.getChildren().add(card);
-            }
-            addHoverEffectToImages(row);
-            cardVBox.getChildren().add(row);
-        }
-        
-        ScrollPane scrollPane = new ScrollPane(cardVBox);
+    private ScrollPane createCardScrollPaneWithCards() {
+        ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setMaxHeight(200);
-        scrollPane.setMaxWidth(510);
-        scrollPane.getStyleClass().add("custom-scroll-pane");
+        scrollPane.setFitToHeight(true);
+        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
         
-        // Apply custom styling
-        String css = """
-        .custom-scroll-pane .scroll-bar {
-            -fx-background-color: transparent;
+        HBox cardContainer = new HBox(10);
+        cardContainer.setAlignment(Pos.CENTER);
+        
+        // Create plant cards
+        AbstractPlantGameObject.PlantType[] plantTypes = {
+            AbstractPlantGameObject.PlantType.PEASHOOTER,
+            AbstractPlantGameObject.PlantType.SUNFLOWER,
+            AbstractPlantGameObject.PlantType.WALL_NUT,
+            AbstractPlantGameObject.PlantType.CHERRY_BOMB,
+            AbstractPlantGameObject.PlantType.REPEATER,
+            AbstractPlantGameObject.PlantType.SNOW_PEA
+        };
+        
+        for (int i = 0; i < 6; i++) {
+            HBox card = createPlantCard(plantTypes[i], cardImages[i]);
+            cardContainer.getChildren().add(card);
         }
-        .custom-scroll-pane .scroll-bar:vertical .thumb {
-            -fx-background-color: #4A2C00;
-            -fx-background-insets: 2;
-            -fx-background-radius: 5;
-        }
-        .custom-scroll-pane .scroll-bar .track {
-            -fx-background-color: transparent;
-        }
-        """;
         
-        scrollPane.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-background-insets: 0;" +
-            "-fx-padding: 0;" +
-            "-fx-control-inner-background: transparent;" +
-            "-fx-background: transparent;" +
-            "-fx-focus-color: transparent;" +
-            "-fx-faint-focus-color: transparent;"
-        );
-        
-        scrollPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.getStylesheets().add("data:text/css," + css);
-            }
-        });
-        
+        scrollPane.setContent(cardContainer);
         return scrollPane;
     }
     
-    private ImageView createSelectableCard(int index) {
-        ImageView card = new ImageView(cardImages[index]);
-        card.setFitWidth(100);
-        card.setPreserveRatio(true);
+    private HBox createPlantCard(AbstractPlantGameObject.PlantType plantType, Image image) {
+        HBox card = new HBox();
+        card.setAlignment(Pos.CENTER);
         card.setCursor(Cursor.HAND);
+        card.setStyle("-fx-background-color: rgba(255, 255, 255, 0.9); -fx-background-radius: 10; -fx-padding: 10;");
+        
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(80);
+        imageView.setFitHeight(80);
+        imageView.setPreserveRatio(true);
+        
+        card.getChildren().add(imageView);
         
         card.setOnMouseClicked(e -> {
-            if (selectedPlants.size() < 6) {
-                String imgPath = cardImages[index].getUrl();
-                String imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1, imgPath.lastIndexOf('.'));
-                AbstractPlantGameObject.PlantType type = AbstractPlantGameObject.PlantType.valueOf(imgName);
-                selectedPlants.add(type);
+            if (e.getButton() == MouseButton.PRIMARY) {
+                if (selectedPlants.contains(plantType)) {
+                    // Remove plant if already selected
+                    selectedPlants.remove(plantType);
+                    selectedPlantHBox.getChildren().removeIf(node -> {
+                        if (node instanceof HBox hbox) {
+                            return hbox.getUserData() == plantType;
+                        }
+                        return false;
+                    });
+                    updateCardMargins();
+                } else if (selectedPlants.size() < 6) {
+                    // Add plant if not at limit
+                    selectedPlants.add(plantType);
+                    
+                    // Create selected plant display
+                    HBox clonedCard = new HBox();
+                    clonedCard.setAlignment(Pos.CENTER);
+                    clonedCard.setStyle("-fx-background-color: rgba(76, 175, 80, 0.8); -fx-background-radius: 8; -fx-padding: 5;");
+                    clonedCard.setUserData(plantType);
+                    
+                    ImageView clonedImageView = new ImageView(image);
+                    clonedImageView.setFitWidth(60);
+                    clonedImageView.setFitHeight(60);
+                    clonedImageView.setPreserveRatio(true);
+                    
+                    clonedCard.getChildren().add(clonedImageView);
+                    
+                    // Add click to remove functionality
+                    clonedCard.setOnMouseClicked(removeEvent -> {
+                        if (removeEvent.getButton() == MouseButton.PRIMARY) {
+                            selectedPlants.remove(plantType);
+                            selectedPlantHBox.getChildren().remove(clonedCard);
+                            updateCardMargins();
+                            updateConnectionStatus();
+                        }
+                    });
+                    
+                    // Update status
+                    updateConnectionStatus();
+                }
                 
-                // Enable play button when 6 plants selected
-                playBtn.setDisable(selectedPlants.size() != 6);
-                
-                // Update status
-                statusLabel.setText("🌱 Selected: " + selectedPlants.size() + "/6 plants");
-                
-                ImageView clonedCard = new ImageView(cardImages[index]);
-                clonedCard.setFitWidth(100);
-                clonedCard.setPreserveRatio(true);
-                clonedCard.setCursor(Cursor.HAND);
-                
-                // Add hover effects to cloned card
-                clonedCard.setOnMouseEntered(ev -> {
-                    clonedCard.setTranslateY(-10);
-                    clonedCard.setScaleX(1.05);
-                    clonedCard.setScaleY(1.05);
-                });
-                clonedCard.setOnMouseExited(ev -> {
-                    clonedCard.setTranslateY(0);
-                    clonedCard.setScaleX(1);
-                    clonedCard.setScaleY(1);
-                });
-                
-                // Remove plant on click
-                clonedCard.setOnMouseClicked(event -> {
-                    if (event.getButton().equals(MouseButton.PRIMARY)) {
-                        selectedPlantHBox.getChildren().remove(selectedPlants.indexOf(type));
-                        selectedPlants.remove(type);
-                        updateCardMargins();
-                        
-                        card.setOpacity(1);
-                        card.setDisable(false);
-                        playBtn.setDisable(selectedPlants.size() != 6);
-                        
-                        // Update status
-                        statusLabel.setText("🌱 Selected: " + selectedPlants.size() + "/6 plants");
-                    }
-                });
-                
-                selectedPlantHBox.getChildren().add(clonedCard);
-                updateCardMargins();
-                
-                card.setDisable(true);
-                card.setOpacity(0.5);
+                updateConnectionStatus();
             }
         });
+        
+        addHoverEffectToImages(card);
         
         return card;
     }
@@ -307,6 +309,12 @@ public class MultiplayerPickingStage {
         button.setOnAction(e -> {
             // Send ready status to server with selected plants
             if (selectedPlants.size() == 6) {
+                // Send ready status to server
+                if (clientEngine != null) {
+                    clientEngine.sendReadyStatus(selectedPlants);
+                    System.out.println("Sent ready status to server with plants: " + selectedPlants);
+                }
+                
                 // Launch multiplayer game
                 Stage gameStage = MultiplayerGameView.createStage(selectedPlants, serverAddress, gameMode);
                 gameStage.show();
