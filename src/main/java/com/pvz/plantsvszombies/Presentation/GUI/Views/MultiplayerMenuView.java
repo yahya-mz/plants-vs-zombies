@@ -256,43 +256,23 @@ public class MultiplayerMenuView {
         statusLabel.setText("🔄 Connecting to server...");
         statusLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #2196F3;");
         
-        // Try to connect in background thread
-        Thread connectThread = new Thread(() -> {
+        // Just open the plant picking stage - no connection test needed
+        Platform.runLater(() -> {
             try {
-                // Test connection first
-                java.net.Socket testSocket = new java.net.Socket();
-                testSocket.connect(new java.net.InetSocketAddress(serverAddress, 12345), 5000);
-                testSocket.close();
-                
-                Platform.runLater(() -> {
-                    statusLabel.setText("✅ Connected! Starting game...");
-                    statusLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: green;");
-                    
-                    // Launch plant picking stage for client
-                    try {
-                        MultiplayerPickingStage pickingStage = new MultiplayerPickingStage(serverAddress, "day");
-                        Stage gameStage = pickingStage.createStage(primaryStage);
-                        gameStage.show();
-                        ((Stage) connectButton.getScene().getWindow()).close();
-                    } catch (Exception e) {
-                        statusLabel.setText("❌ Failed to start game: " + e.getMessage());
-                        statusLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: red;");
-                        connectButton.setDisable(false);
-                    }
-                });
-                
-            } catch (Exception ex) {
-                Platform.runLater(() -> {
-                    statusLabel.setText("❌ Connection failed: " + ex.getMessage());
-                    statusLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: red;");
-                    connectButton.setDisable(false);
-                });
+                MultiplayerPickingStage pickingStage = new MultiplayerPickingStage(serverAddress, "day");
+                Stage gameStage = pickingStage.createStage(primaryStage);
+                gameStage.show();
+                ((Stage) connectButton.getScene().getWindow()).close();
+            } catch (Exception e) {
+                statusLabel.setText("❌ Failed to start game: " + e.getMessage());
+                statusLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: red;");
+                connectButton.setDisable(false);
             }
         });
         
         connectThread.setName("ConnectionTestThread");
         connectThread.setDaemon(true);
-        connectThread.start();
+        // No background thread needed - connection happens later
     }
     
     private void createServerMonitorWindow(ServerGameEngine serverEngine) {
