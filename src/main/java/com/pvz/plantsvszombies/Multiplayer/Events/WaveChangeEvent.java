@@ -18,7 +18,6 @@ public class WaveChangeEvent extends SharedEvent {
     }
     
     @Override
-    @com.fasterxml.jackson.annotation.JsonIgnore
     public String getEventType() {
         return "wave_change";
     }

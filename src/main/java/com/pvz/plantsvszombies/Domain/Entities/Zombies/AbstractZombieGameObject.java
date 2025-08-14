@@ -1,6 +1,6 @@
 package com.pvz.plantsvszombies.Domain.Entities.Zombies;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.AbstractBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.HypnotizedZombieGameObject;
@@ -57,17 +57,11 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
     protected double _speed = (double) 1 / 4 * MapBlock.BLOCK_SIZE / GlobalSettings.FPS;
     // ( 1 block / 1 sec) * ( 1 pixel / 1 block ) * ( 1 sec / 1 frame ) = ( pixel / frame )
 
-    @JsonIgnore
     protected transient ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
-    @JsonIgnore
     protected transient ArrayList<IEventSubscriber> _eatingEventSubscribers = new ArrayList<>();
-    @JsonIgnore
     protected transient ArrayList<IEventSubscriber> _burnEventSubscribers = new ArrayList<>();
-    @JsonIgnore
     protected transient ArrayList<IEventSubscriber> _deathEventSubscribers = new ArrayList<>();
-    @JsonIgnore
     protected transient ArrayList<IEventSubscriber> _freezyEventSubscribers = new ArrayList<>();
-    @JsonIgnore
     protected transient ArrayList<IEventSubscriber> _frozenEventSubscribers = new ArrayList<>();
 
     public void subscribeToMovementEvent(IEventSubscriber eventSubscriber) {

@@ -16,7 +16,6 @@ public class GameStartEvent extends SharedEvent {
     }
     
     @Override
-    @com.fasterxml.jackson.annotation.JsonIgnore
     public String getEventType() {
         return "game_start";
     }

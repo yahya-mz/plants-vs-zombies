@@ -22,7 +22,6 @@ public class SunDropEvent extends SharedEvent {
     }
     
     @Override
-    @com.fasterxml.jackson.annotation.JsonIgnore
     public String getEventType() {
         return "sun_drop";
     }

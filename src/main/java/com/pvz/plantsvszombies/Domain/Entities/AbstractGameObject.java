@@ -1,6 +1,6 @@
 package com.pvz.plantsvszombies.Domain.Entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.IDisposable;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;

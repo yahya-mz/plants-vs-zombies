@@ -1,9 +1,6 @@
 package com.pvz.plantsvszombies.Multiplayer.Network;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 import com.pvz.plantsvszombies.Multiplayer.Events.SharedEvent;
@@ -13,8 +10,8 @@ import com.pvz.plantsvszombies.Multiplayer.Events.SharedEvent;
  */
 public class ClientNetworkManager extends NetworkManager {
     private Socket serverSocket;
-    private PrintWriter out;
-    private BufferedReader in;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
     private final String serverHost;
     private final int serverPort;
     private String clientId;
@@ -41,8 +38,8 @@ public class ClientNetworkManager extends NetworkManager {
         try {
             // Connect to server
             serverSocket = new Socket(serverHost, serverPort);
-            out = new PrintWriter(serverSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+            out = new ObjectOutputStream(serverSocket.getOutputStream());
+            in = new ObjectInputStream(serverSocket.getInputStream());
             
             clientId = "Client_" + java.util.UUID.randomUUID().toString().substring(0, 8);
             System.out.println("Connected to server as " + clientId);
@@ -82,12 +79,14 @@ public class ClientNetworkManager extends NetworkManager {
     
     private void receiveEvents() {
         try {
-            String line;
-            while (isRunning() && !serverSocket.isClosed() && (line = in.readLine()) != null) {
+            while (isRunning() && !serverSocket.isClosed()) {
                 try {
-                    SharedEvent event = deserializeEvent(line);
-                    notifyIncomingEvent(event);
-                } catch (Exception e) {
+                    Object obj = in.readObject();
+                    if (obj instanceof SharedEvent) {
+                        SharedEvent event = (SharedEvent) obj;
+                        notifyIncomingEvent(event);
+                    }
+                } catch (ClassNotFoundException e) {
                     System.err.println("Error deserializing event from server: " + e.getMessage());
                 }
             }
@@ -103,8 +102,7 @@ public class ClientNetworkManager extends NetworkManager {
      */
     private void sendEventToServer(SharedEvent event) {
         try {
-            String eventJson = serializeEvent(event);
-            out.println(eventJson);
+            out.writeObject(event);
             out.flush();
         } catch (Exception e) {
             System.err.println("Failed to send event to server: " + e.getMessage());

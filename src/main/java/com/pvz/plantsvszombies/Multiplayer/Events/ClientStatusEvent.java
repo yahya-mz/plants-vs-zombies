@@ -35,7 +35,6 @@ public class ClientStatusEvent extends SharedEvent {
     }
     
     @Override
-    @com.fasterxml.jackson.annotation.JsonIgnore
     public String getEventType() {
         return "client_status";
     }

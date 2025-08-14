@@ -1,6 +1,6 @@
 package com.pvz.plantsvszombies.Domain.Entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
@@ -28,7 +28,6 @@ public class FogGameObject extends AbstractGameObject implements Serializable {
     private double _lastFadingMillis = 0;
     private final Coordinate _defualtCoordinate;
 
-    @JsonIgnore
     public transient ArrayList<IEventSubscriber> _movementEventSubscribers = new ArrayList<>();
 
 

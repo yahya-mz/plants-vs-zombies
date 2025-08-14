@@ -29,7 +29,6 @@ public class ZombieSpawnEvent extends SharedEvent {
     }
     
     @Override
-    @com.fasterxml.jackson.annotation.JsonIgnore
     public String getEventType() {
         return "zombie_spawn";
     }

@@ -31,7 +31,6 @@ public class GameEndEvent extends SharedEvent {
     }
     
     @Override
-    @com.fasterxml.jackson.annotation.JsonIgnore
     public String getEventType() {
         return "game_end";
     }

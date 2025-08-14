@@ -1,9 +1,6 @@
 package com.pvz.plantsvszombies.Multiplayer.Network;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -56,8 +53,8 @@ public class ServerNetworkManager extends NetworkManager {
                 Socket clientSocket = serverSocket.accept();
                 if (!acceptingConnections) {
                     // Game already started
-                    try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
-                        out.println("ERROR: Game already in progress");
+                    try (ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
+                        out.writeObject("ERROR: Game already in progress");
                     }
                     clientSocket.close();
                     System.out.println("Client rejected - game in progress");
@@ -77,8 +74,8 @@ public class ServerNetworkManager extends NetworkManager {
                     System.out.println("Client connected: " + clientId + " (" + clientConnections.size() + "/" + maxClients + ")");
                 } else {
                     // Server full
-                    try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
-                        out.println("ERROR: Server full");
+                    try (ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
+                        out.writeObject("ERROR: Server full");
                     }
                     clientSocket.close();
                     System.out.println("Client rejected - server full");
@@ -93,14 +90,16 @@ public class ServerNetworkManager extends NetworkManager {
     
     private void handleClient(ClientConnection connection) {
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.socket.getInputStream()));
-            String line;
+            ObjectInputStream in = new ObjectInputStream(connection.socket.getInputStream());
             
-            while (isRunning() && !connection.socket.isClosed() && (line = in.readLine()) != null) {
+            while (isRunning() && !connection.socket.isClosed()) {
                 try {
-                    SharedEvent event = deserializeEvent(line);
-                    notifyIncomingEvent(event);
-                } catch (Exception e) {
+                    Object obj = in.readObject();
+                    if (obj instanceof SharedEvent) {
+                        SharedEvent event = (SharedEvent) obj;
+                        notifyIncomingEvent(event);
+                    }
+                } catch (ClassNotFoundException e) {
                     System.err.println("Error deserializing event from " + connection.clientId + ": " + e.getMessage());
                 }
             }
@@ -134,17 +133,9 @@ public class ServerNetworkManager extends NetworkManager {
      * Broadcast an event to all connected clients
      */
     public void broadcastEvent(SharedEvent event) {
-        String eventJson;
-        try {
-            eventJson = serializeEvent(event);
-        } catch (Exception e) {
-            System.err.println("Failed to serialize event: " + e.getMessage());
-            return;
-        }
-        
         clientConnections.removeIf(connection -> {
             try {
-                connection.out.println(eventJson);
+                connection.out.writeObject(event);
                 connection.out.flush();
                 return false; // Keep connection
             } catch (Exception e) {
@@ -215,12 +206,12 @@ public class ServerNetworkManager extends NetworkManager {
     private static class ClientConnection {
         final String clientId;
         final Socket socket;
-        final PrintWriter out;
+        final ObjectOutputStream out;
         
         ClientConnection(String clientId, Socket socket) throws IOException {
             this.clientId = clientId;
             this.socket = socket;
-            this.out = new PrintWriter(socket.getOutputStream(), true);
+            this.out = new ObjectOutputStream(socket.getOutputStream());
         }
     }
 }

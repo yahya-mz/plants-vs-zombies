@@ -4,8 +4,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pvz.plantsvszombies.Multiplayer.Events.SharedEvent;
 
 /**
@@ -13,7 +11,6 @@ import com.pvz.plantsvszombies.Multiplayer.Events.SharedEvent;
  */
 public class NetworkManager {
     private static final int DEFAULT_PORT = 12345;
-    private final ObjectMapper objectMapper;
     private final ConcurrentLinkedQueue<SharedEvent> incomingEvents;
     private final ConcurrentLinkedQueue<SharedEvent> outgoingEvents;
     private final CopyOnWriteArrayList<Consumer<SharedEvent>> eventListeners;
@@ -22,8 +19,6 @@ public class NetworkManager {
     protected Thread networkThread;
     
     public NetworkManager() {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());
         this.incomingEvents = new ConcurrentLinkedQueue<>();
         this.outgoingEvents = new ConcurrentLinkedQueue<>();
         this.eventListeners = new CopyOnWriteArrayList<>();
@@ -100,20 +95,6 @@ public class NetworkManager {
         if (networkThread != null) {
             networkThread.interrupt();
         }
-    }
-    
-    /**
-     * Serialize an event to JSON
-     */
-    public String serializeEvent(SharedEvent event) throws Exception {
-        return objectMapper.writeValueAsString(event);
-    }
-    
-    /**
-     * Deserialize an event from JSON
-     */
-    public SharedEvent deserializeEvent(String json) throws Exception {
-        return objectMapper.readValue(json, SharedEvent.class);
     }
     
     /**
