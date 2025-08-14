@@ -85,6 +85,11 @@ public class MultiplayerGameView {
                 throw new IllegalStateException("ClientGameEngine must be provided and connected before creating MultiplayerGameView");
             }
             
+            // Start the client engine if it hasn't been started yet
+            if (!clientEngine.isConnected()) {
+                clientEngine.start();
+            }
+            
             // Initialize visual engine based on game mode (simplified for now)
             // TODO: Properly integrate with visual engines
             

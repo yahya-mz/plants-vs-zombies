@@ -347,7 +347,7 @@ public class MultiplayerPickingStage {
                 
                 // Create client engine and connect to server
                 clientEngine = new ClientGameEngine(900, 600, serverAddress, gameMode);
-                clientEngine.start();
+                // Don't start the engine here - let MultiplayerGameView handle it
                 
                 // Wait for connection to be established
                 int attempts = 0;
