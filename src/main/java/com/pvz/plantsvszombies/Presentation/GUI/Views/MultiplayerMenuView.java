@@ -215,13 +215,18 @@ public class MultiplayerMenuView {
                             // Small delay to ensure server is ready
                             Thread.sleep(1000);
                             
-                            // Launch the game for the server creator
-                            MultiplayerPickingStage pickingStage = new MultiplayerPickingStage("localhost", gameMode);
-                            Stage gameStage = pickingStage.createStage(null); // No parent stage
-                            gameStage.setTitle("Plants vs Zombies - Host Player");
-                            gameStage.show();
-                            
-                            statusLabel.setText("✅ Server running! You joined as host. Waiting for " + (playerCount - 1) + " more players...");
+                            // Check if game has already started before auto-joining
+                            if (!serverEngine.isGameStarted()) {
+                                // Launch the game for the server creator
+                                MultiplayerPickingStage pickingStage = new MultiplayerPickingStage("localhost", gameMode);
+                                Stage gameStage = pickingStage.createStage(null); // No parent stage
+                                gameStage.setTitle("Plants vs Zombies - Host Player");
+                                gameStage.show();
+                                
+                                statusLabel.setText("✅ Server running! You joined as host. Waiting for " + (playerCount - 1) + " more players...");
+                            } else {
+                                statusLabel.setText("✅ Server running! Game already started, cannot auto-join as host.");
+                            }
                             
                         } catch (Exception ex) {
                             statusLabel.setText("⚠️ Server running but failed to auto-join: " + ex.getMessage());
