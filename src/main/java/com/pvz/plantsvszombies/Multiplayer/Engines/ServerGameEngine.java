@@ -98,8 +98,11 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
         System.out.println("Waiting for " + _requiredClients + " clients to connect...");
         while (networkManager.getConnectedClientCount() < _requiredClients && !_gameEnded) {
             try {
+                // Process events to populate _connectedClients
+                networkManager.processEvents();
                 Thread.sleep(1000);
                 System.out.println("Connected clients: " + networkManager.getConnectedClientCount() + "/" + _requiredClients);
+                System.out.println("DEBUG: _connectedClients size: " + _connectedClients.size());
             } catch (InterruptedException e) {
                 return;
             }
@@ -110,8 +113,11 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
         System.out.println("Waiting for all clients to be ready with plant selection...");
         while (_readyClients.size() < _requiredClients && !_gameEnded) {
             try {
+                // Process events to populate _readyClients
+                networkManager.processEvents();
                 Thread.sleep(1000);
                 System.out.println("Ready clients: " + _readyClients.size() + "/" + _requiredClients);
+                System.out.println("DEBUG: _connectedClients size: " + _connectedClients.size() + ", _readyClients size: " + _readyClients.size());
             } catch (InterruptedException e) {
                 return;
             }
