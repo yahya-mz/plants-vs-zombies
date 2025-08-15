@@ -91,16 +91,13 @@ public class IceshroomVisualObject extends AbstractPlantVisualObject{
         switch (state) {
             case SLEEPING -> {
                 _currentState = IceshroomVisualObject.States.SLEEPING;
-                if (_currentState.equals(IceshroomVisualObject.States.SLEEPING)) {
-                    playAnimation(IceshroomAnimations.Animations.SLEEPING, Duration.millis(20));//standing
-                }
+                playAnimation(IceshroomAnimations.Animations.SLEEPING, Duration.millis(20));//standing
             }
             case STANDING -> {
                 _currentState = IceshroomVisualObject.States.STANDING;
             }
             case EXPLODED -> {
                 _currentState = States.EXPLODED;
-                playAnimation(IceshroomAnimations.Animations.EXPLODED, Duration.millis(80) , 1);
             }
         }
         return null;

@@ -24,7 +24,9 @@ import javafx.stage.Stage;
  */
 public class MultiplayerMenuView {
     private Stage primaryStage;
-    
+
+    private final Label _counterLabel = new Label();
+
     public MultiplayerMenuView() {
     }
     

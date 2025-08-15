@@ -56,7 +56,6 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
 //                });
 //            }
 //        });
-        var temp_this = this;
         gameObject.subscribeToEatenEvent(new IEventSubscriber() {//notify
             @Override
             public void _notify(AbstractGameObject gameObject) {

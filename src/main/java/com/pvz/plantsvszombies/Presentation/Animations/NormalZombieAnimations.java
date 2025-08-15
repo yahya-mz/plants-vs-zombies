@@ -1,7 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.Animations;
 
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import javafx.scene.image.Image;
 
 import java.io.File;
@@ -18,7 +17,6 @@ public class NormalZombieAnimations {
         ATTACKING,
         FROZEN_ATTACKING,
         BURNING,
-        SPAWNING
     }
 
     private final static ArrayList<Image[]> animations;

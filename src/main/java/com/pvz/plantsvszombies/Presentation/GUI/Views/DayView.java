@@ -46,8 +46,6 @@ public class DayView extends AbstractLevelView {
     private Button lastClickedCard = null;
 
 
-
-
     private DayView() {
     }
 
@@ -105,7 +103,6 @@ public class DayView extends AbstractLevelView {
 //        SoundManager.play(SoundType.BACKGROUND);
 
 
-
         dayView.setScene(scene);
         dayView.setResizable(false);
 
@@ -126,14 +123,6 @@ public class DayView extends AbstractLevelView {
         Mediator.getInstance().runEngine();
 
 
-
-        _visualEngine.selectedPlantTypeProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal == null && lastClickedCard != null) {
-                deactivateButton(lastClickedCard); // مدت دلخواه
-                lastClickedCard = null;
-            }
-        });
-
         this.setOnHiding((event) -> {
             System.out.println("Stopping GameEngine");
             Mediator.getInstance().stopGameEngine();
@@ -148,11 +137,6 @@ public class DayView extends AbstractLevelView {
         counterBox.setMinWidth(50);
 
         return counterBox;
-    }
-
-    public int setMyCounterValue() {
-        counterValue.set(0);
-        return counterValue.get();
     }
 
     public HBox createTopPlantSelectionBar(List<AbstractPlantGameObject.PlantType> selectedPlants) {
@@ -195,26 +179,19 @@ public class DayView extends AbstractLevelView {
 
                     switch (final_plantType) {
                         case PEASHOOTER -> _visualEngine.setSelectedPlantType(PeashooterVisualObject.class);
-                        case SUNFLOWER -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
-                        case WALL_NUT -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
-                        case JALAPENO -> _visualEngine.setSelectedPlantType(JalapenoVisualObject.class);
-                        case TALL_NUT -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
-                        case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
-                        case SNOW_PEA -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
-                        case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
                         case PUFF_SHROOM -> _visualEngine.setSelectedPlantType(PuffshroomVisualObject.class);
                         case SCAREDY_SHROOM -> _visualEngine.setSelectedPlantType(ScaredyShroomVisualObject.class);
                         case ICE_SHROOM -> _visualEngine.setSelectedPlantType(IceshroomVisualObject.class);
                         case HYPNO_SHROOM -> _visualEngine.setSelectedPlantType(HypnoShroomVisualObject.class);
                         case BLOVER -> _visualEngine.setSelectedPlantType(BloverVisualObject.class);
                         case COFFEE_BEAN -> _visualEngine.setSelectedPlantType(CoffeeBeanVisualObject.class);
-                        case SUNFLOWER  -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
-                        case WALL_NUT   -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
-                        case JALAPENO   -> _visualEngine.setSelectedPlantType(JalapenoVisualObject.class);
-                        case TALL_NUT   -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
-                        case CHERRY_BOMB-> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
-                        case SNOW_PEA   -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
-                        case REPEATER   -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
+                        case SUNFLOWER -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
+                        case WALL_NUT -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
+                        case JALAPENO -> _visualEngine.setSelectedPlantType(JalapenoVisualObject.class);
+                        case TALL_NUT -> _visualEngine.setSelectedPlantType(TallNutVisualObject.class);
+                        case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
+                        case SNOW_PEA -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
+                        case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
                     }
                 }
             });

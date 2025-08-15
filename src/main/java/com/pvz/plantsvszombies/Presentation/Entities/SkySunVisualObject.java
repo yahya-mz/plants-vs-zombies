@@ -10,6 +10,7 @@ import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.SunAnimations;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.EffectsManagement;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -100,8 +101,8 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
                 var demo = this._node.getTranslateX();
                 var demo2 = this._node.getTranslateY();
 
-                var verticalDistance = 9 - this._node.getTranslateY();
-                var horizontalDistance = 166 - _visualCoordinate.x();
+                var verticalDistance = 8 - this._node.getTranslateY();
+                var horizontalDistance = 215 - _visualCoordinate.x();
                 _transformAnimation.transform(Math.max(6 * horizontalDistance / verticalDistance, 6), Math.max(6 * verticalDistance / horizontalDistance, 6), horizontalDistance, verticalDistance);
                 _fadingAnimation = GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(4000))
                         .setOnFinished((e) -> {

@@ -13,7 +13,6 @@ public class IceshroomAnimations {
         public enum Animations implements IAnimation {
             STANDING,
             SLEEPING,
-            EXPLODED
         }
 
         private static final ArrayList<Image[]> animations;

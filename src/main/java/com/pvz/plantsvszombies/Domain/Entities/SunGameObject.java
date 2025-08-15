@@ -14,20 +14,24 @@ public class SunGameObject extends AbstractGameObject implements Serializable {
     private final int _points = 50;
     private final int _timeOutMilliseconds = 5000;
 
+    boolean _isFromSky;
+
     private transient GameEngine _engine;
 
     private boolean isDisposed = false;
 
     private transient ArrayList<IEventSubscriber> _timeOutSubscribers = new ArrayList<>();
 
-    public static SunGameObject createSunGameObject(GameEngine gameEngine, String id, Coordinate coordinate) {
-        return new SunGameObject(gameEngine, id, coordinate);
+    public static SunGameObject createSunGameObject(GameEngine gameEngine, String id, Coordinate coordinate,
+                                                    boolean isFromSky) {
+        return new SunGameObject(gameEngine, id, coordinate, isFromSky);
     }
 
-    SunGameObject(GameEngine gameEngine, String id, Coordinate coordinate) {
+    SunGameObject(GameEngine gameEngine, String id, Coordinate coordinate, boolean isFromSky) {
         this._engine = gameEngine;
         this._ID = id;
         this._coordinate = coordinate;
+        this._isFromSky = isFromSky;
     }
     @Override
     public void spawn() {
@@ -55,13 +59,14 @@ public class SunGameObject extends AbstractGameObject implements Serializable {
     }
 
     public void gain() {
-        System.out.println("GAINED");
         _engine.addPoint(this._points);
         _engine.disposeObject(this);
         this.isDisposed = true;
         System.out.println(_engine.getPoint());
 
     }
+
+    public boolean isFromSky(){return _isFromSky;}
 
     public void dispose() {
         _engine.disposeObject(this);

@@ -144,7 +144,7 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
     }
 
     private void handleSunDropping() {
-        if (getMilliseconds() % 10000.0 == 0) { // Drop sun every 10 seconds
+        if (getMilliseconds() % 5000.0 == 0) { // Drop sun every 10 seconds
             dropSunFromSky();
         }
     }

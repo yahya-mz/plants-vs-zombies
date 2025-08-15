@@ -42,12 +42,8 @@ public class NightView extends AbstractLevelView {
     private VisualNightEngine _visualEngine;
     private static StackPane bottommostPlane;
     private static final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
-    private static Button shovelButton;
-    private ProgressBar waveProgressBar;
-    private static final int TOTAL_WAVES = 4;
+    private final Label _counterLabel = new Label();
 
-
-    private Label _counterLabel = new Label();
 
     private NightView() {
     }
@@ -74,7 +70,6 @@ public class NightView extends AbstractLevelView {
 //        addHoverEffectToImages(plantbar);
         Button shoveltool = NightView.createShovelToolButton();
         Button pause = createPauseButton();
-        VBox waveProgressBar = NightView.initWaveProgressUI();
 
         HBox mainbar = new HBox(80);
 //        mainbar.setStyle("-fx-background-color: red;");-debug
@@ -90,14 +85,13 @@ public class NightView extends AbstractLevelView {
         mainbar.setMinWidth(50);
         mainbar.setMinHeight(30);
 
-        bottommostPlane.getChildren().addAll(mainbar , pause, waveProgressBar);
         bottommostPlane.getChildren().addAll(mainbar, pause);
         //StackPane.setMargin(mainbar, new Insets(20, -40, 200, 60));//dont change this
         StackPane.setAlignment(pause, Pos.BOTTOM_LEFT);
         StackPane.setAlignment(mainbar, Pos.TOP_CENTER);
-        StackPane.setAlignment(waveProgressBar, Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(waveProgressBar, new Insets(0, 20, 20, 0));
-        StackPane.setMargin(mainbar, new Insets(15, 60, 185,-20));
+//        StackPane.setAlignment(waveProgressBar, Pos.BOTTOM_RIGHT);
+//        StackPane.setMargin(waveProgressBar, new Insets(0, 20, 20, 0));
+        StackPane.setMargin(mainbar, new Insets(15, 60, 185, -20));
 
 
         var scene = new Scene(bottommostPlane, Width, Height);
@@ -114,8 +108,10 @@ public class NightView extends AbstractLevelView {
     private void setupEngines() {
         NightEngine NightEngine = new NightEngine(NightView.Width, NightView.Height);
         _visualEngine = new VisualNightEngine(this, NightEngine);
+        _counterLabel.textProperty().bind(NightEngine.getPointProperty().asString());
         Mediator.init(NightEngine, _visualEngine);
         Mediator.getInstance().startGameEngine();
+        Mediator.getInstance().runEngine();
 
         this.setOnHiding((event) -> {
             System.out.println("Stopping GameEngine");
@@ -123,12 +119,10 @@ public class NightView extends AbstractLevelView {
         });
     }
 
-    public static VBox createCounter() {
-        Label counterLabel = new Label();
-        counterLabel.textProperty().bind(counterValue.asString());
-        counterLabel.setId("counter-label");
+    public VBox createCounter() {
+        _counterLabel.setId("counter-label");
 
-        VBox counterBox = new VBox(counterLabel);
+        VBox counterBox = new VBox(_counterLabel);
         counterBox.setAlignment(Pos.TOP_CENTER);
         counterBox.setPrefHeight(100);
         counterBox.setMinWidth(50);
@@ -136,10 +130,6 @@ public class NightView extends AbstractLevelView {
         return counterBox;
     }
 
-    public int setMyCounterValue() {//updating counterval
-        counterValue.set(0);
-        return counterValue.get(); //mainenginevalue
-    }
 
     public HBox createTopPlantSelectionBar(List<AbstractPlantGameObject.PlantType> selectedPlants) {
         HBox buttonBar = new HBox(0);
@@ -178,7 +168,7 @@ public class NightView extends AbstractLevelView {
                         case SUNFLOWER -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
                         case WALL_NUT -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
                         case JALAPENO -> _visualEngine.setSelectedPlantType(JalapenoVisualObject.class);
-                        case TALL_NUT -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
+                        case TALL_NUT -> _visualEngine.setSelectedPlantType(TallNutVisualObject.class);
                         case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
                         case SNOW_PEA -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
                         case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
@@ -226,7 +216,6 @@ public class NightView extends AbstractLevelView {
             }
         }
     }
-
 
 
     public Button createShovelToolButton() {
@@ -329,9 +318,6 @@ public class NightView extends AbstractLevelView {
 
         return PauseButton;
     }
-
-
-
 
 
     public static void playImageSequenceInBox(Pane targetBox, Runnable onFinished) {

@@ -10,10 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Objects;
 
-/**
- * Manages audio playback for the Plants vs Zombies game.
- * Supports multiple simultaneous sounds and looping audio.
- */
+
 public class SoundManager {
 
     private static final Map<SoundType, Media> mediaCache = new ConcurrentHashMap<>();
@@ -26,9 +23,7 @@ public class SoundManager {
     private static double musicVolume = 0.7;
     private static double sfxVolume = 0.8;
 
-    /**
-     * Initializes the SoundManager
-     */
+
     public static void initialize() {
         System.out.println("SoundManager.initialize() called");
         if (!isInitialized) {
@@ -42,15 +37,11 @@ public class SoundManager {
         }
     }
 
-    /**
-     * Plays a sound effect
-     * @param sound The sound type to play
-     */
+
     public static void play(SoundType sound) {
         if (!isInitialized) {
             initialize();
         }
-        System.out.println("[SoundManager] play called with: " + sound);
 
 //        System.out.println("Attempting to play sound: " + sound);
 
@@ -63,24 +54,16 @@ public class SoundManager {
 //        System.out.println("Media loaded successfully for: " + sound);
 
         if (sound.shouldLoop()) {
-            System.out.println("Playing looped sound: " + sound);
             playLooped(sound, media);
         } else {
-            System.out.println("Playing one-time sound: " + sound);
             playOnce(sound, media);
         }
     }
 
-    /**
-     * Stops a specific sound
-     * @param sound The sound type to stop
-     */
     public static void stop(SoundType sound) {
-        // پلیر مشترک (مثل BACKGROUND)
         MediaPlayer shared = loopedPlayers.remove(sound);
         if (shared != null) shared.stop();
 
-        // همه‌ی پلیرهای پر-اینستنسِ همین sound
         instancePlayers.keySet().removeIf(player -> {
             if (instancePlayers.get(player) == sound) {
                 player.stop();
@@ -152,7 +135,6 @@ public class SoundManager {
         Platform.runLater(() -> {
             System.out.println("playLooped on FX Thread: " + sound);
 
-            // برای موزیک پس‌زمینه پلیر مشترک
             if (sound == SoundType.NIGHT_BACKGROUND || sound == SoundType.ZOMBIE_GROAN) {
                 MediaPlayer player = loopedPlayers.get(sound);
                 if (player == null) {
@@ -185,11 +167,10 @@ public class SoundManager {
                 return;
             }
 
-            // برای بقیه‌ی صداهای لوپی (مثل ناله‌ی زامبی) هر بار یک پلیر جدید بساز
             MediaPlayer player = new MediaPlayer(media);
             player.setCycleCount(1);
             player.setVolume(getVolumeForSound(sound));
-            instancePlayers.put(player, sound); // ثبت برای کنترل‌های stopAll/pauseAll/...
+            instancePlayers.put(player, sound);
 
             double delaySeconds = sound.getLoopDelay();
             player.setOnEndOfMedia(() -> {
@@ -213,7 +194,6 @@ public class SoundManager {
                 }
             });
 
-            // پاکسازی وقتی دستی stop کنیم یا به هر دلیل متوقف/دیسپوز شود
             player.setOnStopped(() -> instancePlayers.remove(player));
 
             player.play();
@@ -241,7 +221,6 @@ public class SoundManager {
             String resourcePath = "/" + sound.getFileName();
 //            System.out.println("Loading resource: " + resourcePath);
             String mediaUrl = GlobalSettings.getResource(resourcePath);
-            System.out.println("Media URL: " + mediaUrl);
 
 //            if (mediaUrl.isEmpty()) {
 //                System.err.println("Could not find audio file: " + resourcePath);
@@ -250,7 +229,6 @@ public class SoundManager {
 
             try {
                 Media media = new Media(Objects.requireNonNull(mediaUrl));
-//                System.out.println("Media created successfully for: " + sound);
                 return media;
             } catch (Exception e) {
                 System.err.println("Error creating Media for " + sound.getFileName() + ": " + e.getMessage());
@@ -261,14 +239,13 @@ public class SoundManager {
     }
 
     private static double getVolumeForSound(SoundType sound) {
-        double baseVolume = isMusicSound(sound) ? musicVolume : sfxVolume; // 0..1
-        double perSound = sound.getVolumeScale();                           // 0..1 (از enum)
+        double baseVolume = isMusicSound(sound) ? musicVolume : sfxVolume;
+        double perSound = sound.getVolumeScale();
         return baseVolume * masterVolume * perSound;
     }
 
-    // اگر جایی ولوم هر صدا را runtime تغییر دادی:
     public static void refreshVolumes() {
-        updateAllVolumes(); // همون متد داخلی موجود
+        updateAllVolumes();
     }
 
     private static boolean isMusicSound(SoundType sound) {
@@ -277,7 +254,6 @@ public class SoundManager {
 
     private static void updateAllVolumes() {
         loopedPlayers.forEach((sound, player) -> player.setVolume(getVolumeForSound(sound)));
-        // برای پر-اینستنس‌ها هم صدا را به‌روز کنیم
         instancePlayers.forEach((player, sound) -> player.setVolume(getVolumeForSound(sound)));
     }
 

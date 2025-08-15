@@ -12,6 +12,15 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
 public class TallNutGameObject extends AbstractPlantGameObject implements Serializable {
+
+    public enum TallNutStates {
+        FULL_HEALTH,
+        CRACKED1,
+        CRACKED2
+    }
+
+    private TallNutStates _currentState;
+
     private int tick = 1;
 
     private transient ArrayList<IEventSubscriber> _cracked_1_EventSubscribers = new ArrayList<>();
@@ -22,6 +31,7 @@ public class TallNutGameObject extends AbstractPlantGameObject implements Serial
     public static TallNutGameObject createTallNutGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new TallNutGameObject(gameEngine, id, coordinate, row, column);
     }
+
     TallNutGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         this._gameEngine = gameEngine;
         this._ID = id;
@@ -31,14 +41,19 @@ public class TallNutGameObject extends AbstractPlantGameObject implements Serial
 
         this._cost = 50;
         this._health = 400;
+
+        _currentState = TallNutStates.FULL_HEALTH;
+
     }
 
     public void subscribeToCracked_1_Event(IEventSubscriber event) {
         this._cracked_1_EventSubscribers.add(event);
     }
+
     public void subscribeToCracked_2_Event(IEventSubscriber event) {
         this._cracked_2_EventSubscribers.add(event);
     }
+
     public void subscribeToEatenEvent(IEventSubscriber event) {
         this._eatenEventSubscribers.add(event);
     }
@@ -47,18 +62,22 @@ public class TallNutGameObject extends AbstractPlantGameObject implements Serial
     public void spawn() {
 
     }
+
     @Override
     public void update() {
         tick++;
     }
+
     @Override
     public void getHit(int damage) {
         _health -= damage;
         if (_health == 250) {
+            _currentState = TallNutStates.CRACKED1;
             for (IEventSubscriber eventSubscriber : _cracked_1_EventSubscribers) {
                 eventSubscriber._notify(this);
             }
         } else if (_health == 125) {
+            _currentState = TallNutStates.CRACKED2;
             for (IEventSubscriber eventSubscriber : _cracked_2_EventSubscribers) {
                 eventSubscriber._notify(this);
             }
@@ -73,6 +92,11 @@ public class TallNutGameObject extends AbstractPlantGameObject implements Serial
         }
         super.dispose();
     }
+
+    public TallNutStates getCurrentState() {
+        return _currentState;
+    }
+
     private double getMilliseconds() {
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }

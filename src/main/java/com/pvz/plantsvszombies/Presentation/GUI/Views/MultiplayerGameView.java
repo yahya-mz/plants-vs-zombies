@@ -3,6 +3,7 @@ package com.pvz.plantsvszombies.Presentation.GUI.Views;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
@@ -45,15 +46,14 @@ public class MultiplayerGameView extends AbstractLevelView {
 
     private ClientGameEngine clientEngine;
     private String serverAddress;
-    private String gameMode = "day";
+    private GameMode gameMode = GameMode.DAY;
     private ArrayList<AbstractPlantGameObject.PlantType> selectedPlants;
     private VisualMultiplayerEngine _visualEngine;
 
     private static final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
 
 
-    private static final IntegerProperty counterValue = new SimpleIntegerProperty(0);
-
+    private final Label _counterLabel = new Label();
 
     // UI Elements for multiplayer info
     private Label connectionStatusLabel;
@@ -68,7 +68,7 @@ public class MultiplayerGameView extends AbstractLevelView {
     protected Pane gameBoxPane;
 
     private MultiplayerGameView(ArrayList<AbstractPlantGameObject.PlantType> selectedPlants,
-                                String serverAddress, String gameMode) {
+                                String serverAddress, GameMode gameMode) {
         this.selectedPlants = selectedPlants;
         this.serverAddress = serverAddress;
         this.gameMode = gameMode;
@@ -80,7 +80,7 @@ public class MultiplayerGameView extends AbstractLevelView {
     public static Stage createStage(ArrayList<AbstractPlantGameObject.PlantType> selectedPlants,
                                     String serverAddress) {
 
-        MultiplayerGameView view = new MultiplayerGameView(selectedPlants, serverAddress, "day");
+        MultiplayerGameView view = new MultiplayerGameView(selectedPlants, serverAddress, GameMode.DAY);
         view.setupStage();
         return view;
     }
@@ -89,6 +89,8 @@ public class MultiplayerGameView extends AbstractLevelView {
         try {
             this.clientEngine = new ClientGameEngine(GlobalSettings.WIDTH, GlobalSettings.HEIGHT, serverAddress);
             this._visualEngine = new VisualMultiplayerEngine(this, this.clientEngine);
+
+            _counterLabel.textProperty().bind(clientEngine.getPointProperty().asString());
 
             // Don't create a new client engine - use the one passed in
             if (clientEngine == null) {
@@ -292,22 +294,15 @@ public class MultiplayerGameView extends AbstractLevelView {
         return gameBoxPane;
     }
 
-    public static VBox createCounter() {
-        Label counterLabel = new Label();
-        counterLabel.textProperty().bind(counterValue.asString());
-        counterLabel.setId("counter-label");
+    public VBox createCounter() {
+        _counterLabel.setId("counter-label");
 
-        VBox counterBox = new VBox(counterLabel);
-        counterBox.setAlignment(Pos.TOP_CENTER);
-        counterBox.setPrefHeight(100);
+        VBox counterBox = new VBox(_counterLabel);
+        counterBox.setAlignment(Pos.BOTTOM_LEFT);
+        counterBox.setPrefHeight(50);
         counterBox.setMinWidth(50);
 
         return counterBox;
-    }
-
-    public int setMyCounterValue() {//updating counterval
-        counterValue.set(0);
-        return counterValue.get(); //mainenginevalue
     }
 
     public HBox createTopPlantSelectionBar(List<AbstractPlantGameObject.PlantType> selectedPlants) {
@@ -347,7 +342,7 @@ public class MultiplayerGameView extends AbstractLevelView {
                         case SUNFLOWER -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
                         case WALL_NUT -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
                         case JALAPENO -> _visualEngine.setSelectedPlantType(JalapenoVisualObject.class);
-                        case TALL_NUT -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
+                        case TALL_NUT -> _visualEngine.setSelectedPlantType(TallNutVisualObject.class);
                         case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
                         case SNOW_PEA -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
                         case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
@@ -416,7 +411,7 @@ public class MultiplayerGameView extends AbstractLevelView {
         });
 
         shovelButton.setOnAction(e -> {
-            isShovelMode.set(true); // ✅ به‌جای isShovelMode = true;
+            isShovelMode.set(true);
 
             Scene scene = shovelButton.getScene();
             if (scene != null && getIsShovelMode()) {

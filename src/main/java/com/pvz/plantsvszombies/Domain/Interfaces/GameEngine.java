@@ -15,6 +15,7 @@ import com.pvz.plantsvszombies.Domain.Entities.Plants.CoffeeBeanGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Services.PersistenceManager;
 import com.pvz.plantsvszombies.Mediator.Mediator;
+import javafx.application.Platform;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -37,7 +38,7 @@ public abstract class GameEngine {
 
 
     protected int tick = 1;
-    private final IntegerProperty _point = new SimpleIntegerProperty(0);
+    protected final IntegerProperty _point = new SimpleIntegerProperty(0);
     protected GameMode _gameMode;
 
     protected CopyOnWriteArrayList<AbstractGameObject> _gameObjects;
@@ -52,9 +53,6 @@ public abstract class GameEngine {
     public abstract void start();
 
     public abstract void update();
-
-    public void load() {
-    }
 
 
     public void subscribeToGameObjectSpawnEvent(IEventSubscriber eventSubscriber) {
@@ -133,7 +131,6 @@ public abstract class GameEngine {
             if (_currentMap.getBlock(object.getRow(), object.getColumn()).getGrave() == null) {
                 throw new Exception("Exception: No grave exists in row:" + object.getRow() + " col:" + object.getColumn() + " for GraveBuster.");
             }
-            // GraveBuster را فقط اسپاون کن (روی بلاک setPlant نکن)
             this._gameObjects.add(object);
             subtractPoint(object.getCost());
 
@@ -219,17 +216,15 @@ public abstract class GameEngine {
                 coordinate.copy(), row, col);
 
         // ثبت روی بلاک (هر کدوم که ساختی)
-         block.setGrave(grave);
+        block.setGrave(grave);
         _currentMap.placeGrave(grave);
-         _graves.add(grave);
+        _graves.add(grave);
 
         this._gameObjects.add(grave);
         for (IEventSubscriber eventSubscriber : _gameObjectSpawnEventSubscribers) {
             eventSubscriber._notify(grave);
         }
     }
-
-
 
 
     public List<AbstractZombieGameObject> queryZombies(Predicate<AbstractZombieGameObject> predicate) {
@@ -260,7 +255,6 @@ public abstract class GameEngine {
                 .findFirst()
                 .orElse(null);
     }
-
 
 
     public List<AbstractGameObject> getGameObjects() {
@@ -303,9 +297,29 @@ public abstract class GameEngine {
         }
     }
 
-    public void exportObjects() {
+    public void save() {
         PersistenceManager.saveAsDat(_gameObjects.stream().toList());
 
+    }
+
+    public void load() {
+        _gameObjects.clear();
+        var objects = PersistenceManager.load();
+        objects.forEach(e -> {
+            Platform.runLater(() -> {
+                e.setGameEngine(this);
+                _gameObjects.add(e);
+                if (e instanceof MapGameObject mapGameObject) {
+                    Mediator.getInstance().getVisualEngine()
+                            .spawnGameObject(e);
+
+                    _currentMap = mapGameObject;
+                } else {
+                    Mediator.getInstance().getVisualEngine()
+                            .spawnGameObject(e);
+                }
+            });
+        });
     }
 
     public void importObjects(ArrayList<AbstractGameObject> objects) {

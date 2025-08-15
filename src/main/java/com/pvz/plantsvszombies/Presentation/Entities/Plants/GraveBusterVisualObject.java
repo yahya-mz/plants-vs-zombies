@@ -10,7 +10,7 @@ import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.GraveBusterAnimations;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.WallNutAnimations;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import com.pvz.plantsvszombies.Domain.Entities.MapBlock;
 
 import javafx.application.Platform;
@@ -19,9 +19,9 @@ import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
 public class GraveBusterVisualObject extends AbstractPlantVisualObject{
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public GraveBusterVisualObject(GraveBusterGameObject gameObject, IVisualEngine engine) {
+    public GraveBusterVisualObject(GraveBusterGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         this._engine = engine;
 

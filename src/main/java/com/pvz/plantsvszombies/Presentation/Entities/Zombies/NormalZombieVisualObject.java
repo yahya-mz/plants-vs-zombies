@@ -6,7 +6,7 @@ import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
 import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
-import com.pvz.plantsvszombies.Presentation.Animations.Zombies.NormalZombieAnimations;
+import com.pvz.plantsvszombies.Presentation.Animations.NormalZombieAnimations;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;

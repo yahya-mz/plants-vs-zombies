@@ -4,6 +4,7 @@ import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualNightEngine;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.PeashooterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.RepeaterVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.WallNutVisualObject;
@@ -52,9 +53,9 @@ public class MapVisualObject extends AbstractVisualObject {
         mainContainer.setBackground(new Background(
                 new BackgroundImage(
                         new Image(GlobalSettings.getResource(
-                                (_engine instanceof VisualDayEngine ?
-                                        "graphics/Items/Background/daymap.jpg" :
-                                        "graphics/Items/Background/nightmap.jpg")
+                                (_engine instanceof VisualNightEngine ?
+                                        "graphics/Items/Background/nightmap.jpg" :
+                                        "graphics/Items/Background/daymap.jpg")
                         ), true),
                         BackgroundRepeat.NO_REPEAT,
                         BackgroundRepeat.NO_REPEAT,
@@ -104,9 +105,8 @@ public class MapVisualObject extends AbstractVisualObject {
                         var selected = _engine.getSelectedPlantType();
                         if (selected != null) {
 
-                            // ✅ استثنا برای GraveBuster: فقط اگر قبر هست اجازه بده
                             if (selected == GraveBusterVisualObject.class) {
-                                var hasGrave = _mapObject.getBlock(r, c).getGrave() != null; // یا hasGrave() اگر داری
+                                var hasGrave = _gameObject.getBlock(r, c).getGrave() != null; // یا hasGrave() اگر داری
                                 if (!hasGrave) {
                                     System.out.println("No grave here for GraveBuster at " + r + "," + c);
                                     // انتخاب کاربر رو پاک نکن؛ بذار جاشو عوض کنه
@@ -122,7 +122,6 @@ public class MapVisualObject extends AbstractVisualObject {
                                     )
                             );
 
-                            // ✅ فقط وقتی شروع به کاشت کردیم selection رو پاک کن
                             cellButton.setGraphic(null);
                             _engine.clearSelectedPlantType();
 
@@ -166,7 +165,7 @@ public class MapVisualObject extends AbstractVisualObject {
                             ImageView preview = createPlantImageViewForHover("Repeater", cellButton);
                             cellButton.setGraphic(preview);
                         });
-                    } else if (selectedType == TallnutVisualObject.class) {
+                    } else if (selectedType == TallNutVisualObject.class) {
                         Platform.runLater(() -> {
                             ImageView preview = createPlantImageViewForHover("Tallnut", cellButton);
                             cellButton.setGraphic(preview);
@@ -215,7 +214,7 @@ public class MapVisualObject extends AbstractVisualObject {
                         });
                     } else if (selectedType == CoffeeBeanVisualObject.class) {
                         Platform.runLater(() -> {
-                            ImageView preview = createPlantImageView("CoffeeBean", cellButton);
+                            ImageView preview = createPlantImageViewForHover("CoffeeBean", cellButton);
                             cellButton.setGraphic(preview);
                         });
                     }
@@ -229,24 +228,6 @@ public class MapVisualObject extends AbstractVisualObject {
                     fade.play();
                 });
 
-                //
-//                cellButton.setOnMouseEntered((event) -> {
-//                    var demo = pick(mainContainer, event.getSceneX(), event.getSceneY());
-//                    System.out.println( event.getSceneX());
-//                    System.out.println( event.getSceneY());
-//                    for (Node _row : mainContainer.getChildren()) {
-//                        for (Node _col : ((HBox) _row).getChildren()) {
-//                            if (((StackPane) _col).getChildren().get(0).equals(demo)) {
-//                                System.out.println(mainContainer.getChildren().indexOf(_row) + ", " + ((HBox) _row).getChildren().indexOf(_col));
-//                            }
-//                        }
-//                    }
-//                });
-
-
-//                cell.setOnMouseEntered((e)->{//debug
-//                    System.out.println(e.getScreenX()+" , "+e.getScreenY());
-//                });
                 cell.getChildren().add(cellButton);
                 if (_engine.isShovelActivated()) {
                     applyShovelHoverEffect(cell, cellButton);

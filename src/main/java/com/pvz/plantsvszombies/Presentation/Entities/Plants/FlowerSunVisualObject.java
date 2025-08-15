@@ -39,8 +39,8 @@ public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
         _engine = engine;
         _visualCoordinate = gameObject.getCoordinate();
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Sun/Sun_0.png")));
-//        ((ImageView) _node).setFitWidth(50);
-//        ((ImageView) _node).setFitHeight(50);
+        ((ImageView) _node).setFitWidth(50);
+        ((ImageView) _node).setFitHeight(50);
         ((ImageView) _node).setPreserveRatio(true);
 
         _node.setCursor(Cursor.HAND);
@@ -106,11 +106,9 @@ public class FlowerSunVisualObject extends AbstractAnimatedVisualObject {
                     _transformAnimation.interrupt();
                 }
                 _currentState = FlowerSunVisualObject.States.COLLECTING;
-                var demo = this._node.getTranslateX();
-                var demo2 = this._node.getTranslateY();
 
-                var verticalDistance = 9 - this._visualCoordinate.y() + 0.5 * _height;
-                var horizontalDistance = 166 - _visualCoordinate.x();
+                var verticalDistance = 8 - this._visualCoordinate.y() + 0.5 * _height;
+                var horizontalDistance = 215 - _visualCoordinate.x();
                 _transformAnimation.transform(Math.max(6 * horizontalDistance / verticalDistance, 6), Math.max(6 * verticalDistance / horizontalDistance, 6), horizontalDistance, verticalDistance);
                 _fadingAnimation = GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(4000))
                         .setOnFinished((e) -> {

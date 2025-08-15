@@ -13,7 +13,7 @@ import com.pvz.plantsvszombies.Presentation.Animations.BloverAnimations;
 import com.pvz.plantsvszombies.Presentation.Animations.CherryBombAnimations;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.PlanternAnimations;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -27,9 +27,9 @@ public class PlanternVisualObject extends AbstractPlantVisualObject {
     private PlanternVisualObject.States _currentState = PlanternVisualObject.States.STANDING;
 
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public PlanternVisualObject(PlanternGameObject gameObject, IVisualEngine engine) {//وابستگی ها و مقدار دهی
+    public PlanternVisualObject(PlanternGameObject gameObject, VisualEngine engine) {//وابستگی ها و مقدار دهی
         super._gameObject = gameObject;
         _engine = engine;
 

@@ -1,7 +1,7 @@
 package com.pvz.plantsvszombies.Presentation.GUI.Views;
+
 import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
-
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
 import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
@@ -32,10 +32,8 @@ public class PickingPlantStage {
     private Stage primaryStage;
     private Button playBtn;
     private final GameMode _mode;
-    private final String mode;
-    private Image[] cardImages;
 
-    public PickingPlantStage(GameMode mode){
+    public PickingPlantStage(GameMode mode) {
         this._mode = mode;
     }
 
@@ -45,16 +43,16 @@ public class PickingPlantStage {
         this.primaryStage = primaryStage;
 
         VBox root = new VBox(5);
-        StackPane mainPane = new StackPane();
-
+        StackPane mainPickingPane = new StackPane();
         playBtn = createStartButton();
+
         StackPane.setAlignment(playBtn, Pos.BOTTOM_CENTER);
         StackPane.setMargin(playBtn, new Insets(0, 0, -50, 0));
         playBtn.setDisable(true);
 
         root.setPadding(new Insets(20));
 
-        Image bg = new Image(mode.equals("day")
+        Image bg = new Image(_mode.equals(GameMode.DAY)
                 ? GlobalSettings.getResource("graphics/Items/Background/daypickingstage.png")
                 : GlobalSettings.getResource("graphics/Items/Background/nightpickingstage.png"));
         BackgroundSize bgSize = new BackgroundSize(100, 100, true, true, true, false);
@@ -64,14 +62,14 @@ public class PickingPlantStage {
         loadCardImages();
 
         ScrollPane cardScrollPane = createCardScrollPaneWithCards();
-        int topMarginForScroll = mode.equals("day") ? 108 : 125;
+        int topMarginForScroll = _mode.equals(GameMode.DAY) ? 108 : 125;
         VBox.setMargin(cardScrollPane, new Insets(topMarginForScroll, 0, 0, 180));
         VBox.setMargin(selectedPlantHBox, new Insets(10, 0, 0, 125));
 
         root.getChildren().addAll(cardScrollPane, selectedPlantHBox);
-        mainPane.getChildren().addAll(root, playBtn);
+        mainPickingPane.getChildren().addAll(root, playBtn);
 
-        Scene scene = new Scene(mainPane, 900, 600);
+        Scene scene = new Scene(mainPickingPane, 900, 600);
         Stage stage = new Stage();
         stage.setTitle("Picking Plant Stage");
         stage.setScene(scene);
@@ -82,11 +80,11 @@ public class PickingPlantStage {
     }
 
     private void loadCardImages() {
-        File dir = new File(GlobalSettings.getDir("graphics/Cards"));
-        File[] files = dir.listFiles();
-        cardImages = new Image[files.length];
-        for (int i = 0; i < cardImages.length; i++) {
-            cardImages[i] = new Image(files[i].getPath());
+        File cardsDirectory = new File(GlobalSettings.getDir("graphics/Cards"));
+        File[] cardFiles = cardsDirectory.listFiles();
+        cardImages = new Image[cardFiles.length];
+        for (int j = 0; j < cardImages.length; j++) {
+            cardImages[j] = new Image(cardFiles[j].getPath());
         }
     }
 
@@ -97,7 +95,7 @@ public class PickingPlantStage {
         cardVBox.setFillWidth(true);
         cardVBox.setBackground(Background.EMPTY);
 
-        int maxHeight = mode.equals("day") ? 200 : 184;
+        int maxHeight = _mode.equals(GameMode.DAY) ? 200 : 184;
         int maxWidth = 510;
 
         int perRow = 4;
@@ -119,11 +117,11 @@ public class PickingPlantStage {
         scrollPane.getStyleClass().add("custom-scroll-pane");
 
         String css = """
-        .custom-scroll-pane .scroll-bar { -fx-background-color: transparent; }
-        .custom-scroll-pane .scroll-bar:vertical .thumb { -fx-background-color: #4A2C00; -fx-background-insets: 2; -fx-background-radius: 5; }
-        .custom-scroll-pane .scroll-bar:horizontal .thumb { -fx-background-color: #4A2C00; -fx-background-insets: 2; -fx-background-radius: 5; }
-        .custom-scroll-pane .scroll-bar .track { -fx-background-color: transparent; }
-        """;
+                .custom-scroll-pane .scroll-bar { -fx-background-color: transparent; }
+                .custom-scroll-pane .scroll-bar:vertical .thumb { -fx-background-color: #4A2C00; -fx-background-insets: 2; -fx-background-radius: 5; }
+                .custom-scroll-pane .scroll-bar:horizontal .thumb { -fx-background-color: #4A2C00; -fx-background-insets: 2; -fx-background-radius: 5; }
+                .custom-scroll-pane .scroll-bar .track { -fx-background-color: transparent; }
+                """;
 
         scrollPane.setStyle(
                 "-fx-background-color: transparent;" +
@@ -156,13 +154,11 @@ public class PickingPlantStage {
         EffectsManagement.yAndScaleHoverEffectForNode(card);
 
 
-
         card.setOnMouseClicked(e -> {
             if (selectedPlants.size() < 6) {
                 String imgPath = cardImages[index].getUrl();
                 String imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1, imgPath.lastIndexOf('.'));
                 AbstractPlantGameObject.PlantType type = AbstractPlantGameObject.PlantType.valueOf(imgName);
-
                 selectedPlants.add(type);
                 playBtn.setDisable(selectedPlants.size() != 6);
 
@@ -218,6 +214,7 @@ public class PickingPlantStage {
             });
         }
     }
+
     public Button createStartButton() {
         double w = 250, h = 250;
         String[] paths = {
@@ -226,7 +223,7 @@ public class PickingPlantStage {
         };
 
         Image normal = new Image(GlobalSettings.getResource(paths[0]));
-        Image hover  = new Image(GlobalSettings.getResource(paths[1]));
+        Image hover = new Image(GlobalSettings.getResource(paths[1]));
 
         ImageView iv = new ImageView(normal);
         iv.setFitWidth(w);
@@ -246,11 +243,11 @@ public class PickingPlantStage {
         btn.setOnMouseExited(e -> iv.setImage(normal));
 
         btn.setOnAction(e -> {
-            Stage gameStage = mode.equals("day")
+            Stage gameStage = _mode.equals(GameMode.DAY)
                     ? DayView.createStage(selectedPlants)
                     : NightView.createStage(selectedPlants);
 
-            if (mode.equals("day")) SoundManager.play(SoundType.DAY_BACKGROUND);
+            if (_mode.equals(GameMode.DAY)) SoundManager.play(SoundType.DAY_BACKGROUND);
             else SoundManager.play(SoundType.NIGHT_BACKGROUND);
 
             gameStage.show();

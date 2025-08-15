@@ -6,7 +6,7 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralFadingAnimation;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,7 +17,6 @@ import javafx.util.Duration;
 public class FogVisualObject extends AbstractVisualObject {
 
     private final VisualEngine _engine;
-    private final IVisualEngine _engine;
     private GeneralFadingAnimation _fadingAnimation;
 
     private double homeX;

@@ -128,7 +128,8 @@ public class DayEngine extends GameEngine {
                 _skyDroppingRandom.nextDouble(0.2 * _windowWidth, 0.8 * _windowWidth),
                 0
         );
-        var sun = SunGameObject.createSunGameObject(this, sunObjectId, coordinate);
+        var sun = SunGameObject.createSunGameObject(this, sunObjectId, coordinate,
+                true);
         this._gameObjects.add(sun);
         for (IEventSubscriber eventSubscriber : _gameObjectSpawnEventSubscribers) {
             eventSubscriber._notify(sun);

@@ -105,7 +105,6 @@ public class MapGameObject extends AbstractGameObject implements Serializable {
 
     public void placeGrave(GraveGameObject grave) {
         _blocks[grave.getRow() * _columns + grave.getColumn()].setGrave(grave);
-        // اگر خواستی event مخصوص قبر هم اضافه کن، فعلاً لازم نیست
     }
 
 

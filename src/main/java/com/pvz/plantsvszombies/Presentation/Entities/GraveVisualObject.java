@@ -4,7 +4,7 @@ import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.GraveGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Presentation.Engines.IVisualEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -12,9 +12,9 @@ import javafx.scene.image.ImageView;
 
 public class GraveVisualObject extends AbstractVisualObject {
 
-    private final IVisualEngine _engine;
+    private final VisualEngine _engine;
 
-    public GraveVisualObject(GraveGameObject gameObject, IVisualEngine engine) {
+    public GraveVisualObject(GraveGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         this._engine = engine;
 

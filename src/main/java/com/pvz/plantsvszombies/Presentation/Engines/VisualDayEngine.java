@@ -9,24 +9,21 @@ import com.pvz.plantsvszombies.Presentation.GUI.Views.AbstractLevelView;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.DayMenu;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.DayView;
+import com.pvz.plantsvszombies.Presentation.Entities.Zombies.ImpZombieVisualObject;
 import javafx.application.Platform;
 import javafx.scene.layout.Pane;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
 
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class VisualDayEngine implements IVisualEngine {
-    private final int _width = 1280;
-    private final int _height = 728;
-    //
-    private Class<? extends AbstractPlantVisualObject> selectedPlantType;
-    //
-
-    private final ArrayList<AbstractVisualObject> _visualObjects = new ArrayList<>();
-    private MapVisualObject _currentMapVisualObject;
-    private final DayView _levelStage;
-
 public class VisualDayEngine extends VisualEngine {
+
+    private final ObjectProperty<Class<? extends AbstractPlantVisualObject>> selectedPlantTypeProp =
+            new SimpleObjectProperty<>(null);
 
     public VisualDayEngine(DayView levelStage, DayEngine gameEngine) {
         _levelStage = levelStage;

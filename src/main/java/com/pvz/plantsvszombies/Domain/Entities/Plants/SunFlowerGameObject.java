@@ -15,7 +15,7 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
 public class SunFlowerGameObject extends AbstractPlantGameObject implements Serializable {
-    private final Duration _coolDown = Duration.ofMillis(3000);
+    private final Duration _coolDown = Duration.ofMillis(5000);
     private int tick = 1;
 
     private transient ArrayList<IEventSubscriber> _glowingEventSubscribers = new ArrayList<>();
@@ -66,8 +66,10 @@ public class SunFlowerGameObject extends AbstractPlantGameObject implements Seri
     }
 
     private void glow(){
+        System.out.println("GLOWING");
         String SunObjectId = "Sun" + UUID.randomUUID();
-        var bulletObj = SunGameObject.createSunGameObject(_gameEngine, SunObjectId, this._coordinate.copy());
+        var bulletObj = SunGameObject.createSunGameObject(_gameEngine, SunObjectId, this._coordinate.copy(),
+                false);
         _gameEngine.spawnObject(bulletObj);
         for (IEventSubscriber eventSubscriber : _glowingEventSubscribers) {
             eventSubscriber._notify(bulletObj);

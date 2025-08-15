@@ -1,5 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.Animations;
 
+import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.Zombies.ImpZombieAnimations;
 import javafx.scene.image.Image;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class TallnutAnimations {//this animation is empty
+
     public enum Animations implements IAnimation {
         FULL_HEALTH,
         CRACKED1,
@@ -18,7 +20,7 @@ public class TallnutAnimations {//this animation is empty
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(ImpZombieAnimations.class.getResource("graphics/Plants/Tallnut").getPath());
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Tallnut"));
         for (int i = 0; i < Animations.values().length; i++) {
             var animationImages = new File(animationsDirectory.getPath() + "/" + Animations.values()[i]).listFiles();//this is null for now
             Objects.requireNonNull(animationImages);
@@ -30,7 +32,7 @@ public class TallnutAnimations {//this animation is empty
         }
     }
 
-    public static Image[] getFrames(TallnutAnimations.Animations animation){
+    public static Image[] getFrames(TallnutAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
 }

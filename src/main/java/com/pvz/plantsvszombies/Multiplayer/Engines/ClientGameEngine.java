@@ -175,7 +175,8 @@ public class ClientGameEngine extends GameEngine {
         if (!_gameStarted) return;
 
         // Create sun object locally
-        var sun = SunGameObject.createSunGameObject(this, event.getSunId(), event.getDropCoordinate());
+        var sun = SunGameObject.createSunGameObject(this, event.getSunId(), event.getDropCoordinate(),
+                true);
         this._gameObjects.add(sun);
 
         // Notify visual engine

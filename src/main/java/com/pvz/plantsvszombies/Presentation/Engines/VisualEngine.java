@@ -97,7 +97,7 @@ public abstract class VisualEngine {
                     String WalnutObjectId = "Walnut_" + UUID.randomUUID();
                     var obj = WallNutGameObject.createWallNutGameObject(this._gameEngine, WalnutObjectId, coordinate, x, y);
                     this._gameEngine.plantObject(obj);
-                } else if (plantType == TallnutVisualObject.class) {
+                } else if (plantType == TallNutVisualObject.class) {
                     String TallNutObjectId = "Tallnut_" + UUID.randomUUID();
                     var obj = TallNutGameObject.createTallNutGameObject(this._gameEngine, TallNutObjectId, coordinate, x, y);
                     this._gameEngine.plantObject(obj);
@@ -248,8 +248,14 @@ public abstract class VisualEngine {
             }
 
             case SunGameObject s -> {
-                var vo = new SkySunVisualObject(s, temp_this);
-                spawnVisualObject(vo);
+                System.out.println("SUN");
+                if (s.isFromSky()) {
+                    var vo = new SkySunVisualObject(s, temp_this);
+                    spawnVisualObject(vo);
+                } else {
+                    var vo = new FlowerSunVisualObject(s, temp_this);
+                    spawnVisualObject(vo);
+                }
             }
 
             // Bullets
@@ -307,7 +313,7 @@ public abstract class VisualEngine {
                 temp_this._visualObjects.add(vo);
             }
             case TallNutGameObject tl -> {
-                var vo = new TallnutVisualObject(tl, temp_this);
+                var vo = new TallNutVisualObject(tl, temp_this);
                 _currentMapVisualObject.plant(vo, tl.getRow(), tl.getColumn());
                 temp_this._visualObjects.add(vo);
             }

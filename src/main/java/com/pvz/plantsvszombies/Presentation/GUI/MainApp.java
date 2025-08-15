@@ -50,7 +50,7 @@ public class MainApp extends Application {
                 250, 100
         );
         dayModeBtn.setOnAction(e -> {
-            launchGame(primaryStage, "day");
+            launchGame(primaryStage, GameMode.DAY);
         });
 
         Button nightModeBtn = createHoverButton(
@@ -74,9 +74,9 @@ public class MainApp extends Application {
                 250, 100
         );
 
-        Button loadBtn = new Button();
-        loadBtn.setPrefWidth(250);
-        loadBtn.setPrefHeight(100);
+//        Button loadBtn = new Button();
+//        loadBtn.setPrefWidth(250);
+//        loadBtn.setPrefHeight(100);
 
         dayModeBtn.setOnAction(e -> {
             launchGame(primaryStage, GameMode.DAY);
@@ -90,11 +90,11 @@ public class MainApp extends Application {
             launchMultiplayerMenu(primaryStage);
         });
 
-        loadBtn.setOnAction(e -> {
-            loadGame(primaryStage);
-        });
+//        loadBtn.setOnAction(e -> {
+//            loadGame(primaryStage);
+//        });
 
-        VBox buttonContainer = new VBox(-30, dayModeBtn, nightModeBtn, multiplayerBtn, loadBtn);//VBox for mode btn
+        VBox buttonContainer = new VBox(-30, dayModeBtn, nightModeBtn, multiplayerBtn);//VBox for mode btn
         buttonContainer.setAlignment(Pos.CENTER);
 
         root.getChildren().add(buttonContainer);

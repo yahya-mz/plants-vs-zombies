@@ -19,17 +19,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class NightEngine extends GameEngine {
-    private final Duration _zombieSpawnInterval = Duration.ofSeconds(3);
     private final Duration _wave_2_Start = Duration.ofSeconds(15);
     private final Duration _wave_3_Start = Duration.ofSeconds(30);
     private final Duration _wave_4_Start = Duration.ofSeconds(45);
-    private final Duration _gameInterval = Duration.ofSeconds(5);
+    private final Duration _gameInterval = Duration.ofSeconds(60);
 
     private final Random _zombieSpawnRandom = new Random(System.currentTimeMillis());
     private final Random _zombieTypeRandom = new Random(System.currentTimeMillis() / 1000);
 
     private final ArrayList<FogGameObject> _fogs = new ArrayList<>();
-
 
 
     private final ArrayList<IEventSubscriber> _midAttackEventSubscribers = new ArrayList<>();
@@ -40,13 +38,14 @@ public class NightEngine extends GameEngine {
         this._windowHeight = windowHeight;
         this._gameMode = GameMode.NIGHT;
         this._gameObjects = new CopyOnWriteArrayList<>();
+
+        _point.setValue(50);
     }
 
     private int _currentWave = 1;
 
     @Override
     public void start() {
-//        load();
         initMap();
         _currentMap.subscribeToBlocksReadyEvent(new IEventSubscriber() {
             @Override
@@ -60,9 +59,6 @@ public class NightEngine extends GameEngine {
     //updates every object
     @Override
     public void update() {
-        if (getMilliseconds() % 30000 == 0) {
-//            exportObjects();
-        }
 
         // Checking wave changes:
         if (getMilliseconds() % _gameInterval.toMillis() == 0) {
@@ -134,7 +130,7 @@ public class NightEngine extends GameEngine {
                     if (gameObject instanceof FogGameObject) {
                         System.out.println("fog");
                     }
-                    gameObject.dispose(true);
+                    gameObject.dispose();
                 }
             }
 //            _gameObjects.removeAll(toRemove); // Remove after iteration — safe
@@ -191,13 +187,13 @@ public class NightEngine extends GameEngine {
             int row = candidates.get(k)[0];
             int col = candidates.get(k)[1];
 
-            // این چک الان isOccupied است و قبر را هم شامل می‌شود
             if (_currentMap.isOccupied(row, col)) continue;
 
             spawnGrave(row, col);
             placed++;
         }
     }
+
     private boolean _gravesConverted = false;
 
     private void convertAllGravesToZombies() {
@@ -216,41 +212,10 @@ public class NightEngine extends GameEngine {
         _gravesConverted = true;
     }
 
-    @Override
-    public void load() {
-        _gameObjects.clear();
-        var objects = PersistenceManager.load();
-        objects.forEach(e -> {
-            Platform.runLater(() -> {
-                e.setGameEngine(this);
-                _gameObjects.add(e);
-                switch (e) {
-                    case MapGameObject mapGameObject -> {
-                        Mediator.getInstance().getVisualEngine()
-                                .spawnGameObject(e);
-
-//                        for (IEventSubscriber subscriber : _gameObjectSpawnEventSubscribers) {
-//                            subscriber._notify(e);
-//                        }
-
-                        _currentMap = mapGameObject;
-
-                    }
-//                    case AbstractPlantGameObject plant -> {
-//                        try {
-//                            plantObject(plant);
-//                        } catch (Exception _) {
-//
-//                        }
-//                    }
-                    default -> Mediator.getInstance().getVisualEngine()
-                            .spawnGameObject(e);
-                }
-            });
-        });
-
+    public int get_currentWave() {
+        return _currentWave;
     }
-    public int get_currentWave() {return _currentWave;}
+
     private double getMilliseconds() {
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }
