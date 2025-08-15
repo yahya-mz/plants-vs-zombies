@@ -6,7 +6,6 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.PuffshroomAnimations;
-import com.pvz.plantsvszombies.Presentation.Animations.ScaredyShroomAnimations;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualNightEngine;
 import javafx.application.Platform;

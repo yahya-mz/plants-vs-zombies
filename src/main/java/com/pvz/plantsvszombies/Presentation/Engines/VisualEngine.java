@@ -103,8 +103,8 @@ public abstract class VisualEngine {
                     var obj = WallNutGameObject.createWallNutGameObject(this._gameEngine, WalnutObjectId, coordinate, x, y);
                     this._gameEngine.plantObject(obj);
                 } else if (plantType == TallnutVisualObject.class) {
-                    String PeashooterObjectId = "Tallnut_" + UUID.randomUUID();
-                    var obj = TallNutGameObject.createTallNutGameObject(this._gameEngine, PeashooterObjectId, coordinate, x, y);
+                    String TallNutObjectId = "Tallnut_" + UUID.randomUUID();
+                    var obj = TallNutGameObject.createTallNutGameObject(this._gameEngine, TallNutObjectId, coordinate, x, y);
                     this._gameEngine.plantObject(obj);
                 } else if (plantType == SunFlowerVisualObject.class) {
                     String SunFlowerObjectId = "SunFlower_" + UUID.randomUUID();
@@ -145,6 +145,10 @@ public abstract class VisualEngine {
                 } else if (plantType == BloverVisualObject.class) {
                     String bloverObjectId = "Blover_" + UUID.randomUUID();
                     var obj = BloverGameObject.createBloverGameObject(this._gameEngine, bloverObjectId, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == CoffeeBeanVisualObject.class) {
+                    String bloverObjectId = "CoffeeBean_" + UUID.randomUUID();
+                    var obj = CoffeeBeanGameObject.createCoffeeBeanGameObject(this._gameEngine, bloverObjectId, coordinate, x, y);
                     this._gameEngine.plantObject(obj);
                 }
 
@@ -335,6 +339,11 @@ public abstract class VisualEngine {
             case BloverGameObject bl -> {
                 var vo = new BloverVisualObject(bl, temp_this);
                 _currentMapVisualObject.plant(vo, bl.getRow(), bl.getColumn());
+                temp_this._visualObjects.add(vo);
+            }
+            case CoffeeBeanGameObject cb -> {
+                var vo = new CoffeeBeanVisualObject(cb, temp_this);
+                _currentMapVisualObject.plant(vo, cb.getRow(), cb.getColumn());
                 temp_this._visualObjects.add(vo);
             }
 

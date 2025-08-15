@@ -173,6 +173,11 @@ public class MapVisualObject extends AbstractVisualObject {
                             ImageView preview = createPlantImageView("Blover", cellButton);
                             cellButton.setGraphic(preview);
                         });
+                    } else if (selectedType == CoffeeBeanVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageView("CoffeeBean", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
                     }
                 });
 

@@ -1,8 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.ScaredyShroomGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.ScaredyShroomAnimations;
@@ -49,17 +47,7 @@ public class ScaredyShroomVisualObject extends AbstractPlantVisualObject {
 
     @Override
     public void spawn() {
-        switch (((ScaredyShroomGameObject) _gameObject)._state) {
-            case FEARED -> {
-                changeStateTo(ScaredyShroomGameObject.ScaredyShroomState.FEARED);
-            }
-            case SLEEPING -> {
-                changeStateTo(ScaredyShroomGameObject.ScaredyShroomState.SLEEPING);
-            }
-            case STANDING -> {
-                changeStateTo(ScaredyShroomGameObject.ScaredyShroomState.STANDING);
-            }
-        }
+        changeStateTo(((ScaredyShroomGameObject) _gameObject)._state);
     }
 
 
@@ -72,7 +60,7 @@ public class ScaredyShroomVisualObject extends AbstractPlantVisualObject {
                 playAnimation(ScaredyShroomAnimations.Animations.STANDING, Duration.millis(80));
             }
             case FEARED -> {
-                playAnimation(ScaredyShroomAnimations.Animations.CRYING, Duration.millis(80));
+                playAnimation(ScaredyShroomAnimations.Animations.FEARED, Duration.millis(80));
             }
         }
         return this;

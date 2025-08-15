@@ -9,19 +9,19 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class ScaredyShroomAnimations {
-        public enum Animations implements IAnimation {
-            STANDING,
-            FEARED,
-            SLEEPING
-        }
-        private static final ArrayList<Image[]> animations;
+public class CoffeeBeanAnimations {
+    public enum Animations implements IAnimation {
+        STANDING,
+        DYING
+    }
 
-        static {
+    private static final ArrayList<Image[]> animations;
+
+    static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/ScaredyShroom"));
-        for (int i = 0; i < ScaredyShroomAnimations.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + ScaredyShroomAnimations.Animations.values()[i].name()).listFiles();
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/CoffeeBean"));
+        for (int i = 0; i < CoffeeBeanAnimations.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + CoffeeBeanAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
                 String name = f.getName();
                 int dotIndex = name.lastIndexOf('.');
@@ -39,8 +39,7 @@ public class ScaredyShroomAnimations {
         }
     }
 
-        public static Image[] getFrames(ScaredyShroomAnimations.Animations animation) {
+    public static Image[] getFrames(CoffeeBeanAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
-
 }

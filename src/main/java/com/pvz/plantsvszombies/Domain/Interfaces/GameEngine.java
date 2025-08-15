@@ -4,7 +4,9 @@ package com.pvz.plantsvszombies.Domain.Interfaces;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Entities.*;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractNightPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.CoffeeBeanGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Services.PersistenceManager;
 import com.pvz.plantsvszombies.Mediator.Mediator;
@@ -40,7 +42,10 @@ public abstract class GameEngine {
 
     public abstract void update();
 
-    public void load(){};
+    public void load() {
+    }
+
+    ;
 
     public void subscribeToGameObjectSpawnEvent(IEventSubscriber eventSubscriber) {
         this._gameObjectSpawnEventSubscribers.add(eventSubscriber);
@@ -104,6 +109,22 @@ public abstract class GameEngine {
     }
 
     public void plantObject(AbstractPlantGameObject object) throws Exception {
+        if (object instanceof CoffeeBeanGameObject) {
+            if (!_currentMap.isOccupied(object.getRow(), object.getColumn()) ||
+                    !(_currentMap.getPlantAtBlock(object.getRow(), object.getColumn()) instanceof AbstractNightPlantGameObject)) {
+                throw new Exception("Exception: CoffeeBean should be planted on an sleeping plant");
+            }
+
+            this._gameObjects.add(object); // add to game objects list
+
+            subtractPoint(object.getCost()); // subtract cost
+
+            for (IEventSubscriber eventSubscriber : _gameObjectSpawnEventSubscribers) { // notify visual engine to spawn the plant
+                eventSubscriber._notify(object);
+            }
+            return;
+
+        }
         if (!_currentMap.isOccupied(object.getRow(), object.getColumn())) {
             this._gameObjects.add(object); // add to game objects list
 

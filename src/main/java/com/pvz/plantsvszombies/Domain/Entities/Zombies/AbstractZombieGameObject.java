@@ -287,12 +287,18 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
                 this._currentState = GeneralZombieState.FREEZY_EATING;
             }
             if (plant instanceof HypnoShroomGameObject) {
-                plant.getHit(0);
-                var id = "HypnotizedZombie_" + UUID.randomUUID();
-                var hypnotizedZombie = HypnotizedZombieGameObject
-                        .createHypnotizedZombieGameObject(_gameEngine, id, this);
-                super.dispose(true);
-                _gameEngine.spawnObject(hypnotizedZombie);
+
+                if (((HypnoShroomGameObject) plant).isAwake()){
+                    plant.getHit(plant.getHealth());
+                    var id = "HypnotizedZombie_" + UUID.randomUUID();
+                    var hypnotizedZombie = HypnotizedZombieGameObject
+                            .createHypnotizedZombieGameObject(_gameEngine, id, this);
+                    super.dispose(true);
+                    _gameEngine.spawnObject(hypnotizedZombie);
+                }
+                else{
+                    plant.getHit(_damage);
+                }
             }
         }
         if (getMilliseconds() - lastBiteMillis > _biteCoolDown.toMillis()) {

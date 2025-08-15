@@ -52,7 +52,8 @@ public class ShroomBulletGameObject extends AbstractBulletGameObject implements 
             for (IEventSubscriber subscriber : _collisionEventSubscribers) {
                 subscriber._notify(this);
             }
-            super.dispose();
+            super.dispose(true);
+            System.out.println("demo");
         }
     }
 

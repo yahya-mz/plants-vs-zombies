@@ -14,15 +14,13 @@ import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 
-public class IceShroomGameObject extends AbstractPlantGameObject implements Serializable {
+public class IceShroomGameObject extends AbstractNightPlantGameObject implements Serializable {
     public final static Duration EXPLOSION_TIME = Duration.ofSeconds(1);
     public final static Duration FROZEN_TIME = Duration.ofSeconds(4);
 
 
     private int _tick;
-    private boolean _isAwake;
     private transient ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
-    private transient ArrayList<IEventSubscriber> _wakeUpEventSubscribers = new ArrayList<>();
 
     public static IceShroomGameObject createIceShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new IceShroomGameObject(gameEngine, id, coordinate, row, column);
@@ -45,9 +43,6 @@ public class IceShroomGameObject extends AbstractPlantGameObject implements Seri
         this._explosionEventSubscribers.add(event);
     }
 
-    public void subscribeToWakeUpEvent(IEventSubscriber event) {
-        this._wakeUpEventSubscribers.add(event);
-    }
 
     @Override
     public void spawn() {
@@ -91,19 +86,6 @@ public class IceShroomGameObject extends AbstractPlantGameObject implements Seri
 
     private double getMilliseconds() {
         return this._tick * 1000.0 / GlobalSettings.FPS;
-    }
-
-    public boolean isAwake() {
-        return this._isAwake;
-    }
-
-    public void wakeUp() {
-        if (!this._isAwake) {
-            this._isAwake = true;
-            for (IEventSubscriber subscriber : _wakeUpEventSubscribers) {
-                subscriber._notify(this);
-            }
-        }
     }
     
     // Serialization

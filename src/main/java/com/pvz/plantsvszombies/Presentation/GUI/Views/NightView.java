@@ -172,8 +172,8 @@ public class NightView extends AbstractLevelView {
                         case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
                         case SNOW_PEA -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
                         case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
-                        case PUFF_SHROOM -> _visualEngine.setSelectedPlantType(ScaredyShroomVisualObject.class);
-                        case SCAREDY_SHROOM -> _visualEngine.setSelectedPlantType(PuffshroomVisualObject.class);
+                        case PUFF_SHROOM -> _visualEngine.setSelectedPlantType(PuffshroomVisualObject.class);
+                        case SCAREDY_SHROOM -> _visualEngine.setSelectedPlantType(ScaredyShroomVisualObject.class);
                         case ICE_SHROOM -> _visualEngine.setSelectedPlantType(IceshroomVisualObject.class);
                         case HYPNO_SHROOM -> _visualEngine.setSelectedPlantType(HypnoShroomVisualObject.class);
                         case BLOVER -> _visualEngine.setSelectedPlantType(BloverVisualObject.class);

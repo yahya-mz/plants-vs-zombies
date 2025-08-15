@@ -12,14 +12,14 @@ import java.util.Objects;
 public class ShroomBulletAnimations {
         public enum Animations implements IAnimation {
             MOVING,
-            COLIDING
+            COLLIDED
         }
 
         private static final ArrayList<Image[]> animations;
 
         static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Peashooter"));
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Bullets/ShroomBullet"));
         for (int i = 0; i < ShroomBulletAnimations.Animations.values().length; i++) {
             var animationImages = new File(animationsDirectory.getPath() + "/" + ShroomBulletAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {

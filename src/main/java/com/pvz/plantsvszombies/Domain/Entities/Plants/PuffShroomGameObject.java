@@ -16,7 +16,7 @@ import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 
-public class PuffShroomGameObject extends AbstractPlantGameObject implements Serializable {
+public class PuffShroomGameObject extends AbstractNightPlantGameObject implements Serializable {
     public enum PuffshroomState {
         STANDING,
         SLEEPING
@@ -26,11 +26,9 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
     private final Duration _coolDown = Duration.ofMillis(3000);
     private int tick = 1;
     private int _lastShootTick = 0;
-    private boolean _isAwake;
 
     private transient ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
     private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
-    private transient ArrayList<IEventSubscriber> _wakeUpEventSubscribers = new ArrayList<>();
 
     public static PuffShroomGameObject createPuffShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new PuffShroomGameObject(gameEngine, id, coordinate, row, column);
@@ -45,9 +43,9 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
 
         this._cost = 0;
         this._health = 100;
-        
+
         this._isAwake = (_gameEngine.getGameMode() == GameMode.NIGHT);
-        
+
         if (this._isAwake) {
             this._visualState = PuffshroomState.STANDING;
         } else {
@@ -55,9 +53,6 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
         }
     }
 
-    public void setVisualState(PuffshroomState state) {
-        _visualState = state;
-    }
 
     public void subscribeToShootingEvent(IEventSubscriber event) {
         this._shootingEventSubscribers.add(event);
@@ -67,9 +62,6 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
         this._eatenEventSubscribers.add(event);
     }
 
-    public void subscribeToWakeUpEvent(IEventSubscriber event) {
-        this._wakeUpEventSubscribers.add(event);
-    }
 
     @Override
     public void spawn() {
@@ -126,20 +118,6 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
 
     public PuffshroomState getState() {
         return this._visualState;
-    }
-
-    public boolean isAwake() {
-        return this._isAwake;
-    }
-
-    public void wakeUp() {
-        if (!this._isAwake) {
-            this._isAwake = true;
-            this._visualState = PuffshroomState.STANDING;
-            for (IEventSubscriber subscriber : _wakeUpEventSubscribers) {
-                subscriber._notify(this);
-            }
-        }
     }
 
     // Serialization

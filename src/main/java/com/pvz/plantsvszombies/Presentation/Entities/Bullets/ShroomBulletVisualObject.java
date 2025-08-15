@@ -1,6 +1,9 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Bullets;
 
+import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Bullets.AbstractBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
@@ -10,48 +13,49 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
-public class ShroomBulletVisualObject  extends AbstractAnimatedVisualObject {
-        public enum States {
-            MOVING,
-            COLLIDED
-        }
+public class ShroomBulletVisualObject extends AbstractAnimatedVisualObject {
+    public enum States {
+        MOVING,
+        COLLIDED
+    }
 
-        private final VisualEngine _engine;
-        private ShroomBulletVisualObject.States _state;
+    private final VisualEngine _engine;
+    private ShroomBulletVisualObject.States _state;
 
     public ShroomBulletVisualObject(ShroomBulletGameObject gameObject, VisualEngine engine) {
         super._gameObject = gameObject;
         this._engine = engine;
 
         _visualCoordinate = gameObject.getCoordinate();
-        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Bullets/ShroomBullet/Moving/ShroomBullet_0.png")));
+        _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Bullets/ShroomBullet/ShroomBullet_0.png")));
         _node.setManaged(false);
 
         var height = ((Image) ((ImageView) _node).getImage()).getHeight();
         var width = ((Image) ((ImageView) _node).getImage()).getWidth();
 
+
         _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
 
-//        ((ShroomBulletGameObject) _gameObject).subscribeToMovementEvent(new IEventSubscriber() {
-//            @Override
-//            public void _notify(AbstractGameObject gameObject) {
-//                Platform.runLater(() -> {
-//                    _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
-//                });
-////                System.out.println(gameObject.getCoordinate().x());
+        ((ShroomBulletGameObject) _gameObject).subscribeToMovementEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                Platform.runLater(() -> {
+                    _node.relocate(_visualCoordinate.x() - 0.5 * width, _visualCoordinate.y() - 0.5 * height);
+                });
+//                System.out.println(gameObject.getCoordinate().x());
+
+//                _node.setLayoutY(gameObject.getCoordinate().y());
+//                _node.setTranslateX(_node.getTranslateX() + gameObject.getCoordinate().x() - old_x);
+            }
+        });
 //
-////                _node.setLayoutY(gameObject.getCoordinate().y());
-////                _node.setTranslateX(_node.getTranslateX() + gameObject.getCoordinate().x() - old_x);
-//            }
-//        });
-//
-//        ((ShroomBulletGameObject) _gameObject).subscribeToCollisionEvent(new IEventSubscriber() {
-//            @Override
-//            public void _notify(AbstractGameObject gameObject) {
-//                changeStateTo(ShroomBulletVisualObject.States.COLLIDED);
-//            }
-//        });
-//
+        ((ShroomBulletGameObject) _gameObject).subscribeToCollisionEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                changeStateTo(ShroomBulletVisualObject.States.COLLIDED);
+            }
+        });
+
 //        var temp_this = this;
 //        ((ShroomBulletGameObject) _gameObject).subscribeToDisposeEvent(new IEventSubscriber() {
 //            @Override
@@ -71,7 +75,7 @@ public class ShroomBulletVisualObject  extends AbstractAnimatedVisualObject {
         changeStateTo(ShroomBulletVisualObject.States.MOVING);
     }
 
-        public ShroomBulletVisualObject changeStateTo(ShroomBulletVisualObject.States state) {
+    public ShroomBulletVisualObject changeStateTo(ShroomBulletVisualObject.States state) {
         switch (state) {
             case MOVING -> {
                 _state = ShroomBulletVisualObject.States.MOVING;
@@ -81,7 +85,8 @@ public class ShroomBulletVisualObject  extends AbstractAnimatedVisualObject {
             case COLLIDED -> {
                 _state = ShroomBulletVisualObject.States.COLLIDED;
                 Platform.runLater(() -> {
-                    ((ImageView) _node).setImage(new Image(GlobalSettings.getResource("graphics/Bullets/PeaShroomExplode/PeaShroomExplode_0.png")));
+                    stopAnimation();
+                    ((ImageView) _node).setImage(new Image(GlobalSettings.getResource("graphics/Bullets/ShroomBullet/COLLIDED/0.png")));
                     GeneralFadingAnimation.attach(this).fadeOut(Duration.millis(300)).setOnFinished((e) -> {
                         _engine.disposeObject(this);
                     });

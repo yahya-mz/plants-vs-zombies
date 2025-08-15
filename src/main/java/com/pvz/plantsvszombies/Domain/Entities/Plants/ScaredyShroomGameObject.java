@@ -47,9 +47,9 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
         this._column = column;
 
         this._cost = 0;
-        
+
         this._isAwake = (_gameEngine.getGameMode() == GameMode.NIGHT);
-        
+
         if (this._isAwake) {
             this._state = ScaredyShroomState.STANDING;
         } else {
@@ -92,15 +92,17 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
             if (!rowsZombies.isEmpty()) {
                 var frontZombie = rowsZombies.getFirst(); // Most front zombie
                 if (frontZombie.getColumn() - _column < 2) {
-                    _state = ScaredyShroomState.FEARED;
-                    for (IEventSubscriber eventSubscriber : _switchFearedEventSubscribers) {
-                        eventSubscriber._notify(this);
+                    if (!_state.equals(ScaredyShroomState.FEARED)) {
+                        System.out.println("FEAR");
+                        _state = ScaredyShroomState.FEARED;
+                        for (IEventSubscriber eventSubscriber : _switchFearedEventSubscribers) {
+                            eventSubscriber._notify(this);
+                        }
+                        _lastShootTick = 0;
                     }
-                    _lastShootTick = 0;
                     return;
                 }
-                if ((_lastShootTick * 1000 / GlobalSettings.FPS) % _coolDown.toMillis() == 0
-                        && frontZombie.getColumn() - 4 <= _column) {
+                else if ((_lastShootTick * 1000 / GlobalSettings.FPS) % _coolDown.toMillis() == 0) {
                     shoot();
                     _lastShootTick = 0;
                 }
