@@ -38,7 +38,7 @@ public abstract class GameEngine {
 
     public abstract void update();
 
-    public abstract void load();
+    public void load(){};
 
     public void subscribeToGameObjectSpawnEvent(IEventSubscriber eventSubscriber) {
         this._gameObjectSpawnEventSubscribers.add(eventSubscriber);

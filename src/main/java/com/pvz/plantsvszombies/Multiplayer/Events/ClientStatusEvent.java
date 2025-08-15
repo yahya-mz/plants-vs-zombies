@@ -9,7 +9,7 @@ public class ClientStatusEvent extends SharedEvent {
     private int zombiesRemaining;
     private boolean isAlive;
     private long survivedTime;
-    private String status;
+    private ClientStatus status;
     
     public enum ClientStatus {
         CONNECTED,
@@ -24,7 +24,7 @@ public class ClientStatusEvent extends SharedEvent {
     }
     
     public ClientStatusEvent(long gameTick, String clientId, int currentWave, 
-                           int zombiesRemaining, boolean isAlive, long survivedTime, String status) {
+                           int zombiesRemaining, boolean isAlive, long survivedTime, ClientStatus status) {
         super(gameTick);
         this.clientId = clientId;
         this.currentWave = currentWave;
@@ -55,6 +55,6 @@ public class ClientStatusEvent extends SharedEvent {
     public long getSurvivedTime() { return survivedTime; }
     public void setSurvivedTime(long survivedTime) { this.survivedTime = survivedTime; }
     
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public ClientStatus getStatus() { return status; }
+    public void setStatus(ClientStatus status) { this.status = status; }
 }

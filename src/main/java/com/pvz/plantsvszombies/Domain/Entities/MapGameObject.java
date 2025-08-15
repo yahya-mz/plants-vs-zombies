@@ -10,6 +10,8 @@ import java.io.ObjectInputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MapGameObject extends AbstractGameObject implements Serializable {
 
@@ -69,6 +71,10 @@ public class MapGameObject extends AbstractGameObject implements Serializable {
         for (IEventSubscriber eventSubscriber : _blocksReadyEventSubscribers) {
             eventSubscriber._notify(this);
         }
+    }
+
+    public List<MapBlock> getAllBlocks(){
+        return Arrays.stream(_blocks).toList();
     }
 
     public MapBlock getBlock(int row, int col) {

@@ -8,11 +8,9 @@ import java.time.LocalDateTime;
  */
 public abstract class SharedEvent implements Serializable {
     protected String eventId;
-    protected LocalDateTime timestamp;
     protected long gameTickWhenCreated;
     
     public SharedEvent() {
-        this.timestamp = LocalDateTime.now();
         this.eventId = java.util.UUID.randomUUID().toString();
     }
     
@@ -23,9 +21,6 @@ public abstract class SharedEvent implements Serializable {
     
     public String getEventId() { return eventId; }
     public void setEventId(String eventId) { this.eventId = eventId; }
-    
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
     
     public long getGameTickWhenCreated() { return gameTickWhenCreated; }
     public void setGameTickWhenCreated(long gameTickWhenCreated) { this.gameTickWhenCreated = gameTickWhenCreated; }
