@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
@@ -20,17 +21,20 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
     public enum ScaredyShroomState {
         CRYING,
         SLEEPING,
-        STANDING
+        STANDING,
+        WAKING_UP
     }
 
     private final Duration _coolDown = Duration.ofMillis(4000);
     private int tick = 1;
+    private boolean _isAwake;
 
     public ScaredyShroomState _state;
 
     private transient ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
     private transient ArrayList<IEventSubscriber> _switchAwakenessEventSubscribers = new ArrayList<>();
     private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _wakeUpEventSubscribers = new ArrayList<>();
 
     public static ScaredyShroomGameObject createScaredyShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new ScaredyShroomGameObject(gameEngine, id, coordinate, row, column);
@@ -44,6 +48,16 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
         this._column = column;
 
         this._cost = 0;
+        
+        // Set initial awake state and visual state based on game mode
+        GameMode gameMode = _gameEngine.getGameMode();
+        this._isAwake = (gameMode == GameMode.NIGHT);
+        
+        if (this._isAwake) {
+            this._state = ScaredyShroomState.STANDING;
+        } else {
+            this._state = ScaredyShroomState.SLEEPING;
+        }
     }
 
     public void subscribeToShootingEvent(IEventSubscriber event) {
