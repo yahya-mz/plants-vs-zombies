@@ -76,7 +76,9 @@ public class ClientGameEngine extends GameEngine {
             initMap();
             
             // Send connection status
+            System.out.println("DEBUG: About to send CONNECTED status...");
             sendClientStatus("CONNECTED");
+            System.out.println("DEBUG: CONNECTED status sent");
             
             System.out.println("Client connected and waiting for game to start...");
         } catch (Exception e) {
@@ -255,7 +257,13 @@ public class ClientGameEngine extends GameEngine {
     }
     
     private void sendClientStatus(String status) {
-        if (!networkManager.isConnected()) return;
+        System.out.println("DEBUG: sendClientStatus called with status: " + status);
+        System.out.println("DEBUG: networkManager.isConnected(): " + networkManager.isConnected());
+        
+        if (!networkManager.isConnected()) {
+            System.out.println("DEBUG: Network manager not connected, cannot send status");
+            return;
+        }
         
         int zombiesRemaining = (int) _gameObjects.stream()
             .filter(obj -> obj instanceof AbstractZombieGameObject)
@@ -266,7 +274,9 @@ public class ClientGameEngine extends GameEngine {
             !_playerLost, System.currentTimeMillis() - _gameStartTime, status
         );
         
+        System.out.println("DEBUG: Created ClientStatusEvent with clientId: " + clientId + ", status: " + status);
         networkManager.sendEvent(event);
+        System.out.println("DEBUG: Event sent to network manager");
     }
     
     /**
