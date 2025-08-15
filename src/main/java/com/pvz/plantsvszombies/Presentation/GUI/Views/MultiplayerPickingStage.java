@@ -345,57 +345,29 @@ public class MultiplayerPickingStage {
                 statusLabel.setText("🔄 Connecting to server...");
                 statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #2196F3; -fx-padding: 10;");
                 
-                // Create client engine and connect to server
+                // Create client engine (don't start it yet)
                 clientEngine = new ClientGameEngine(900, 600, serverAddress, gameMode);
-                // Don't start the engine here - let MultiplayerGameView handle it
                 
-                // Wait for connection to be established
-                int attempts = 0;
-                while (!clientEngine.isConnected() && attempts < 50) { // Wait up to 5 seconds
-                    try {
-                        Thread.sleep(100);
-                        attempts++;
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
+                // Update status
+                statusLabel.setText("✅ Plants selected! Starting game...");
+                statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #4CAF50; -fx-padding: 10;");
                 
-                if (clientEngine.isConnected()) {
-                    // Send ready status to server
-                    clientEngine.sendReadyStatus(selectedPlants);
-                    System.out.println("Sent ready status to server with plants: " + selectedPlants);
-                    
-                    // Update status
-                    statusLabel.setText("✅ Connected! Ready status sent. Starting game...");
-                    statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #4CAF50; -fx-padding: 10;");
-                    
-                    // Small delay to show the status
-                    Thread.sleep(1000);
-                    
-                    // Launch multiplayer game with the already-connected client engine
-                    Stage gameStage = MultiplayerGameView.createStage(clientEngine, selectedPlants, serverAddress, gameMode);
-                    gameStage.show();
-                    gameStage.setOnHiding(event -> {
-                        if (primaryStage != null) {
-                            primaryStage.show();
-                        }
-                    });
-                    
-                    // Close the current stage
-                    Stage currentStage = (Stage) playBtn.getScene().getWindow();
-                    if (currentStage != null) {
-                        currentStage.close();
+                // Small delay to show the status
+                Thread.sleep(1000);
+                
+                // Launch multiplayer game - the engine will be started by MultiplayerGameView
+                Stage gameStage = MultiplayerGameView.createStage(clientEngine, selectedPlants, serverAddress, gameMode);
+                gameStage.show();
+                gameStage.setOnHiding(event -> {
+                    if (primaryStage != null) {
+                        primaryStage.show();
                     }
-                } else {
-                    // Connection failed
-                    statusLabel.setText("❌ Failed to connect to server. Please try again.");
-                    statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #F44336; -fx-padding: 10;");
-                    
-                    // Clean up failed connection
-                    if (clientEngine != null) {
-                        clientEngine.disconnect();
-                        clientEngine = null;
-                    }
+                });
+                
+                // Close the current stage
+                Stage currentStage = (Stage) playBtn.getScene().getWindow();
+                if (currentStage != null) {
+                    currentStage.close();
                 }
                 
             } catch (Exception e) {

@@ -88,6 +88,19 @@ public class MultiplayerGameView {
             // Start the client engine if it hasn't been started yet
             if (!clientEngine.isConnected()) {
                 clientEngine.start();
+                
+                // Wait a moment for connection to establish
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    // Ignore interruption
+                }
+                
+                // Send ready status to server with selected plants
+                if (clientEngine.isConnected()) {
+                    clientEngine.sendReadyStatus(selectedPlants);
+                    System.out.println("Sent ready status to server with plants: " + selectedPlants);
+                }
             }
             
             // Initialize visual engine based on game mode (simplified for now)
@@ -101,8 +114,6 @@ public class MultiplayerGameView {
             
             // Start game engines
             Mediator.getInstance().startGameEngine();
-            
-            // Don't send ready status here - it should already be sent from MultiplayerPickingStage
             
             // Setup close handler
             stage.setOnCloseRequest(e -> {
