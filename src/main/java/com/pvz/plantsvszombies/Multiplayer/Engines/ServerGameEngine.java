@@ -243,14 +243,22 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
     }
     
     private void handleClientEvent(SharedEvent event) {
+        System.out.println("DEBUG: Server received event: " + event.getEventType() + " from " + event.getClass().getSimpleName());
+        
         if (event instanceof ClientStatusEvent statusEvent) {
             String clientId = statusEvent.getClientId();
+            String status = statusEvent.getStatus();
+            System.out.println("DEBUG: ClientStatusEvent - clientId: " + clientId + ", status: " + status);
             
-            switch (statusEvent.getStatus()) {
+            switch (status) {
                 case "CONNECTED" -> {
+                    System.out.println("DEBUG: Processing CONNECTED status for client: " + clientId);
                     if (!_connectedClients.contains(clientId)) {
                         _connectedClients.add(clientId);
                         System.out.println("Client connected: " + clientId + " (" + _connectedClients.size() + "/" + _requiredClients + ")");
+                        System.out.println("DEBUG: _connectedClients now contains: " + _connectedClients);
+                    } else {
+                        System.out.println("DEBUG: Client " + clientId + " already in _connectedClients");
                     }
                 }
                 case "LOST" -> {
@@ -285,11 +293,15 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
             }
         } else if (event instanceof ClientReadyEvent readyEvent) {
             String clientId = readyEvent.getClientId();
+            System.out.println("DEBUG: Processing ClientReadyEvent for client: " + clientId + " with plants: " + readyEvent.getSelectedPlants());
             if (!_readyClients.contains(clientId)) {
                 _readyClients.add(clientId);
                 _clientPlants.put(clientId, readyEvent.getSelectedPlants());
                 System.out.println("Client ready: " + clientId + " with plants: " + readyEvent.getSelectedPlants());
                 System.out.println("Ready clients: " + _readyClients.size() + "/" + _requiredClients);
+                System.out.println("DEBUG: _readyClients now contains: " + _readyClients);
+            } else {
+                System.out.println("DEBUG: Client " + clientId + " already in _readyClients");
             }
         }
     }
