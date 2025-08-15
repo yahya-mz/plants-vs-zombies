@@ -118,6 +118,7 @@ public class MultiplayerGameView extends AbstractLevelView {
 
             // Setup close handler
             stage.setOnCloseRequest(e -> {
+                System.out.println("DEMO");
                 if (clientEngine != null) {
                     clientEngine.disconnect();
                 }
@@ -127,6 +128,7 @@ public class MultiplayerGameView extends AbstractLevelView {
             // Start the client engine if it hasn't been started yet
             if (!clientEngine.isConnected()) {
                 clientEngine.start();
+                clientEngine.initMap();
 //                clientEngine.initMap();
 
                 // Wait a moment for connection to establish
@@ -139,8 +141,11 @@ public class MultiplayerGameView extends AbstractLevelView {
                 // Send ready status to server with selected plants
                 if (clientEngine.isConnected()) {
                     Platform.runLater(() -> {
-                        clientEngine.initMap();
-//                        clientEngine.sendReadyStatus(selectedPlants);
+                        Platform.runLater(() -> {
+                            Platform.runLater(() -> {
+                                clientEngine.sendReadyStatus(selectedPlants);
+                            });
+                        });
                     });
                     System.out.println("Sent ready status to server with plants: " + selectedPlants);
                 }

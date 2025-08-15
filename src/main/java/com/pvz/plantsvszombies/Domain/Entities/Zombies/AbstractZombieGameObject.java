@@ -138,7 +138,6 @@ public abstract class AbstractZombieGameObject extends AbstractGameObject implem
                 }
 
                 var zombieBlock = _gameEngine.getBlockByCoordinate(this._coordinate);
-
                 if (zombieBlock != null) {
                     if (Math.abs(this._column - zombieBlock.getColumn()) > 1) {
 

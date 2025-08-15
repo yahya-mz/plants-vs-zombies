@@ -5,12 +5,9 @@ package com.pvz.plantsvszombies.Multiplayer.Events;
  */
 public class ClientStatusEvent extends SharedEvent {
     private String clientId;
-    private int currentWave;
     private int zombiesRemaining;
-    private boolean isAlive;
-    private long survivedTime;
     private ClientStatus status;
-    
+
     public enum ClientStatus {
         CONNECTED,
         PLAYING,
@@ -18,43 +15,36 @@ public class ClientStatusEvent extends SharedEvent {
         WON,
         DISCONNECTED
     }
-    
+
     public ClientStatusEvent() {
         super();
     }
-    
-    public ClientStatusEvent(long gameTick, String clientId, int currentWave, 
-                           int zombiesRemaining, boolean isAlive, long survivedTime, ClientStatus status) {
+
+    public ClientStatusEvent(long gameTick, String clientId,
+                             int zombiesRemaining, ClientStatus status) {
         super(gameTick);
         this.clientId = clientId;
-        this.currentWave = currentWave;
         this.zombiesRemaining = zombiesRemaining;
-        this.isAlive = isAlive;
-        this.survivedTime = survivedTime;
         this.status = status;
     }
-    
+
     @Override
     public String getEventType() {
         return "client_status";
     }
-    
+
     // Getters and setters
-    public String getClientId() { return clientId; }
-    public void setClientId(String clientId) { this.clientId = clientId; }
-    
-    public int getCurrentWave() { return currentWave; }
-    public void setCurrentWave(int currentWave) { this.currentWave = currentWave; }
-    
-    public int getZombiesRemaining() { return zombiesRemaining; }
-    public void setZombiesRemaining(int zombiesRemaining) { this.zombiesRemaining = zombiesRemaining; }
-    
-    public boolean isAlive() { return isAlive; }
-    public void setAlive(boolean alive) { isAlive = alive; }
-    
-    public long getSurvivedTime() { return survivedTime; }
-    public void setSurvivedTime(long survivedTime) { this.survivedTime = survivedTime; }
-    
-    public ClientStatus getStatus() { return status; }
-    public void setStatus(ClientStatus status) { this.status = status; }
+    public String getClientId() {
+        return clientId;
+    }
+
+    public int getZombiesRemaining() {
+        return zombiesRemaining;
+    }
+
+
+    public ClientStatus getStatus() {
+        return status;
+    }
+
 }

@@ -27,22 +27,18 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Client-side game engine that handles local events (planting, bullets)
- * and listens for shared events from the server
- */
+
 public class ClientGameEngine extends GameEngine {
     private final ClientNetworkManager networkManager;
     private String clientId;
     private int _currentWave = 1;
+    private long _gameStartTime = 0;
     private boolean _gameStarted = false;
     private boolean _gameEnded = false;
     private boolean _playerLost = false;
-    private String _gameMode; // "day" or "night"
 
     // Track game state for win condition
     private int _zombiesKilled = 0;
-    private long _gameStartTime = 0;
 
     // Plant selection
     private ArrayList<AbstractPlantGameObject.PlantType> _selectedPlants;
@@ -67,6 +63,7 @@ public class ClientGameEngine extends GameEngine {
 
     @Override
     public void start() {
+
         // Prevent multiple starts
         if (networkManager.isConnected()) {
             System.out.println("Client game engine already started and connected");
@@ -77,10 +74,6 @@ public class ClientGameEngine extends GameEngine {
 
         try {
             networkManager.start();
-
-            // Send connection status
-//            sendClientStatus(ClientStatusEvent.ClientStatus.CONNECTED);
-
             System.out.println("Client connected and waiting for game to start...");
         } catch (Exception e) {
             System.err.println("Failed to start client: " + e.getMessage());
@@ -194,7 +187,6 @@ public class ClientGameEngine extends GameEngine {
 
     private void handleGameStart(GameStartEvent event) {
         _gameStarted = true;
-        _gameStartTime = System.currentTimeMillis();
         System.out.println("🎮 Game starting with " + event.getPlayerCount() + " players!");
 
         // Send initial status
@@ -264,9 +256,11 @@ public class ClientGameEngine extends GameEngine {
                 .filter(obj -> obj instanceof AbstractZombieGameObject)
                 .count();
 
+        if (_playerLost) {
+            status = ClientStatusEvent.ClientStatus.LOST;
+        }
         ClientStatusEvent event = new ClientStatusEvent(
-                tick, clientId, _currentWave, zombiesRemaining,
-                !_playerLost, System.currentTimeMillis() - _gameStartTime, status
+                tick, clientId, zombiesRemaining, status
         );
 
         networkManager.sendEvent(event);
@@ -286,13 +280,9 @@ public class ClientGameEngine extends GameEngine {
             plantTypeStrings.add(plantType.name());
         }
 
-        while (_currentMap.getAllBlocks().contains(null)) {
-
-        }
-//        initMap();
-
         ClientReadyEvent event = new ClientReadyEvent(tick, clientId, plantTypeStrings,
                 _currentMap);
+
         networkManager.sendEvent(event);
 
         System.out.println("Sent ready status to server with plants: " + plantTypeStrings);
@@ -388,10 +378,6 @@ public class ClientGameEngine extends GameEngine {
 
     public boolean isConnected() {
         return networkManager.isConnected();
-    }
-
-    public String getGameMode() {
-        return _gameMode;
     }
 
     public ArrayList<AbstractPlantGameObject.PlantType> getSelectedPlants() {

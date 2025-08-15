@@ -138,7 +138,7 @@ public class HypnotizedZombieGameObject extends AbstractGameObject implements Se
         for (IEventSubscriber eventSubscriber : _deathEventSubscribers) {
             eventSubscriber._notify(this);
         }
-        super.dispose();
+        super.dispose(true);
 
     }
 
