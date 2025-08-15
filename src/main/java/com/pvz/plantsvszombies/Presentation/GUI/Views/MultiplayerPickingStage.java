@@ -356,9 +356,9 @@ public class MultiplayerPickingStage {
                 Thread.sleep(1000);
                 
                 // Launch multiplayer game - the engine will be started by MultiplayerGameView
-                Stage gameStage = MultiplayerGameView.createStage(clientEngine, selectedPlants, serverAddress, gameMode);
-                gameStage.show();
-                gameStage.setOnHiding(event -> {
+                MultiplayerGameView gameView = MultiplayerGameView.createStage(clientEngine, selectedPlants, serverAddress, gameMode);
+                gameView.show();
+                gameView.setOnHiding(event -> {
                     if (primaryStage != null) {
                         primaryStage.show();
                     }
