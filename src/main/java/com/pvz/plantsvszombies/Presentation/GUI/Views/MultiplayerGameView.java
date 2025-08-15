@@ -373,25 +373,41 @@ public class MultiplayerGameView extends AbstractLevelView {
 
     
     private void startGameLoop() {
+        System.out.println("🚀 Starting game loop for multiplayer...");
         // Start game loop for client engine at 30 FPS
         Thread gameThread = new Thread(() -> {
+            int loopCount = 0;
             while (!Thread.currentThread().isInterrupted()) {
                 try {
+                    loopCount++;
                     if (clientEngine != null && clientEngine.isConnected()) {
                         clientEngine.update();
+                        if (loopCount % 30 == 0) { // Log every second (30 FPS)
+                            System.out.println("🔄 Game loop running - tick: " + loopCount + ", client connected: " + clientEngine.isConnected());
+                        }
+                    } else {
+                        if (loopCount % 30 == 0) { // Log every second
+                            System.out.println("⚠️ Game loop running but client engine is null or not connected");
+                            System.out.println("   clientEngine: " + (clientEngine != null ? "exists" : "null"));
+                            System.out.println("   isConnected: " + (clientEngine != null ? clientEngine.isConnected() : "N/A"));
+                        }
                     }
                     Thread.sleep(33); // ~30 FPS (1000ms / 30 = 33ms)
                 } catch (InterruptedException e) {
+                    System.out.println("🛑 Game loop interrupted");
                     break;
                 } catch (Exception e) {
-                    System.err.println("Error in client game loop: " + e.getMessage());
+                    System.err.println("❌ Error in client game loop: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
+            System.out.println("🛑 Game loop stopped");
         });
         
         gameThread.setDaemon(true);
+        gameThread.setName("MultiplayerGameLoop");
         gameThread.start();
+        System.out.println("✅ Game loop started successfully");
     }
     
     public Pane getGameBoxPane() {

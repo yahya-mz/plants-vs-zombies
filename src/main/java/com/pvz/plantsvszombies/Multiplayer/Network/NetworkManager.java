@@ -64,8 +64,11 @@ public class NetworkManager {
      */
     public void processEvents() {
         SharedEvent event;
+        int eventCount = 0;
         while ((event = incomingEvents.poll()) != null) {
+            eventCount++;
             final SharedEvent finalEvent = event;
+            System.out.println("📨 Processing event: " + event.getEventType() + " (event #" + eventCount + ")");
             eventListeners.forEach(listener -> {
                 try {
                     listener.accept(finalEvent);
@@ -74,6 +77,11 @@ public class NetworkManager {
                     e.printStackTrace();
                 }
             });
+        }
+        if (eventCount > 0) {
+            System.out.println("✅ Processed " + eventCount + " events");
+        } else {
+            System.out.println("📭 No events to process");
         }
     }
     

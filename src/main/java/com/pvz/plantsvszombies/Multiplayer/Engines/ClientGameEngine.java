@@ -85,9 +85,12 @@ public class ClientGameEngine extends GameEngine {
         }
         
         // Process incoming server events
+        System.out.println("🔄 ClientGameEngine.update() called - processing events...");
         networkManager.processEvents();
+        System.out.println("✅ Events processed");
         
         if (!_gameStarted) {
+            System.out.println("⏳ Game not started yet, skipping game logic");
             return;
         }
         
