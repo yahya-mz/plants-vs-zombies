@@ -63,6 +63,12 @@ public class ClientGameEngine extends GameEngine {
     
     @Override
     public void start() {
+        // Prevent multiple starts
+        if (networkManager.isConnected()) {
+            System.out.println("Client game engine already started and connected");
+            return;
+        }
+        
         System.out.println("Starting client game engine...");
         
         try {
