@@ -105,6 +105,7 @@ public class NightView extends AbstractLevelView {
         _visualEngine = new VisualNightEngine(this, NightEngine);
         Mediator.init(NightEngine, _visualEngine);
         Mediator.getInstance().startGameEngine();
+        Mediator.getInstance().runEngine();
 
         this.setOnHiding((event) -> {
             System.out.println("Stopping GameEngine");

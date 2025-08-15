@@ -64,6 +64,8 @@ public class ClientGameEngine extends GameEngine {
     @Override
     public void start() {
 
+        initMap();
+
         // Prevent multiple starts
         if (networkManager.isConnected()) {
             System.out.println("Client game engine already started and connected");
@@ -108,9 +110,6 @@ public class ClientGameEngine extends GameEngine {
                 }
             }
         }
-
-        // Check for loss condition
-        checkLossCondition();
 
         // Check for win condition
         checkWinCondition();
@@ -212,24 +211,9 @@ public class ClientGameEngine extends GameEngine {
             System.out.println("🎉 YOU WON! Congratulations!");
             win();
         } else {
+            // LOSE
             System.out.println("Game ended. Winner: " + event.getWinnerName());
             System.out.println("Reason: " + event.getEndReason());
-        }
-    }
-
-    private void checkLossCondition() {
-        if (_playerLost) return;
-
-        // Check if any zombie reached the left side
-        for (AbstractGameObject obj : _gameObjects) {
-            if (obj instanceof AbstractZombieGameObject zombie) {
-                if (zombie.getCoordinate().x() <= 50) { // Reached house
-                    _playerLost = true;
-                    sendClientStatus(ClientStatusEvent.ClientStatus.LOST);
-                    lose(zombie);
-                    break;
-                }
-            }
         }
     }
 
@@ -238,6 +222,7 @@ public class ClientGameEngine extends GameEngine {
 
         // Win condition: Complete all 4 waves and kill all zombies
         if (_currentWave >= 4) {
+            System.out.println("wave 4");
             // Check if no zombies left on the field
             boolean hasZombies = _gameObjects.stream()
                     .anyMatch(obj -> obj instanceof AbstractZombieGameObject);
@@ -305,10 +290,10 @@ public class ClientGameEngine extends GameEngine {
     @Override
     public void lose(AbstractZombieGameObject winnerZombie) {
         if (!_playerLost) {
+            System.out.println("💀 You lost! A zombie reached your house.");
             _playerLost = true;
             sendClientStatus(ClientStatusEvent.ClientStatus.LOST);
             super.lose(winnerZombie);
-            System.out.println("💀 You lost! A zombie reached your house.");
         }
     }
 

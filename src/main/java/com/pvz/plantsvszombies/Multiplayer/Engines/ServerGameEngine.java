@@ -270,6 +270,7 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
                 // All clients lost
                 endGame(null, GameEndEvent.EndReason.PLAYER_LOST);
             } else if (_aliveClients.size() == 1) {
+                System.out.println("****************");
                 // Only one player left - they win!
                 endGame(_aliveClients.get(0), GameEndEvent.EndReason.LAST_SURVIVOR);
             }

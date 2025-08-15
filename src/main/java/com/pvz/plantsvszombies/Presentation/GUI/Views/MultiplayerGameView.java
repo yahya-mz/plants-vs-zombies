@@ -74,14 +74,6 @@ public class MultiplayerGameView extends AbstractLevelView {
         this.gameMode = gameMode;
     }
 
-    public static Stage createStage(ArrayList<AbstractPlantGameObject.PlantType> selectedPlants,
-                                    String serverAddress, String gameMode) {
-        MultiplayerGameView view = new MultiplayerGameView(selectedPlants, serverAddress, gameMode);
-        Stage stage = new Stage();
-        view.setupStage(stage);
-        return stage;
-    }
-
     /**
      * Create stage with an already-connected ClientGameEngine
      */
@@ -89,13 +81,11 @@ public class MultiplayerGameView extends AbstractLevelView {
                                     String serverAddress) {
 
         MultiplayerGameView view = new MultiplayerGameView(selectedPlants, serverAddress, "day");
-
-        Stage stage = new Stage();
-        view.setupStage(stage);
-        return stage;
+        view.setupStage();
+        return view;
     }
 
-    private void setupStage(Stage stage) {
+    private void setupStage() {
         try {
             this.clientEngine = new ClientGameEngine(GlobalSettings.WIDTH, GlobalSettings.HEIGHT, serverAddress);
             this._visualEngine = new VisualMultiplayerEngine(this, this.clientEngine);
@@ -111,13 +101,13 @@ public class MultiplayerGameView extends AbstractLevelView {
             // TODO: Properly integrate with visual engines
 
             // Setup UI
-            setupUI(stage);
+            setupUI();
 
             // Don't start game engines here - the client engine is already running
             // Mediator.getInstance().startGameEngine();
 
             // Setup close handler
-            stage.setOnCloseRequest(e -> {
+            this.setOnCloseRequest(e -> {
                 System.out.println("DEMO");
                 if (clientEngine != null) {
                     clientEngine.disconnect();
@@ -128,8 +118,6 @@ public class MultiplayerGameView extends AbstractLevelView {
             // Start the client engine if it hasn't been started yet
             if (!clientEngine.isConnected()) {
                 clientEngine.start();
-                clientEngine.initMap();
-//                clientEngine.initMap();
 
                 // Wait a moment for connection to establish
                 try {
@@ -149,6 +137,9 @@ public class MultiplayerGameView extends AbstractLevelView {
                     });
                     System.out.println("Sent ready status to server with plants: " + selectedPlants);
                 }
+
+                // Start game loop for client engine
+                startGameLoop();
             }
 
         } catch (Exception e) {
@@ -158,7 +149,7 @@ public class MultiplayerGameView extends AbstractLevelView {
         }
     }
 
-    private void setupUI(Stage stage) {
+    private void setupUI() {
 
         bottommostPlane = new StackPane();//changed
         gameBoxPane = bottommostPlane;
@@ -192,14 +183,8 @@ public class MultiplayerGameView extends AbstractLevelView {
 
 
         var scene = new Scene(gameBoxPane, Width, Height);
-        stage.setScene(scene);
-        stage.setResizable(false);
-
-        // Start status update timer
-        startStatusUpdates();
-
-        // Start game loop for client engine
-        startGameLoop();
+        this.setScene(scene);
+        this.setResizable(false);
     }
 
     private HBox createStatusBar() {
@@ -285,11 +270,11 @@ public class MultiplayerGameView extends AbstractLevelView {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     if (clientEngine != null && clientEngine.isConnected()) {
-                        clientEngine.update();
+//                        clientEngine.update();
+                        Mediator.getInstance().runEngine();
+                        return;
                     }
                     Thread.sleep(33); // ~30 FPS (1000ms / 30 = 33ms)
-                } catch (InterruptedException e) {
-                    break;
                 } catch (Exception e) {
                     System.err.println("Error in client game loop: " + e.getMessage());
                     e.printStackTrace();

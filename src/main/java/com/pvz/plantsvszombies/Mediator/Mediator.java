@@ -28,11 +28,10 @@ public class Mediator {
         this._visualEngine = visualEngine;
     }
 
-    public void startGameEngine() {
+    public void runEngine() {
         _engineThreadRunning = true;
         var gameEngineThread = new Thread(() -> {
             try {
-                _gameEngine.start();
                 while (_engineThreadRunning) {
                     try {
                         _gameEngine.update();
@@ -49,6 +48,10 @@ public class Mediator {
         gameEngineThread.start();
     }
 
+    public void startGameEngine() {
+        _gameEngine.start();
+    }
+
     public void stopGameEngine() {
         _engineThreadRunning = false;
         stopVisualEngine();
@@ -62,7 +65,7 @@ public class Mediator {
         _visualEngine.stopEngine();
     }
 
-    public void loadGame(){
+    public void loadGame() {
 
     }
 }

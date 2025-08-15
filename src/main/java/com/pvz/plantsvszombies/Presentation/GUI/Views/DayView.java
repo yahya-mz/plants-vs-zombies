@@ -105,6 +105,7 @@ public class DayView extends AbstractLevelView {
         _visualEngine = new VisualDayEngine(this, dayEngine);
         Mediator.init(dayEngine, _visualEngine);
         Mediator.getInstance().startGameEngine();
+        Mediator.getInstance().runEngine();
 
         this.setOnHiding((event) -> {
             System.out.println("Stopping GameEngine");
