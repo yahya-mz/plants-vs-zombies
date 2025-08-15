@@ -1,27 +1,22 @@
 package com.pvz.plantsvszombies.Presentation.Engines;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
+import com.pvz.plantsvszombies.Domain.Engines.DayEngine;
+import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.NormalBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.SnowBulletGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.FogGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.HypnotizedZombieGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.MapGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.*;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation;
-import com.pvz.plantsvszombies.Presentation.Entities.AbstractAnimatedVisualObject;
+import com.pvz.plantsvszombies.Presentation.Entities.*;
 import com.pvz.plantsvszombies.Presentation.Entities.Bullets.NormalBulletVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Bullets.ShroomBulletVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Bullets.SnowBulletVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.FogVisualObject;
-import com.pvz.plantsvszombies.Presentation.Entities.MapVisualObject;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.AbstractLevelView;
-import com.pvz.plantsvszombies.Presentation.Entities.AbstractVisualObject;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.DayMenu;
 import javafx.application.Platform;
 import javafx.scene.layout.Pane;
@@ -250,6 +245,11 @@ public abstract class VisualEngine {
             case MapGameObject m -> {
                 _currentMapVisualObject = new MapVisualObject(m, temp_this);
                 spawnVisualObject(_currentMapVisualObject, -10);
+            }
+
+            case SunGameObject s -> {
+                var vo = new SkySunVisualObject(s, temp_this);
+                spawnVisualObject(vo);
             }
 
             // Bullets

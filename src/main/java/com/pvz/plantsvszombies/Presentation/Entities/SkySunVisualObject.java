@@ -9,6 +9,7 @@ import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.SunAnimations;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
+import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,9 +32,9 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
     private GeneralFadingAnimation _fadingAnimation;
     private GeneralTransformAnimation _transformAnimation;
 
-    private VisualDayEngine _engine;
+    private VisualEngine _engine;
 
-    public SkySunVisualObject(SunGameObject gameObject, VisualDayEngine engine) {
+    public SkySunVisualObject(SunGameObject gameObject, VisualEngine engine) {
         _engine = engine;
         gameObject.subscribeToTimeOut(new IEventSubscriber() {
             @Override
@@ -51,7 +52,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
 
         _node.setCursor(Cursor.HAND);
         _node.setManaged(false);
-        _node.relocate(_visualCoordinate.x(),_visualCoordinate.y());
+        _node.relocate(_visualCoordinate.x(), _visualCoordinate.y());
         _node.setTranslateY(-50);
 //        _node.setTranslateX(_visualCoordinate.x());
 
@@ -71,7 +72,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
     public void spawn() {
         _gameObject.spawn();
         changeStateTo(States.DROPPING);
-        playAnimation(SunAnimations.Animations.SHINING,Duration.millis(60));
+        playAnimation(SunAnimations.Animations.SHINING, Duration.millis(60));
     }
 
     public SkySunVisualObject changeStateTo(States state) {

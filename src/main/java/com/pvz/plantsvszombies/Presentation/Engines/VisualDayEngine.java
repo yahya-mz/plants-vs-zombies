@@ -1,6 +1,7 @@
 package com.pvz.plantsvszombies.Presentation.Engines;
 
 import com.pvz.plantsvszombies.Domain.Engines.DayEngine;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.DayMenu;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.DayView;
 import javafx.application.Platform;
 
@@ -15,7 +16,7 @@ public class VisualDayEngine extends VisualEngine {
             playLosingSequence(gameObject.getId());
         }));
         _gameEngine.subscribeToWinEvent(gameObject -> {
-
+            DayMenu.createLostPopup().show();
         });
     }
 }

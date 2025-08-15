@@ -35,11 +35,11 @@ public class DayView extends AbstractLevelView {
     public static final double Width = 1200;
     public static final double Height = 728;
     public int cursorType;
-    private final IntegerProperty counterValue = new SimpleIntegerProperty(0);
     private VisualDayEngine _visualEngine;
     private StackPane bottommostPlane;
     private final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
     private Button shovelButton;
+    private final Label _counterLabel = new Label();
 
 
     private DayView() {
@@ -103,9 +103,11 @@ public class DayView extends AbstractLevelView {
     private void setupEngines() {
         DayEngine dayEngine = new DayEngine(DayView.Width, DayView.Height);
         _visualEngine = new VisualDayEngine(this, dayEngine);
+        _counterLabel.textProperty().bind(dayEngine.getPointProperty().asString());
         Mediator.init(dayEngine, _visualEngine);
         Mediator.getInstance().startGameEngine();
         Mediator.getInstance().runEngine();
+
 
         this.setOnHiding((event) -> {
             System.out.println("Stopping GameEngine");
@@ -114,21 +116,13 @@ public class DayView extends AbstractLevelView {
     }
 
     public VBox createCounter() {
-        Label counterLabel = new Label();
-        counterLabel.textProperty().bind(counterValue.asString());
-        counterLabel.setId("counter-label");
-
-        VBox counterBox = new VBox(counterLabel);
+        _counterLabel.setId("counter-label");
+        VBox counterBox = new VBox(_counterLabel);
         counterBox.setAlignment(Pos.TOP_CENTER);
         counterBox.setPrefHeight(100);
         counterBox.setMinWidth(50);
 
         return counterBox;
-    }
-
-    public int setMyCounterValue() {//updating counterval
-        counterValue.set(0);
-        return counterValue.get(); //mainenginevalue
     }
 
     public HBox createTopPlantSelectionBar(List<AbstractPlantGameObject.PlantType> selectedPlants) {

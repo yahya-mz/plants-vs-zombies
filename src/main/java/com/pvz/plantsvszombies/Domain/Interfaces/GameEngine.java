@@ -10,6 +10,9 @@ import com.pvz.plantsvszombies.Domain.Entities.Plants.CoffeeBeanGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Services.PersistenceManager;
 import com.pvz.plantsvszombies.Mediator.Mediator;
+import javafx.beans.binding.StringBinding;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,7 +30,7 @@ public abstract class GameEngine {
     protected final int _columns = 9;
 
     protected int tick = 1;
-    protected double _point;
+    private final IntegerProperty _point = new SimpleIntegerProperty(0);
     protected GameMode _gameMode;
 
     protected CopyOnWriteArrayList<AbstractGameObject> _gameObjects;
@@ -45,7 +48,6 @@ public abstract class GameEngine {
     public void load() {
     }
 
-    ;
 
     public void subscribeToGameObjectSpawnEvent(IEventSubscriber eventSubscriber) {
         this._gameObjectSpawnEventSubscribers.add(eventSubscriber);
@@ -68,7 +70,11 @@ public abstract class GameEngine {
         return this._columns;
     }
 
-    public double getPoint() {
+    public int getPoint() {
+        return _point.get();
+    }
+
+    public IntegerProperty getPointProperty() {
         return _point;
     }
 
@@ -84,12 +90,13 @@ public abstract class GameEngine {
         return _gameMode;
     }
 
-    public void addPoint(double point) {
-        this._point += point;
+    public void addPoint(int point) {
+        _point.setValue(_point.getValue() + point);
+        System.out.println(_point.get());
     }
 
-    public void subtractPoint(double point) {
-        this._point -= point;
+    public void subtractPoint(int point) {
+        _point.setValue(_point.getValue() - point);
     }
 
     public void disposeObject(AbstractGameObject object) {
@@ -109,6 +116,9 @@ public abstract class GameEngine {
     }
 
     public void plantObject(AbstractPlantGameObject object) throws Exception {
+        if (_point.get() < object.getCost()) {
+//            return;
+        }
         if (object instanceof CoffeeBeanGameObject) {
             if (!_currentMap.isOccupied(object.getRow(), object.getColumn()) ||
                     !(_currentMap.getPlantAtBlock(object.getRow(), object.getColumn()) instanceof AbstractNightPlantGameObject)) {

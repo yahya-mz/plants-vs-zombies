@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DayEngine extends GameEngine {
-    private final Duration _skySunDroppingInterval = Duration.ofSeconds(7);
+    private final Duration _skySunDroppingInterval = Duration.ofSeconds(3);
     private Duration _zombieSpawnInterval = Duration.ofSeconds(3);
     private final Duration _wave_2_Start = Duration.ofSeconds(15);
     private final Duration _wave_3_Start = Duration.ofSeconds(30);
@@ -48,7 +48,7 @@ public class DayEngine extends GameEngine {
 
         // Checking wave changes:
         if (getMilliseconds() % _gameInterval.toMillis() == 0) {
-            System.out.println("GameOver !");
+            win();
         } else if (getMilliseconds() == _wave_4_Start.toMillis()) {
             _currentWave = 4;
             System.out.println("Wave 4");

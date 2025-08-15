@@ -10,6 +10,7 @@ import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -27,6 +28,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
+
 import java.util.List;
 
 public class NightView extends AbstractLevelView {
@@ -34,13 +36,11 @@ public class NightView extends AbstractLevelView {
     public static final double Width = 1200;
     public static final double Height = 728;
     public int cursorType;
-    private static final IntegerProperty counterValue = new SimpleIntegerProperty(0);
     private VisualNightEngine _visualEngine;
     private static StackPane bottommostPlane;
     private static final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
     private static Button shovelButton;
-
-
+    private Label _counterLabel = new Label();
 
     private NightView() {
     }
@@ -62,7 +62,7 @@ public class NightView extends AbstractLevelView {
         //
 
         //bar
-        VBox suncounter = createCounter();
+        VBox suncounter = NightView.createCounter();
         HBox plantbar = NightView.createTopPlantSelectionBar(selectedPlants);
 //        addHoverEffectToImages(plantbar);
         Button shoveltool = NightView.createShovelToolButton();
@@ -77,16 +77,16 @@ public class NightView extends AbstractLevelView {
         mainbar.setMouseTransparent(false);
         mainbar.setPickOnBounds(true);
         HBox.setMargin(suncounter, new Insets(73, 60, 0, 236));//dont change this
-        HBox.setMargin(plantbar, new Insets(0,85,0, -70));
-        HBox.setMargin(shoveltool , new Insets(-14,0,0,-30));
+        HBox.setMargin(plantbar, new Insets(0, 85, 0, -70));
+        HBox.setMargin(shoveltool, new Insets(-14, 0, 0, -30));
         mainbar.setMinWidth(50);
         mainbar.setMinHeight(30);
 
-        bottommostPlane.getChildren().addAll(mainbar , pause);
+        bottommostPlane.getChildren().addAll(mainbar, pause);
         //StackPane.setMargin(mainbar, new Insets(20, -40, 200, 60));//dont change this
         StackPane.setAlignment(pause, Pos.BOTTOM_LEFT);
         StackPane.setAlignment(mainbar, Pos.TOP_CENTER);
-        StackPane.setMargin(mainbar, new Insets(15, 60, 185,-20));
+        StackPane.setMargin(mainbar, new Insets(15, 60, 185, -20));
 
 
         var scene = new Scene(bottommostPlane, Width, Height);
@@ -102,6 +102,7 @@ public class NightView extends AbstractLevelView {
 
     private void setupEngines() {
         NightEngine NightEngine = new NightEngine(NightView.Width, NightView.Height);
+        _counterLabel.textProperty().bind(NightEngine.getPointProperty().asString());
         _visualEngine = new VisualNightEngine(this, NightEngine);
         Mediator.init(NightEngine, _visualEngine);
         Mediator.getInstance().startGameEngine();
@@ -113,22 +114,14 @@ public class NightView extends AbstractLevelView {
         });
     }
 
-    public static VBox createCounter() {
-        Label counterLabel = new Label();
-        counterLabel.textProperty().bind(counterValue.asString());
-        counterLabel.setId("counter-label");
-
-        VBox counterBox = new VBox(counterLabel);
+    public VBox createCounter() {
+        _counterLabel.setId("counter-label");
+        VBox counterBox = new VBox(_counterLabel);
         counterBox.setAlignment(Pos.TOP_CENTER);
         counterBox.setPrefHeight(100);
         counterBox.setMinWidth(50);
 
         return counterBox;
-    }
-
-    public int setMyCounterValue() {//updating counterval
-        counterValue.set(0);
-        return counterValue.get(); //mainenginevalue
     }
 
     public HBox createTopPlantSelectionBar(List<AbstractPlantGameObject.PlantType> selectedPlants) {
@@ -216,7 +209,6 @@ public class NightView extends AbstractLevelView {
     }
 
 
-
     public Button createShovelToolButton() {
         Image shovelCursorImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shoveltool/shovel.png"));
         Image shovelFullImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shoveltool/shovelToolFull.png"), true);
@@ -274,7 +266,6 @@ public class NightView extends AbstractLevelView {
     }
 
 
-
     public static BooleanProperty isShovelModeProperty() {
         return isShovelMode;
     }
@@ -287,7 +278,7 @@ public class NightView extends AbstractLevelView {
         return isShovelMode.get();
     }
 
-    private static void shovelBarView(Button btn , ImageView shovelView){
+    private static void shovelBarView(Button btn, ImageView shovelView) {
         shovelView.setFitWidth(120);
         shovelView.setFitHeight(120);
         shovelView.setPreserveRatio(false);
@@ -320,9 +311,6 @@ public class NightView extends AbstractLevelView {
     }
 
 
-
-
-
     public static void playImageSequenceInBox(Pane targetBox, Runnable onFinished) {
         String[] imagePaths = {
                 "graphics/Items/Messages/ready.png",
@@ -347,10 +335,10 @@ public class NightView extends AbstractLevelView {
             setImage.setOnFinished(e -> imageView.setImage(image));
 
             FadeTransition fadeIn;
-            if (i==0){
+            if (i == 0) {
                 fadeIn = new FadeTransition(Duration.seconds(1.2), imageView);
 
-            }else {
+            } else {
                 fadeIn = new FadeTransition(Duration.seconds(0.5), imageView);
             }
             fadeIn.setFromValue(0);
@@ -381,18 +369,22 @@ public class NightView extends AbstractLevelView {
     }
 
 
-    public void showWave1(){
-        showWaveImages(bottommostPlane , "wave1");
+    public void showWave1() {
+        showWaveImages(bottommostPlane, "wave1");
     }
-    public void showWave2(){
-        showWaveImages(bottommostPlane , "wave2");
+
+    public void showWave2() {
+        showWaveImages(bottommostPlane, "wave2");
     }
-    public void showWave3(){
-        showWaveImages(bottommostPlane , "wave3");
+
+    public void showWave3() {
+        showWaveImages(bottommostPlane, "wave3");
     }
-    public void showFinalWave(){
-        showWaveImages(bottommostPlane , "finalwave");
+
+    public void showFinalWave() {
+        showWaveImages(bottommostPlane, "finalwave");
     }
+
     private static void showWaveImages(StackPane parentPane, String imageName) {
 
         VBox overlayBox = new VBox();

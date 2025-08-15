@@ -3,6 +3,7 @@ package com.pvz.plantsvszombies.Presentation.Engines;
 import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.DayMenu;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.NightView;
 import javafx.application.Platform;
 
@@ -18,7 +19,9 @@ public class VisualNightEngine extends VisualEngine {
             playLosingSequence(gameObject.getId());
         }));
         _gameEngine.subscribeToWinEvent(gameObject -> {
-
+            Platform.runLater(() -> {
+                DayMenu.createWinPopup().show();
+            });
         });
     }
 

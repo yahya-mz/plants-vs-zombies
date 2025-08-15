@@ -17,35 +17,22 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NightEngine extends GameEngine {
-    private final Duration _skySunDroppingInterval = Duration.ofSeconds(7);
     private final Duration _zombieSpawnInterval = Duration.ofSeconds(3);
     private final Duration _wave_2_Start = Duration.ofSeconds(15);
     private final Duration _wave_3_Start = Duration.ofSeconds(30);
     private final Duration _wave_4_Start = Duration.ofSeconds(45);
-    private final Duration _gameInterval = Duration.ofSeconds(60);
+    private final Duration _gameInterval = Duration.ofSeconds(5);
 
     private final Random _zombieSpawnRandom = new Random(System.currentTimeMillis());
-    private final Random _skyDroppingRandom = new Random(System.currentTimeMillis() * 100);
     private final Random _zombieTypeRandom = new Random(System.currentTimeMillis() / 1000);
 
     private final ArrayList<FogGameObject> _fogs = new ArrayList<>();
-
-    private final ArrayList<IEventSubscriber> _midAttackEventSubscribers = new ArrayList<>();
-    private final ArrayList<IEventSubscriber> _finalAttackEventSubscribers = new ArrayList<>();
 
     public NightEngine(double windowWidth, double windowHeight) {
         this._windowWidth = windowWidth;
         this._windowHeight = windowHeight;
         this._gameMode = GameMode.NIGHT;
         this._gameObjects = new CopyOnWriteArrayList<>();
-    }
-
-    public NightEngine(double windowWidth, double windowHeight, List<AbstractGameObject> gameObjects) {
-        this._windowWidth = windowWidth;
-        this._windowHeight = windowHeight;
-        this._gameMode = GameMode.NIGHT;
-        this._gameObjects = new CopyOnWriteArrayList<>();
-        _gameObjects.addAll(gameObjects);
     }
 
     private int _currentWave = 1;
@@ -71,7 +58,7 @@ public class NightEngine extends GameEngine {
 
         // Checking wave changes:
         if (getMilliseconds() % _gameInterval.toMillis() == 0) {
-            System.out.println("GameOver !");
+            win();
         } else if (getMilliseconds() == _wave_4_Start.toMillis()) {
             _currentWave = 4;
             System.out.println("Wave 4");

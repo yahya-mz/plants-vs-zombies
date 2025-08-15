@@ -11,7 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class SunGameObject extends AbstractGameObject implements Serializable {
-    private final double _points = 50;
+    private final int _points = 50;
     private final int _timeOutMilliseconds = 5000;
 
     private transient GameEngine _engine;
@@ -55,6 +55,7 @@ public class SunGameObject extends AbstractGameObject implements Serializable {
     }
 
     public void gain() {
+        System.out.println("GAINED");
         _engine.addPoint(this._points);
         _engine.disposeObject(this);
         this.isDisposed = true;
