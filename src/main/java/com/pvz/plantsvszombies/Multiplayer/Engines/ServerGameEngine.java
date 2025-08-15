@@ -295,9 +295,13 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
                     // Only check end conditions if game has started
                     if (_gameStarted) {
                         checkGameEndConditions();
-                    } else if (_connectedClients.isEmpty()) {
-                        // If no clients left before game starts, stop server
+                    } else if (_connectedClients.isEmpty() && networkManager.getConnectedClientCount() == 0) {
+                        // Only shutdown if both our tracking list AND network manager show no clients
+                        // This prevents premature shutdown due to tracking bugs
+                        System.out.println("DEBUG: All clients disconnected, shutting down server");
                         endGame(null, GameEndEvent.EndReason.SERVER_SHUTDOWN);
+                    } else if (_connectedClients.isEmpty() && networkManager.getConnectedClientCount() > 0) {
+                        System.out.println("DEBUG: _connectedClients is empty but network manager shows " + networkManager.getConnectedClientCount() + " clients - tracking bug detected");
                     }
                 }
             }
