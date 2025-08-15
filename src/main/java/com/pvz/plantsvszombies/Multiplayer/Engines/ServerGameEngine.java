@@ -121,12 +121,12 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
     
     @Override
     public void update() {
+        // Always process incoming client events, even before game starts
+        networkManager.processEvents();
+        
         if (!_gameStarted || _gameEnded) {
             return;
         }
-        
-        // Process incoming client events
-        networkManager.processEvents();
         
         // Check for game end conditions
         checkGameEndConditions();
