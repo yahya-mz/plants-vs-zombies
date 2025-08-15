@@ -112,8 +112,8 @@ public class MultiplayerGameView {
             // Setup UI
             setupUI(stage);
             
-            // Start game engines
-            Mediator.getInstance().startGameEngine();
+            // Don't start game engines here - the client engine is already running
+            // Mediator.getInstance().startGameEngine();
             
             // Setup close handler
             stage.setOnCloseRequest(e -> {
