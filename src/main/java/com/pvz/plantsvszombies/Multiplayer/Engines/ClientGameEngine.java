@@ -283,6 +283,9 @@ public class ClientGameEngine extends GameEngine {
             plantTypeStrings.add(plantType.name());
         }
         
+        System.out.println("DEBUG: Sending ready status with clientId: " + clientId);
+        System.out.println("DEBUG: Network manager clientId: " + networkManager.getClientId());
+        
         ClientReadyEvent event = new ClientReadyEvent(tick, clientId, plantTypeStrings);
         networkManager.sendEvent(event);
         
