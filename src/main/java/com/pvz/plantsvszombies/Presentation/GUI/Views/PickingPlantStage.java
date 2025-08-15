@@ -1,4 +1,5 @@
 package com.pvz.plantsvszombies.Presentation.GUI.Views;
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
@@ -25,9 +26,9 @@ public class PickingPlantStage {
     private final HBox selectedPlantHBox = new HBox(0);
     private Stage primaryStage;
     private Button playBtn;
-    private final String _mode;
+    private final GameMode _mode;
 
-    public PickingPlantStage(String mode){
+    public PickingPlantStage(GameMode mode){
         this._mode = mode;
     }
 
@@ -293,7 +294,7 @@ public class PickingPlantStage {
 
         button.setOnAction(e -> {
             Stage gameStage;
-            if (_mode.equals("day")){
+            if (_mode == GameMode.DAY){
                 gameStage = DayView.createStage(selectedPlants);
             }
             else {

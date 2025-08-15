@@ -1,5 +1,6 @@
 package com.pvz.plantsvszombies.Multiplayer;
 
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Multiplayer.Engines.ServerGameEngine;
 
@@ -14,7 +15,7 @@ public class ServerLauncher {
         
         // Parse command line arguments
         int playerCount = 2;
-        String gameMode = "day";
+        GameMode gameMode = GameMode.DAY;
         
         if (args.length >= 1) {
             try {
@@ -29,23 +30,19 @@ public class ServerLauncher {
         }
         
         if (args.length >= 2) {
-            gameMode = args[1].toLowerCase();
-            if (!gameMode.equals("day") && !gameMode.equals("night")) {
-                System.err.println("Game mode must be 'day' or 'night'. Using default: day");
-                gameMode = "day";
-            }
+            gameMode = GameMode.fromString(args[1]);
         }
         
         System.out.println("Server Configuration:");
         System.out.println("- Max Players: " + playerCount);
-        System.out.println("- Game Mode: " + gameMode);
+        System.out.println("- Game Mode: " + gameMode.name());
         System.out.println("- Port: 12345");
         System.out.println();
         
         try {
             // Create and start server
             ServerGameEngine serverEngine = new ServerGameEngine(
-                GlobalSettings.WIDTH, GlobalSettings.HEIGHT, playerCount);
+                GlobalSettings.WIDTH, GlobalSettings.HEIGHT, playerCount, gameMode);
             
             System.out.println("🚀 Starting server...");
             serverEngine.start();

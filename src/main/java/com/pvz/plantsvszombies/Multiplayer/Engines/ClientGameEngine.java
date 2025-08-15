@@ -1,6 +1,7 @@
 package com.pvz.plantsvszombies.Multiplayer.Engines;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
@@ -46,6 +47,7 @@ public class ClientGameEngine extends GameEngine {
     public ClientGameEngine(double windowWidth, double windowHeight, String serverHost) {
         this._windowWidth = windowWidth;
         this._windowHeight = windowHeight;
+        this._gameMode = GameMode.DAY; // Default to day mode
         this._gameObjects = new CopyOnWriteArrayList<>();
 
         // Initialize network manager first
@@ -59,6 +61,25 @@ public class ClientGameEngine extends GameEngine {
         this.networkManager.addEventListener(this::handleServerEvent);
 
         System.out.println("Client game engine initialized: " + clientId);
+    }
+
+    public ClientGameEngine(double windowWidth, double windowHeight, String serverHost, GameMode gameMode) {
+        this._windowWidth = windowWidth;
+        this._windowHeight = windowHeight;
+        this._gameMode = gameMode;
+        this._gameObjects = new CopyOnWriteArrayList<>();
+
+        // Initialize network manager first
+        this.networkManager = new ClientNetworkManager(serverHost);
+
+        // Generate client ID and set it in both places
+        this.clientId = "Client_" + java.util.UUID.randomUUID().toString().substring(0, 8);
+        this.networkManager.setClientId(this.clientId);
+
+        // Listen for server events
+        this.networkManager.addEventListener(this::handleServerEvent);
+
+        System.out.println("Client game engine initialized: " + clientId + " (mode: " + gameMode + ")");
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.pvz.plantsvszombies.Presentation.GUI.Views;
 import java.io.File;
 import java.util.ArrayList;
 
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Multiplayer.Engines.ClientGameEngine;
@@ -38,7 +39,7 @@ public class MultiplayerPickingStage {
     private Stage primaryStage;
     private Button playBtn;
     private final String serverAddress;
-    private final String gameMode;
+    private final GameMode gameMode;
     private Image[] cardImages;
 
     // Status display
@@ -47,7 +48,7 @@ public class MultiplayerPickingStage {
     // Client engine for sending ready status (created only when needed)
     private ClientGameEngine clientEngine;
 
-    public MultiplayerPickingStage(String serverAddress, String gameMode) {
+    public MultiplayerPickingStage(String serverAddress, GameMode gameMode) {
         this.serverAddress = serverAddress;
         this.gameMode = gameMode;
         // Don't create ClientGameEngine here - wait until start button is clicked

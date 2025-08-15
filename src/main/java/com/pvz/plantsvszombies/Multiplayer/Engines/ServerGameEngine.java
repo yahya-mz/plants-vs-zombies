@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
@@ -45,6 +46,20 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
     public ServerGameEngine(double windowWidth, double windowHeight, int requiredClients) {
         super(windowWidth, windowHeight);
         this._requiredClients = requiredClients;
+        this._gameMode = GameMode.DAY; // Default to day mode
+        this._gameObjects = new CopyOnWriteArrayList<>();
+
+        // Initialize network manager
+        this.networkManager = new ServerNetworkManager(12345, requiredClients);
+
+        // Listen for client status events
+        this.networkManager.addEventListener(this::handleClientEvent);
+    }
+
+    public ServerGameEngine(double windowWidth, double windowHeight, int requiredClients, GameMode gameMode) {
+        super(windowWidth, windowHeight);
+        this._requiredClients = requiredClients;
+        this._gameMode = gameMode;
         this._gameObjects = new CopyOnWriteArrayList<>();
 
         // Initialize network manager

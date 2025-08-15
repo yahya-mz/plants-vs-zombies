@@ -1,5 +1,6 @@
 package com.pvz.plantsvszombies.Presentation.GUI.Views;
 
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Multiplayer.Engines.ServerGameEngine;
 
@@ -133,7 +134,7 @@ public class MultiplayerMenuView {
         startServerButton.setStyle("-fx-font-size: 16px; -fx-padding: 10 30; -fx-background-color: #4CAF50; -fx-text-fill: white;");
         
         startServerButton.setOnAction(e -> {
-            String gameMode = dayMode.isSelected() ? "day" : "night";
+            GameMode gameMode = dayMode.isSelected() ? GameMode.DAY : GameMode.NIGHT;
             int playerCount = playerSpinner.getValue();
             boolean hostShouldPlay = hostPlay.isSelected();
             startServer(gameMode, playerCount, hostShouldPlay, statusLabel, startServerButton);
@@ -186,7 +187,7 @@ public class MultiplayerMenuView {
         return clientBox;
     }
     
-    private void startServer(String gameMode, int playerCount, boolean hostShouldPlay, Label statusLabel, Button startButton) {
+    private void startServer(GameMode gameMode, int playerCount, boolean hostShouldPlay, Label statusLabel, Button startButton) {
         startButton.setDisable(true);
         statusLabel.setText("🔄 Starting server...");
         statusLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #2196F3;");
@@ -195,7 +196,7 @@ public class MultiplayerMenuView {
         Thread serverThread = new Thread(() -> {
             try {
                 ServerGameEngine serverEngine = new ServerGameEngine(
-                    GlobalSettings.WIDTH, GlobalSettings.HEIGHT, playerCount);
+                    GlobalSettings.WIDTH, GlobalSettings.HEIGHT, playerCount, gameMode);
                 
                 Platform.runLater(() -> {
                     statusLabel.setText("✅ Server running! Waiting for " + playerCount + " players...");
@@ -264,7 +265,7 @@ public class MultiplayerMenuView {
         // Just open the plant picking stage - no connection test needed
         Platform.runLater(() -> {
             try {
-                MultiplayerPickingStage pickingStage = new MultiplayerPickingStage(serverAddress, "day");
+                MultiplayerPickingStage pickingStage = new MultiplayerPickingStage(serverAddress, GameMode.DAY);
                 Stage gameStage = pickingStage.createStage(primaryStage);
                 gameStage.show();
                 ((Stage) connectButton.getScene().getWindow()).close();

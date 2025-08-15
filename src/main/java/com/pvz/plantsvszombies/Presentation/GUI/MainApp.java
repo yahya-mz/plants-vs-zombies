@@ -1,6 +1,7 @@
 //}
 package com.pvz.plantsvszombies.Presentation.GUI;
 
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.MultiplayerMenuView;
 import com.pvz.plantsvszombies.Presentation.GUI.Views.PickingPlantStage;
@@ -57,11 +58,11 @@ public class MainApp extends Application {
         loadBtn.setPrefHeight(100);
 
         dayModeBtn.setOnAction(e -> {
-            launchGame(primaryStage, "day");
+            launchGame(primaryStage, GameMode.DAY);
         });
 
         nightModeBtn.setOnAction(e -> {
-            launchGame(primaryStage, "night");
+            launchGame(primaryStage, GameMode.NIGHT);
         });
         
         multiplayerBtn.setOnAction(e -> {
@@ -116,7 +117,7 @@ public class MainApp extends Application {
     }
 
 
-    private void launchGame(Stage primaryStage, String mode) {//for launching game
+    private void launchGame(Stage primaryStage, GameMode mode) {//for launching game
         try {
             PickingPlantStage pickingStageBuilder = new PickingPlantStage(mode);
             Stage pickingPlantStage = pickingStageBuilder.createStage(primaryStage);
