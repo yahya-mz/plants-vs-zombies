@@ -9,56 +9,63 @@ import com.pvz.plantsvszombies.Multiplayer.Events.SharedEvent;
 /**
  * Manages network communication for multiplayer functionality
  */
-public class NetworkManager {
+public abstract class NetworkManager {
     private static final int DEFAULT_PORT = 12345;
     private final ConcurrentLinkedQueue<SharedEvent> incomingEvents;
     private final ConcurrentLinkedQueue<SharedEvent> outgoingEvents;
     private final CopyOnWriteArrayList<Consumer<SharedEvent>> eventListeners;
-    
+
     private boolean isRunning = false;
     protected Thread networkThread;
-    
+
     public NetworkManager() {
         this.incomingEvents = new ConcurrentLinkedQueue<>();
         this.outgoingEvents = new ConcurrentLinkedQueue<>();
         this.eventListeners = new CopyOnWriteArrayList<>();
     }
-    
+
     /**
      * Add a listener for incoming events
      */
     public void addEventListener(Consumer<SharedEvent> listener) {
         eventListeners.add(listener);
     }
-    
+
     /**
      * Remove an event listener
      */
     public void removeEventListener(Consumer<SharedEvent> listener) {
         eventListeners.remove(listener);
     }
-    
+
     /**
      * Send an event to the network
      */
     public void sendEvent(SharedEvent event) {
         outgoingEvents.offer(event);
     }
-    
+
+    protected void notifyIncomingEvent(SharedEvent event) {
+        incomingEvents.offer(event);
+    }
+
     /**
      * Get the next incoming event (non-blocking)
      */
-    public SharedEvent getNextEvent() {
+    protected SharedEvent getNextEvent() {
         return incomingEvents.poll();
     }
-    
+    protected SharedEvent getNextOutgoingEvent() {
+        return outgoingEvents.poll();
+    }
+
     /**
      * Check if there are incoming events
      */
     public boolean hasIncomingEvents() {
         return !incomingEvents.isEmpty();
     }
-    
+
     /**
      * Process all incoming events and notify listeners
      */
@@ -76,7 +83,7 @@ public class NetworkManager {
             });
         }
     }
-    
+
     /**
      * Start the network manager
      */
@@ -86,7 +93,7 @@ public class NetworkManager {
             startNetworkThread();
         }
     }
-    
+
     /**
      * Stop the network manager
      */
@@ -96,26 +103,16 @@ public class NetworkManager {
             networkThread.interrupt();
         }
     }
-    
+
     /**
      * Method to be overridden by server and client managers
      */
-    protected void startNetworkThread() {
-        // Default implementation - to be overridden
-    }
-    
-    protected void notifyIncomingEvent(SharedEvent event) {
-        incomingEvents.offer(event);
-    }
-    
-    protected SharedEvent getNextOutgoingEvent() {
-        return outgoingEvents.poll();
-    }
-    
+    protected abstract void startNetworkThread();
+
     protected boolean hasOutgoingEvents() {
         return !outgoingEvents.isEmpty();
     }
-    
+
     public boolean isRunning() {
         return isRunning;
     }
