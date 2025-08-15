@@ -1,84 +1,322 @@
 package com.pvz.plantsvszombies.Presentation.GUI.Views;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
 import com.pvz.plantsvszombies.Multiplayer.Engines.ClientGameEngine;
+import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.ImageCursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 /**
- * Main game view for multiplayer mode
+ * Main game view for multiplayer mode - follows NightView pattern
  */
-public class MultiplayerGameView {
+public class MultiplayerGameView extends AbstractLevelView {
     
-    public static final int Width = GlobalSettings.WIDTH;
-    public static final int Height = GlobalSettings.HEIGHT;
+    public static final double Width = 1200;
+    public static final double Height = 728;
     
     private ClientGameEngine clientEngine;
     private String serverAddress;
     private String gameMode;
-    private ArrayList<AbstractPlantGameObject.PlantType> selectedPlants;
+    private List<AbstractPlantGameObject.PlantType> selectedPlants;
     
-    // UI Elements for multiplayer info
-    private Label connectionStatusLabel;
-    private Label gameStatusLabel;
-    private Label waveLabel;
-    private Label playerStatusLabel;
+
     
     // Game components
-    protected Pane gameBoxPane;
-    protected boolean isShovelMode = false;
+    private static StackPane bottommostPlane;
+    private static final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
+    private static final IntegerProperty counterValue = new SimpleIntegerProperty(0);
     
     // Visual engine reference
     private Object visualEngine;
     
-    private MultiplayerGameView(ArrayList<AbstractPlantGameObject.PlantType> selectedPlants, 
-                              String serverAddress, String gameMode) {
-        this.selectedPlants = selectedPlants;
-        this.serverAddress = serverAddress;
-        this.gameMode = gameMode;
+    private MultiplayerGameView() {
     }
     
-    public static Stage createStage(ArrayList<AbstractPlantGameObject.PlantType> selectedPlants, 
+    public static MultiplayerGameView createStage(List<AbstractPlantGameObject.PlantType> selectedPlants, 
                                    String serverAddress, String gameMode) {
-        MultiplayerGameView view = new MultiplayerGameView(selectedPlants, serverAddress, gameMode);
-        Stage stage = new Stage();
-        view.setupStage(stage);
-        return stage;
+        var view = new MultiplayerGameView();
+        view.selectedPlants = selectedPlants;
+        view.serverAddress = serverAddress;
+        view.gameMode = gameMode;
+        
+        bottommostPlane = new StackPane();
+        view._gameBoxPane = bottommostPlane;
+        
+        // Create UI components
+        VBox suncounter = view.createCounter();
+        HBox plantbar = view.createTopPlantSelectionBar(selectedPlants);
+        Button shoveltool = view.createShovelToolButton();
+        Button pause = view.createPauseButton();
+        
+        // Create main bar
+        HBox mainbar = new HBox(80);
+        mainbar.setMaxWidth(1100);
+        mainbar.setMaxHeight(100);
+        mainbar.getChildren().addAll(suncounter, plantbar, shoveltool);
+        mainbar.setAlignment(Pos.TOP_CENTER);
+        mainbar.setMouseTransparent(false);
+        mainbar.setPickOnBounds(true);
+        HBox.setMargin(suncounter, new Insets(73, 60, 0, 236));
+        HBox.setMargin(plantbar, new Insets(0,85,0, -70));
+        HBox.setMargin(shoveltool, new Insets(-14,0,0,-30));
+        mainbar.setMinWidth(50);
+        mainbar.setMinHeight(30);
+        
+        bottommostPlane.getChildren().addAll(mainbar, pause);
+        StackPane.setAlignment(pause, Pos.BOTTOM_LEFT);
+        StackPane.setAlignment(mainbar, Pos.TOP_CENTER);
+        StackPane.setMargin(mainbar, new Insets(15, 60, 185,-20));
+        
+        var scene = new Scene(bottommostPlane, Width, Height);
+        view.setScene(scene);
+        view.setResizable(false);
+        view.setupEngines();
+        
+        return view;
     }
     
     /**
      * Create stage with an already-connected ClientGameEngine
      */
-    public static Stage createStage(ClientGameEngine connectedClientEngine, 
-                                   ArrayList<AbstractPlantGameObject.PlantType> selectedPlants, 
+    public static MultiplayerGameView createStage(ClientGameEngine connectedClientEngine, 
+                                   List<AbstractPlantGameObject.PlantType> selectedPlants, 
                                    String serverAddress, String gameMode) {
-        MultiplayerGameView view = new MultiplayerGameView(selectedPlants, serverAddress, gameMode);
-        view.clientEngine = connectedClientEngine; // Use the already-connected engine
-        Stage stage = new Stage();
-        view.setupStage(stage);
-        return stage;
+        var view = new MultiplayerGameView();
+        view.clientEngine = connectedClientEngine;
+        view.selectedPlants = selectedPlants;
+        view.serverAddress = serverAddress;
+        view.gameMode = gameMode;
+        
+        bottommostPlane = new StackPane();
+        view._gameBoxPane = bottommostPlane;
+        
+        // Create UI components
+        VBox suncounter = view.createCounter();
+        HBox plantbar = view.createTopPlantSelectionBar(selectedPlants);
+        Button shoveltool = view.createShovelToolButton();
+        Button pause = view.createPauseButton();
+        
+        // Create main bar
+        HBox mainbar = new HBox(80);
+        mainbar.setMaxWidth(1100);
+        mainbar.setMaxHeight(100);
+        mainbar.getChildren().addAll(suncounter, plantbar, shoveltool);
+        mainbar.setAlignment(Pos.TOP_CENTER);
+        mainbar.setMouseTransparent(false);
+        mainbar.setPickOnBounds(true);
+        HBox.setMargin(suncounter, new Insets(73, 60, 0, 236));
+        HBox.setMargin(plantbar, new Insets(0,85,0, -70));
+        HBox.setMargin(shoveltool, new Insets(-14,0,0,-30));
+        mainbar.setMinWidth(50);
+        mainbar.setMinHeight(30);
+        
+        bottommostPlane.getChildren().addAll(mainbar, pause);
+        StackPane.setAlignment(pause, Pos.BOTTOM_LEFT);
+        StackPane.setAlignment(mainbar, Pos.TOP_CENTER);
+        StackPane.setMargin(mainbar, new Insets(15, 60, 185,-20));
+        
+        var scene = new Scene(bottommostPlane, Width, Height);
+        view.setScene(scene);
+        view.setResizable(false);
+        view.setupEngines();
+        
+        return view;
     }
     
-    private void setupStage(Stage stage) {
+    public static VBox createCounter() {
+        Label counterLabel = new Label();
+        counterLabel.textProperty().bind(counterValue.asString());
+        counterLabel.setId("counter-label");
+
+        VBox counterBox = new VBox(counterLabel);
+        counterBox.setAlignment(Pos.TOP_CENTER);
+        counterBox.setPrefHeight(100);
+        counterBox.setMinWidth(50);
+
+        return counterBox;
+    }
+
+    public int setMyCounterValue() {
+        counterValue.set(0);
+        return counterValue.get();
+    }
+
+    public HBox createTopPlantSelectionBar(List<AbstractPlantGameObject.PlantType> selectedPlants) {
+        HBox buttonBar = new HBox(0);
+
+        buttonBar.setAlignment(Pos.TOP_CENTER);
+        buttonBar.setPrefHeight(86);
+
+        for (int i = 0; i < selectedPlants.size(); i++) {
+            Button btn = new Button("Item " + i);
+            btn.setCursor(Cursor.HAND);
+            Image path = new Image(GlobalSettings.getResource("graphics/Cards/" + selectedPlants.get(i).name() + ".png"), true);
+            ImageView cardpic = new ImageView(path);
+
+            cardpic.setPreserveRatio(true);
+            cardpic.setSmooth(true);
+            cardpic.setFitWidth(79);
+
+            Insets margin;
+            switch (i) {
+                case 0 -> margin = new Insets(5, 4, 0, 40);
+                case 1 -> margin = new Insets(5, 0, 0, 0);
+                case 2 -> margin = new Insets(5, 3, 0, 5);
+                case 3 -> margin = new Insets(5, 25, 0, 0);
+                case 4 -> margin = new Insets(5, 4, 0, -20);
+                case 5 -> margin = new Insets(5, 8, 0, 0);
+                default -> margin = new Insets(5, 0, 0, 0);
+            }
+            HBox.setMargin(btn, margin);
+
+            final AbstractPlantGameObject.PlantType final_plantType = selectedPlants.get(i);
+            btn.setOnMouseClicked(e -> {
+                if (e.getButton().equals(MouseButton.PRIMARY)) {
+                    // TODO: Implement plant selection for multiplayer
+                    System.out.println("Selected plant: " + final_plantType);
+                }
+            });
+
+            btn.setGraphic(cardpic);
+            btn.setPrefSize(70, 90);
+            btn.setMinSize(70, 90);
+            btn.setMaxSize(70, 90);
+            btn.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-border-color: transparent;");
+
+            buttonBar.getChildren().add(btn);
+        }
+        addHoverEffectToImages(buttonBar);
+        return buttonBar;
+    }
+
+    public static void addHoverEffectToImages(HBox hbox) {
+        for (Node node : hbox.getChildren()) {
+            if (node instanceof Button btn) {
+                btn.setOnMouseEntered(e -> {
+                    btn.setTranslateY(-9);
+                    btn.setScaleX(1.02);
+                    btn.setScaleY(1.02);
+                });
+
+                btn.setOnMouseExited(e -> {
+                    btn.setTranslateY(0);
+                    btn.setScaleX(1);
+                    btn.setScaleY(1);
+                });
+            }
+        }
+    }
+
+    public Button createShovelToolButton() {
+        Image shovelCursorImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shoveltool/shovel.png"));
+        Image shovelFullImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shoveltool/shovelToolFull.png"), true);
+        Image shovelEmptyImage = new Image(GlobalSettings.getResource("graphics/Items/bar/shoveltool/shovelToolEmpty.png"), true);
+
+        Button shovelButton = new Button();
+        ImageView shovelFullView = new ImageView(shovelFullImage);
+        ImageView shovelEmptyView = new ImageView(shovelEmptyImage);
+
+        shovelBarView(shovelButton, shovelFullView);
+
+        isShovelModeProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal && shovelButton.getScene() != null) {
+                Platform.runLater(() -> {
+                    shovelButton.getScene().setCursor(Cursor.DEFAULT);
+                    shovelBarView(shovelButton, new ImageView(shovelFullImage));
+                });
+            }
+        });
+
+        shovelButton.setOnAction(e -> {
+            isShovelMode.set(true);
+
+            Scene scene = shovelButton.getScene();
+            if (scene != null && getIsShovelMode()) {
+                scene.setCursor(new ImageCursor(shovelCursorImage, 32, 32));
+                // TODO: Implement shovel functionality for multiplayer
+                System.out.println("Shovel mode activated");
+                shovelBarView(shovelButton, new ImageView(shovelEmptyImage));
+
+                scene.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
+                    if (event.getButton() == MouseButton.SECONDARY && getIsShovelMode()) {
+                        // TODO: Implement shovel deactivation for multiplayer
+                        System.out.println("Shovel mode deactivated");
+                        isShovelMode.set(false);
+                    }
+                });
+            }
+        });
+        addHoverEffectToShovel(shovelButton);
+
+        return shovelButton;
+    }
+
+    private void addHoverEffectToShovel(Button btn) {
+        btn.setOnMouseEntered(e -> {
+            if (!getIsShovelMode()) {
+                btn.setScaleX(1.1);
+                btn.setScaleY(1.1);
+            }
+        });
+
+        btn.setOnMouseExited(e -> {
+            btn.setScaleX(1.0);
+            btn.setScaleY(1.0);
+        });
+    }
+
+    public static BooleanProperty isShovelModeProperty() {
+        return isShovelMode;
+    }
+
+    public void setIsShovelMode(boolean value) {
+        isShovelMode.set(value);
+    }
+
+    public static boolean getIsShovelMode() {
+        return isShovelMode.get();
+    }
+
+    private static void shovelBarView(Button btn, ImageView shovelView) {
+        shovelView.setFitWidth(120);
+        shovelView.setPreserveRatio(false);
+        btn.setGraphic(shovelView);
+        btn.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-border-color: transparent;");
+    }
+
+    public static Button createPauseButton() {
+        Button PauseButton = new Button();
+        // TODO: Implement pause functionality for multiplayer
+        PauseButton.setText("PAUSE");
+        PauseButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
+        PauseButton.setPrefSize(80, 40);
+        
+        return PauseButton;
+    }
+
+    private void setupEngines() {
         try {
             // Don't create a new client engine - use the one passed in
             if (clientEngine == null) {
@@ -103,20 +341,14 @@ public class MultiplayerGameView {
                 }
             }
             
-            // Initialize visual engine based on game mode (simplified for now)
-            // TODO: Properly integrate with visual engines
-            
             // Initialize mediator
             Mediator.init(clientEngine, null);
             
-            // Setup UI
-            setupUI(stage);
-            
-            // Don't start game engines here - the client engine is already running
-            // Mediator.getInstance().startGameEngine();
+            // Start game loop for client engine
+            startGameLoop();
             
             // Setup close handler
-            stage.setOnCloseRequest(e -> {
+            this.setOnHiding((event) -> {
                 if (clientEngine != null) {
                     clientEngine.disconnect();
                 }
@@ -130,151 +362,15 @@ public class MultiplayerGameView {
         }
     }
     
-    private void setupUI(Stage stage) {
-        // Create main layout
-        BorderPane root = new BorderPane();
-        
-        // Game area (center)
-        gameBoxPane = new Pane();
-        gameBoxPane.setPrefSize(Width, Height);
-        
-        // Background
-        String backgroundPath = gameMode.equals("night") ? 
-            "graphics/Items/Background/daymap.jpg" :
-            "graphics/Items/Background/nightmap.jpg";
-        
-        Image backgroundImage = new Image(GlobalSettings.getResource(backgroundPath));
-        BackgroundSize backgroundSize = new BackgroundSize(Width, Height, false, false, false, false);
-        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, backgroundSize);
-        gameBoxPane.setBackground(new Background(background));
-        
-        root.setCenter(gameBoxPane);
-        
-        // Top status bar
-        HBox statusBar = createStatusBar();
-        root.setTop(statusBar);
-        
-        // Left side plant selection
-        VBox plantPanel = createPlantPanel();
-        root.setLeft(plantPanel);
-        
-        // Right side player info
-        VBox playerPanel = createPlayerInfoPanel();
-        root.setRight(playerPanel);
-        
-        // Create scene and stage
-        Scene scene = new Scene(root, Width + 200, Height + 50); // Extra space for UI
-        stage.setTitle("Plants vs Zombies - Multiplayer (" + gameMode + ")");
-        stage.setScene(scene);
-        stage.setResizable(false);
-        
-        // Start status update timer
-        startStatusUpdates();
-        
-        // Start game loop for client engine
-        startGameLoop();
-    }
+
     
-    private HBox createStatusBar() {
-        HBox statusBar = new HBox(20);
-        statusBar.setPadding(new Insets(5, 10, 5, 10));
-        statusBar.setAlignment(Pos.CENTER_LEFT);
-        statusBar.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-text-fill: white;");
-        
-        connectionStatusLabel = new Label("🔗 Connected");
-        connectionStatusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
-        
-        gameStatusLabel = new Label("⏳ Waiting for game to start");
-        gameStatusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
-        
-        waveLabel = new Label("Wave: --");
-        waveLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
-        
-        playerStatusLabel = new Label("Plants: " + selectedPlants.size());
-        playerStatusLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
-        
-        statusBar.getChildren().addAll(connectionStatusLabel, gameStatusLabel, waveLabel, playerStatusLabel);
-        return statusBar;
-    }
+
     
-    private VBox createPlantPanel() {
-        VBox plantPanel = new VBox(5);
-        plantPanel.setPadding(new Insets(10));
-        plantPanel.setPrefWidth(150);
-        plantPanel.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7); -fx-text-fill: white;");
-        
-        Label titleLabel = new Label("Selected Plants");
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: white;");
-        
-        VBox plantList = new VBox(5);
-        for (AbstractPlantGameObject.PlantType plantType : selectedPlants) {
-            Label plantLabel = new Label("• " + plantType.name().replace("_", " "));
-            plantLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
-            plantList.getChildren().add(plantLabel);
-        }
-        
-        plantPanel.getChildren().addAll(titleLabel, plantList);
-        return plantPanel;
-    }
+
     
-    private VBox createPlayerInfoPanel() {
-        VBox playerPanel = new VBox(5);
-        playerPanel.setPadding(new Insets(10));
-        playerPanel.setPrefWidth(150);
-        playerPanel.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7); -fx-text-fill: white;");
-        
-        Label titleLabel = new Label("Player Info");
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: white;");
-        
-        Label clientIdLabel = new Label("ID: " + (clientEngine != null ? clientEngine.getClientId() : "Unknown"));
-        clientIdLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
-        
-        Label gameModeLabel = new Label("Mode: " + gameMode);
-        gameModeLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px;");
-        
-        playerPanel.getChildren().addAll(titleLabel, clientIdLabel, gameModeLabel);
-        return playerPanel;
-    }
+
     
-    private void startStatusUpdates() {
-        // Update status every second
-        Thread statusThread = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    Platform.runLater(() -> {
-                        if (clientEngine != null) {
-                            // Update connection status
-                            if (clientEngine.isConnected()) {
-                                connectionStatusLabel.setText("🔗 Connected");
-                                connectionStatusLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-size: 12px;");
-                            } else {
-                                connectionStatusLabel.setText("❌ Disconnected");
-                                connectionStatusLabel.setStyle("-fx-text-fill: #F44336; -fx-font-size: 12px;");
-                            }
-                            
-                            // Update game status
-                            if (clientEngine.isGameStarted()) {
-                                gameStatusLabel.setText("🎮 Game in progress");
-                                gameStatusLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-size: 12px;");
-                                waveLabel.setText("Wave: " + clientEngine.getCurrentWave());
-                            } else if (clientEngine.isGameEnded()) {
-                                gameStatusLabel.setText("🏁 Game ended");
-                                gameStatusLabel.setStyle("-fx-text-fill: #FF9800; -fx-font-size: 12px;");
-                            }
-                        }
-                    });
-                    
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-        });
-        
-        statusThread.setDaemon(true);
-        statusThread.start();
-    }
+
     
     private void startGameLoop() {
         // Start game loop for client engine at 30 FPS
@@ -299,14 +395,6 @@ public class MultiplayerGameView {
     }
     
     public Pane getGameBoxPane() {
-        return gameBoxPane;
-    }
-    
-    public void setIsShovelMode(boolean isShovelMode) {
-        this.isShovelMode = isShovelMode;
-    }
-    
-    public boolean getIsShovelMode() {
-        return isShovelMode;
+        return _gameBoxPane;
     }
 }

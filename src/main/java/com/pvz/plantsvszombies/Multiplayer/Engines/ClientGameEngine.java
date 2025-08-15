@@ -40,7 +40,7 @@ public class ClientGameEngine extends GameEngine {
     private long _gameStartTime = 0;
     
     // Plant selection
-    private ArrayList<AbstractPlantGameObject.PlantType> _selectedPlants;
+    private List<AbstractPlantGameObject.PlantType> _selectedPlants;
     
     public ClientGameEngine(double windowWidth, double windowHeight, String serverHost, String gameMode) {
         this._windowWidth = windowWidth;
@@ -272,7 +272,7 @@ public class ClientGameEngine extends GameEngine {
     /**
      * Send ready status to server with selected plants
      */
-    public void sendReadyStatus(ArrayList<AbstractPlantGameObject.PlantType> selectedPlants) {
+    public void sendReadyStatus(List<AbstractPlantGameObject.PlantType> selectedPlants) {
         if (!networkManager.isConnected()) return;
         
         this._selectedPlants = selectedPlants;
@@ -358,5 +358,5 @@ public class ClientGameEngine extends GameEngine {
     public int getZombiesKilled() { return _zombiesKilled; }
     public boolean isConnected() { return networkManager.isConnected(); }
     public String getGameMode() { return _gameMode; }
-    public ArrayList<AbstractPlantGameObject.PlantType> getSelectedPlants() { return _selectedPlants; }
+    public List<AbstractPlantGameObject.PlantType> getSelectedPlants() { return _selectedPlants; }
 }
