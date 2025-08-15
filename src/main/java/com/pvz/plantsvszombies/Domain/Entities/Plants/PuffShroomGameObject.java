@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Entities.Bullets.ShroomBulletGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
@@ -18,16 +19,19 @@ import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 public class PuffShroomGameObject extends AbstractPlantGameObject implements Serializable {
     public enum PuffshroomState {
         STANDING,
-        SLEEPING
+        SLEEPING,
+        WAKING_UP
     }
 
     private PuffshroomState _visualState = PuffshroomState.STANDING;
     private final Duration _coolDown = Duration.ofMillis(3000);
     private int tick = 1;
     private int _lastShootTick = 0;
+    private boolean _isAwake;
 
     private transient ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
     private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _wakeUpEventSubscribers = new ArrayList<>();
 
     public static PuffShroomGameObject createPuffShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new PuffShroomGameObject(gameEngine, id, coordinate, row, column);
@@ -43,8 +47,11 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
         this._cost = 0;
         this._health = 100;
         
-        // Set initial visual state based on engine type
-        if (_gameEngine instanceof NightEngine) {
+        // Set initial awake state and visual state based on game mode
+        GameMode gameMode = _gameEngine.getGameMode();
+        this._isAwake = (gameMode == GameMode.NIGHT);
+        
+        if (this._isAwake) {
             this._visualState = PuffshroomState.STANDING;
         } else {
             this._visualState = PuffshroomState.SLEEPING;
@@ -67,6 +74,10 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
         this._eatenEventSubscribers.add(event);
     }
 
+    public void subscribeToWakeUpEvent(IEventSubscriber event) {
+        this._wakeUpEventSubscribers.add(event);
+    }
+
     @Override
     public void spawn() {
         if (_gameEngine instanceof NightEngine) {
@@ -78,7 +89,7 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
 
     @Override
     public void update() {
-        if (!this._isDisposed && !_visualState.equals(PuffshroomState.SLEEPING)) {
+        if (!this._isDisposed && _isAwake && !_visualState.equals(PuffshroomState.SLEEPING)) {
             tick++;
             var rowsZombies = _gameEngine.getZombiesByRow(_row);
             if (!rowsZombies.isEmpty()) {
@@ -120,6 +131,28 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
         }
     }
 
+    public PuffshroomState getState() {
+        return this._visualState;
+    }
+
+    public void setState(PuffshroomState state) {
+        this._visualState = state;
+    }
+
+    public boolean isAwake() {
+        return this._isAwake;
+    }
+
+    public void wakeUp() {
+        if (!this._isAwake) {
+            this._isAwake = true;
+            this._visualState = PuffshroomState.WAKING_UP;
+            for (IEventSubscriber subscriber : _wakeUpEventSubscribers) {
+                subscriber._notify(this);
+            }
+        }
+    }
+
     // Serialization
     @Serial
     private void readObject(ObjectInputStream in)
@@ -127,5 +160,6 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
         in.defaultReadObject();
         _shootingEventSubscribers = new ArrayList<>();
         _eatenEventSubscribers = new ArrayList<>();
+        _wakeUpEventSubscribers = new ArrayList<>();
     }
 }

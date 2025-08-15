@@ -17,7 +17,8 @@ import javafx.util.Duration;
 public class PuffshroomVisualObject extends AbstractPlantVisualObject {
     public enum States {
         STANDING,
-        SLEEPING
+        SLEEPING,
+        WAKING_UP
     }
 
     private States _currentState;
@@ -38,6 +39,15 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
                     System.out.println("Shooting: " + gameObject.getCoordinate().x() + "," + gameObject.getCoordinate().y());
 //                    var bulletVisualObject = new ShroomBulletVisualObject((ShroomBulletGameObject) gameObject, engine);
 //                    _engine.spawnVisualObject(bulletVisualObject);
+                });
+            }
+        });
+
+        gameObject.subscribeToWakeUpEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                Platform.runLater(() -> {
+                    changeStateTo(States.WAKING_UP);
                 });
             }
         });
@@ -82,13 +92,18 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
         switch (state) {
             case SLEEPING -> {
                 _currentState = States.SLEEPING;
-                playAnimation(ScaredyShroomAnimations.Animations.SLEEPING, Duration.millis(80));
+                playAnimation(PuffshroomAnimations.Animations.SLEEPING, Duration.millis(80));
             }
             case STANDING -> {
                 _currentState = States.STANDING;
+                playAnimation(PuffshroomAnimations.Animations.STANDING, Duration.millis(80));
+            }
+            case WAKING_UP -> {
+                _currentState = States.WAKING_UP;
+                playAnimation(PuffshroomAnimations.Animations.WAKING_UP, Duration.millis(100));
             }
         }
-        return null;
+        return this;
     }
 }
 
