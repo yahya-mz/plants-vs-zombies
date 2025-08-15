@@ -2,6 +2,7 @@ package com.pvz.plantsvszombies.Domain.Interfaces;
 
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
@@ -25,6 +26,7 @@ public abstract class GameEngine {
 
     protected int tick = 1;
     protected double _point;
+    protected GameMode _gameMode;
 
     protected CopyOnWriteArrayList<AbstractGameObject> _gameObjects;
     protected MapGameObject _currentMap;
@@ -71,6 +73,10 @@ public abstract class GameEngine {
 
     public double getWindowHeight() {
         return _windowHeight;
+    }
+
+    public GameMode getGameMode() {
+        return _gameMode;
     }
 
     public void addPoint(double point) {

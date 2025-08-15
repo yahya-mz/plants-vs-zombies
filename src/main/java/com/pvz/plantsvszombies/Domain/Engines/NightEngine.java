@@ -1,6 +1,7 @@
 package com.pvz.plantsvszombies.Domain.Engines;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
@@ -33,15 +34,18 @@ public class NightEngine extends GameEngine {
     private final ArrayList<IEventSubscriber> _finalAttackEventSubscribers = new ArrayList<>();
 
     public NightEngine(double windowWidth, double windowHeight) {
-
         this._windowWidth = windowWidth;
         this._windowHeight = windowHeight;
+        this._gameMode = GameMode.NIGHT;
 
         this._gameObjects = new CopyOnWriteArrayList<>();
     }
 
     public NightEngine(double windowWidth, double windowHeight, List<AbstractGameObject> gameObjects) {
-        new NightEngine(windowWidth, windowHeight);
+        this._windowWidth = windowWidth;
+        this._windowHeight = windowHeight;
+        this._gameMode = GameMode.NIGHT;
+        this._gameObjects = new CopyOnWriteArrayList<>();
         _gameObjects.addAll(gameObjects);
     }
 

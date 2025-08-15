@@ -1,6 +1,7 @@
 package com.pvz.plantsvszombies.Domain.Engines;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
@@ -27,9 +28,9 @@ public class DayEngine extends GameEngine {
     private final ArrayList<IEventSubscriber> _finalAttackEventSubscribers = new ArrayList<>();
 
     public DayEngine(double windowWidth, double windowHeight) {
-
         this._windowWidth = windowWidth;
         this._windowHeight = windowHeight;
+        this._gameMode = GameMode.DAY;
 
         this._gameObjects = new CopyOnWriteArrayList<>();
     }
