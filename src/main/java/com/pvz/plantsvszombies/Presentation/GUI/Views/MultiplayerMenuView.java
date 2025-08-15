@@ -270,8 +270,6 @@ public class MultiplayerMenuView {
             }
         });
         
-        connectThread.setName("ConnectionTestThread");
-        connectThread.setDaemon(true);
         // No background thread needed - connection happens later
     }
     
