@@ -7,7 +7,14 @@ import com.pvz.plantsvszombies.Domain.Entities.Zombies.*;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Multiplayer.Events.*;
+import com.pvz.plantsvszombies.Multiplayer.Events.ClientReadyEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.ClientStatusEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.GameEndEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.GameStartEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.SharedEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.SunDropEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.WaveChangeEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.ZombieSpawnEvent;
 import com.pvz.plantsvszombies.Multiplayer.Network.ClientNetworkManager;
 
 import java.util.ArrayList;
@@ -33,7 +40,7 @@ public class ClientGameEngine extends GameEngine {
     private long _gameStartTime = 0;
     
     // Plant selection
-    private List<AbstractPlantGameObject.PlantType> _selectedPlants;
+    private ArrayList<AbstractPlantGameObject.PlantType> _selectedPlants;
     
     public ClientGameEngine(double windowWidth, double windowHeight, String serverHost, String gameMode) {
         this._windowWidth = windowWidth;
@@ -85,12 +92,9 @@ public class ClientGameEngine extends GameEngine {
         }
         
         // Process incoming server events
-        System.out.println("🔄 ClientGameEngine.update() called - processing events...");
         networkManager.processEvents();
-        System.out.println("✅ Events processed");
         
         if (!_gameStarted) {
-            System.out.println("⏳ Game not started yet, skipping game logic");
             return;
         }
         
@@ -130,8 +134,6 @@ public class ClientGameEngine extends GameEngine {
             case SunDropEvent sunEvent -> handleSunDrop(sunEvent);
             case WaveChangeEvent waveEvent -> handleWaveChange(waveEvent);
             case GameEndEvent endEvent -> handleGameEnd(endEvent);
-            case MapInitializationEvent mapEvent -> handleMapInitialization(mapEvent);
-            case VisualEngineInitializationEvent visualEvent -> handleVisualEngineInitialization(visualEvent);
             default -> {
                 // Ignore other event types
             }
@@ -219,53 +221,6 @@ public class ClientGameEngine extends GameEngine {
             System.out.println("Reason: " + event.getEndReason());
         }
     }
-
-    private void handleMapInitialization(MapInitializationEvent event) {
-        System.out.println("🗺️ Initializing map from server...");
-        
-        // Create map object locally using server data
-        String objectId = event.getMapId();
-        Coordinate coordinate = new Coordinate(event.getMapX(), event.getMapY());
-        
-        // Initialize map based on game mode
-        if ("night".equals(event.getGameMode())) {
-            // For night mode, we might need to initialize fog or other night-specific elements
-            System.out.println("Night mode map initialized");
-        } else {
-            // Day mode
-            System.out.println("Day mode map initialized");
-        }
-        
-        // Store map dimensions for reference (these are final, so we can't reassign them)
-        System.out.println("Map dimensions: " + event.getRows() + " rows x " + event.getColumns() + " columns");
-        
-        System.out.println("Map initialized: " + _rows + " rows x " + _columns + " columns");
-    }
-
-    private void handleVisualEngineInitialization(VisualEngineInitializationEvent event) {
-        System.out.println("🎨 Initializing visual engine from server...");
-        
-        // Clear existing game objects
-        _gameObjects.clear();
-        
-        // Add all game objects from server
-        for (AbstractGameObject gameObject : event.getGameObjects()) {
-            gameObject.setGameEngine(this);
-            _gameObjects.add(gameObject);
-            
-            // Notify visual engine subscribers
-            for (IEventSubscriber eventSubscriber : _gameObjectSpawnEventSubscribers) {
-                eventSubscriber._notify(gameObject);
-            }
-        }
-        
-        System.out.println("Visual engine initialized with " + event.getGameObjects().size() + " game objects");
-        
-        // If this includes map initialization, set up the map
-        if (event.isIncludeMap()) {
-            System.out.println("Map objects included in visual engine initialization");
-        }
-    }
     
     private void checkLossCondition() {
         if (_playerLost) return;
@@ -317,7 +272,7 @@ public class ClientGameEngine extends GameEngine {
     /**
      * Send ready status to server with selected plants
      */
-    public void sendReadyStatus(List<AbstractPlantGameObject.PlantType> selectedPlants) {
+    public void sendReadyStatus(ArrayList<AbstractPlantGameObject.PlantType> selectedPlants) {
         if (!networkManager.isConnected()) return;
         
         this._selectedPlants = selectedPlants;
@@ -403,5 +358,5 @@ public class ClientGameEngine extends GameEngine {
     public int getZombiesKilled() { return _zombiesKilled; }
     public boolean isConnected() { return networkManager.isConnected(); }
     public String getGameMode() { return _gameMode; }
-    public List<AbstractPlantGameObject.PlantType> getSelectedPlants() { return _selectedPlants; }
+    public ArrayList<AbstractPlantGameObject.PlantType> getSelectedPlants() { return _selectedPlants; }
 }

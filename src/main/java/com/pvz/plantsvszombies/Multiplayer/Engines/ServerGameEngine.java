@@ -7,12 +7,16 @@ import java.util.Random;
 import java.util.UUID;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
-import com.pvz.plantsvszombies.Domain.Entities.*;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
-import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
 import com.pvz.plantsvszombies.GlobalSettings;
-import com.pvz.plantsvszombies.Multiplayer.Events.*;
-import java.util.ArrayList;
+import com.pvz.plantsvszombies.Multiplayer.Events.ClientStatusEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.ClientReadyEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.GameEndEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.GameStartEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.SharedEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.SunDropEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.WaveChangeEvent;
+import com.pvz.plantsvszombies.Multiplayer.Events.ZombieSpawnEvent;
 import com.pvz.plantsvszombies.Multiplayer.Network.ServerNetworkManager;
 
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -80,22 +84,6 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
             networkManager.stopAcceptingConnections();
             
             System.out.println("Game started with " + currentPlayers + " players!");
-            
-            // Initialize map and send map initialization event
-            initMapForMultiplayer();
-            MapInitializationEvent mapEvent = new MapInitializationEvent(
-                tick, _currentMap.getId(), _currentMap.getCoordinate().x(), 
-                _currentMap.getCoordinate().y(), _rows, _columns, "day" // Default to day mode for now
-            );
-            networkManager.sendEvent(mapEvent);
-            System.out.println("Map initialized and sent to clients");
-            
-            // Send visual engine initialization event with current game objects
-            VisualEngineInitializationEvent visualEvent = new VisualEngineInitializationEvent(
-                tick, new ArrayList<>(_gameObjects), "day", true // Default to day mode for now
-            );
-            networkManager.sendEvent(visualEvent);
-            System.out.println("Visual engine initialization sent to clients");
             
             // Broadcast game start
             broadcastWaveChange(1, (long)getMilliseconds());
@@ -385,24 +373,4 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
     public int getAliveClientCount() { return _aliveClients.size(); }
     public int getReadyClientCount() { return _readyClients.size(); }
     public int getRequiredClients() { return _requiredClients; }
-    
-    /**
-     * Initialize map for multiplayer game
-     */
-    private void initMapForMultiplayer() {
-        String objectId = "SERVER_MAP_" + UUID.randomUUID();
-        Coordinate coordinate = new Coordinate(0, 0);
-        MapGameObject map = MapGameObject.createMapGameObject(objectId, coordinate, this);
-        _currentMap = map;
-        
-        // Add map to game objects
-        _gameObjects.add(map);
-        
-        // Notify subscribers
-        for (IEventSubscriber subscriber : _gameObjectSpawnEventSubscribers) {
-            subscriber._notify(map);
-        }
-        
-        System.out.println("Multiplayer map initialized: " + objectId);
-    }
 }
