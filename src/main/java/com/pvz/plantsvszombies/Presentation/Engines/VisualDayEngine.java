@@ -19,6 +19,10 @@ import com.pvz.plantsvszombies.Presentation.GUI.Views.DayView;
 import com.pvz.plantsvszombies.Presentation.Entities.Zombies.ImpZombieVisualObject;
 import javafx.application.Platform;
 import javafx.scene.layout.Pane;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -28,6 +32,9 @@ public class VisualDayEngine implements IVisualEngine {
     private final int _height = 728;
     //
     private Class<? extends AbstractPlantVisualObject> selectedPlantType;
+    private final ObjectProperty<Class<? extends AbstractPlantVisualObject>> selectedPlantTypeProp =
+            new SimpleObjectProperty<>(null);
+
     //
 
     private final ArrayList<AbstractVisualObject> _visualObjects = new ArrayList<>();
@@ -282,6 +289,7 @@ public class VisualDayEngine implements IVisualEngine {
     @Override
     public void setSelectedPlantType(Class<? extends AbstractPlantVisualObject> plantType) {
         this.selectedPlantType = plantType;
+        selectedPlantTypeProp.set(plantType);
         System.out.println(plantType.getName() + "have been selected");
     }
 
@@ -290,9 +298,14 @@ public class VisualDayEngine implements IVisualEngine {
         return this.selectedPlantType;
     }
 
+    public ReadOnlyObjectProperty<Class<? extends AbstractPlantVisualObject>> selectedPlantTypeProperty() {
+        return selectedPlantTypeProp;
+    }
+
     @Override
     public void clearSelectedPlantType() {
         this.selectedPlantType = null;
+        selectedPlantTypeProp.set(null);
     }
 
     @Override

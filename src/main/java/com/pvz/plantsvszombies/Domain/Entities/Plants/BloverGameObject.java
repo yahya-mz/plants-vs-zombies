@@ -73,7 +73,6 @@ public class BloverGameObject extends AbstractPlantGameObject implements Seriali
             for (FogGameObject fog : fogs) {
                 fog.fadeAwayCompletely();
             }
-
         }
         super.dispose();
     }

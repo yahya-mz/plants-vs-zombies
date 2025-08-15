@@ -1,86 +1,71 @@
 package com.pvz.plantsvszombies.Presentation.GUI.Views;
+
+import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
 import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
+import javafx.util.Duration;
+
 import java.io.File;
 import java.util.ArrayList;
-import javafx.scene.Node;
-import javafx.scene.layout.HBox;
 
 public class PickingPlantStage {
     private final ArrayList<AbstractPlantGameObject.PlantType> selectedPlants = new ArrayList<>();
     private final HBox selectedPlantHBox = new HBox(0);
     private Stage primaryStage;
     private Button playBtn;
-    private final String _mode;
-    Image backgroundImage;
-
-    public PickingPlantStage(String mode){
-        this._mode = mode;
-    }
-
+    private final String mode;
     private Image[] cardImages;
+
+    public PickingPlantStage(String mode) {
+        this.mode = mode;
+    }
 
     public Stage createStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+
         VBox root = new VBox(5);
-        StackPane mainPickingPane = new StackPane();
-        int topMargineForScroll;
+        StackPane mainPane = new StackPane();
 
         playBtn = createStartButton();
-        StackPane.setAlignment(playBtn , Pos.BOTTOM_CENTER);
+        StackPane.setAlignment(playBtn, Pos.BOTTOM_CENTER);
         StackPane.setMargin(playBtn, new Insets(0, 0, -50, 0));
         playBtn.setDisable(true);
 
         root.setPadding(new Insets(20));
-        if (_mode.equals("day")){
-            backgroundImage = new Image(
-                    GlobalSettings.getResource("graphics/Items/Background/daypickingstage.png")
-            );
-        } else {
-            backgroundImage = new Image(
-                    GlobalSettings.getResource("graphics/Items/Background/nightpickingstage.png")
-            );
-        }
 
-        BackgroundSize backgroundSize = new BackgroundSize(
-                100, 100, true, true, true, false
-        );
-
-        BackgroundImage background = new BackgroundImage(
-                backgroundImage,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                backgroundSize
-        );
-        root.setBackground(new Background(background));
+        Image bg = new Image(mode.equals("day")
+                ? GlobalSettings.getResource("graphics/Items/Background/daypickingstage.png")
+                : GlobalSettings.getResource("graphics/Items/Background/nightpickingstage.png"));
+        BackgroundSize bgSize = new BackgroundSize(100, 100, true, true, true, false);
+        BackgroundImage bgImg = new BackgroundImage(bg, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSize);
+        root.setBackground(new Background(bgImg));
 
         loadCardImages();
 
         ScrollPane cardScrollPane = createCardScrollPaneWithCards();
-        if(_mode.equals("day")){topMargineForScroll = 108;}
-        else{topMargineForScroll = 125;}
-        VBox.setMargin(cardScrollPane, new Insets(topMargineForScroll, 0, 0, 180));
+        int topMarginForScroll = mode.equals("day") ? 108 : 125;
+        VBox.setMargin(cardScrollPane, new Insets(topMarginForScroll, 0, 0, 180));
         VBox.setMargin(selectedPlantHBox, new Insets(10, 0, 0, 125));
 
         root.getChildren().addAll(cardScrollPane, selectedPlantHBox);
-        mainPickingPane.getChildren().addAll(root, playBtn);
+        mainPane.getChildren().addAll(root, playBtn);
 
-        Scene scene = new Scene(mainPickingPane, 900, 600);
+        Scene scene = new Scene(mainPane, 900, 600);
         Stage stage = new Stage();
         stage.setTitle("Picking Plant Stage");
         stage.setScene(scene);
@@ -91,76 +76,13 @@ public class PickingPlantStage {
     }
 
     private void loadCardImages() {
-        File cardsDirectory = new File(GlobalSettings.getDir("graphics/Cards"));
-        File[] cardFiles = cardsDirectory.listFiles();
-        cardImages = new Image[cardFiles.length];
-        for (int j = 0; j < cardImages.length; j++) {
-            cardImages[j] = new Image(cardFiles[j].getPath());
+        File dir = new File(GlobalSettings.getDir("graphics/Cards"));
+        File[] files = dir.listFiles();
+        cardImages = new Image[files.length];
+        for (int i = 0; i < cardImages.length; i++) {
+            cardImages[i] = new Image(files[i].getPath());
         }
     }
-
-//    public HBox createCardRow(int from, int to) {
-//        HBox row = new HBox(8);
-//        for (int i = from; i <= to; i++) {
-//            ImageView card = new ImageView(cardImages[i]);
-//            card.setFitWidth(100);
-//            card.setPreserveRatio(true);
-//            card.setCursor(Cursor.HAND);
-//
-//            final int index = i;
-//            card.setOnMouseClicked(e -> {
-//                if (selectedPlants.size() < 6) {
-//                    String imgPath = cardImages[index].getUrl();
-//                    String imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1, imgPath.lastIndexOf('.'));
-//                    AbstractPlantGameObject.PlantType type = AbstractPlantGameObject.PlantType.valueOf(imgName);
-//                    selectedPlants.add(type);
-//                    playBtn.setDisable(selectedPlants.size() != 6);
-//
-//                    ImageView clonedCard = new ImageView(cardImages[index]);
-//                    clonedCard.setFitWidth(100);
-//                    clonedCard.setPreserveRatio(true);
-//                    clonedCard.setCursor(Cursor.HAND);
-//
-//                    clonedCard.setOnMouseEntered(ev -> {
-//                        clonedCard.setTranslateY(-10);
-//                        clonedCard.setScaleX(1.05);
-//                        clonedCard.setScaleY(1.05);
-//                    });
-//                    clonedCard.setOnMouseExited(ev -> {
-//                        clonedCard.setTranslateY(0);
-//                        clonedCard.setScaleX(1);
-//                        clonedCard.setScaleY(1);
-//                    });
-//
-//
-//                    clonedCard.setOnMouseClicked(event -> {
-//                        if (event.getButton().equals(MouseButton.PRIMARY)) {
-//                            selectedPlantHBox.getChildren().remove(selectedPlants.indexOf(type));
-//                            selectedPlants.remove(type);
-//
-//                            updateCardMargins();
-//
-//                            card.setOpacity(1);
-//                            card.setDisable(false);
-//                            playBtn.setDisable(selectedPlants.size() != 6);
-//                        }
-//                    });
-//
-//                    selectedPlantHBox.getChildren().add(clonedCard);
-//                    updateCardMargins();
-//
-//
-//                    card.setDisable(true);
-//                    card.setOpacity(0.5);
-//                    playBtn.setDisable(selectedPlants.size() != 6);
-//                }
-//            });
-//
-//            row.getChildren().add(card);
-//        }
-//        return row;
-//    }
-
 
     public ScrollPane createCardScrollPaneWithCards() {
         VBox cardVBox = new VBox(10);
@@ -168,21 +90,17 @@ public class PickingPlantStage {
         cardVBox.setStyle("-fx-background-color: transparent;");
         cardVBox.setFillWidth(true);
         cardVBox.setBackground(Background.EMPTY);
-        int maxhight;
-        int maxwidth;
 
-        if (_mode.equals("day")){maxhight = 200; maxwidth = 510;}
-        else{maxhight = 184; maxwidth = 510; }
+        int maxHeight = mode.equals("day") ? 200 : 184;
+        int maxWidth = 510;
 
-        int cardsPerRow = 4;
-        for (int i = 0; i < cardImages.length; i += cardsPerRow) {
+        int perRow = 4;
+        for (int i = 0; i < cardImages.length; i += perRow) {
             HBox row = new HBox(8);
             row.setAlignment(Pos.CENTER);
-            for (int j = i; j < i + cardsPerRow && j < cardImages.length; j++) {
-                ImageView card = createSelectableCard(j);
-                row.getChildren().add(card);
+            for (int j = i; j < i + perRow && j < cardImages.length; j++) {
+                row.getChildren().add(createSelectableCard(j));
             }
-            addHoverEffectToImages(row);
             cardVBox.getChildren().add(row);
         }
 
@@ -190,31 +108,16 @@ public class PickingPlantStage {
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setMaxHeight(maxhight);
-        scrollPane.setMaxWidth(maxwidth);
+        scrollPane.setMaxHeight(maxHeight);
+        scrollPane.setMaxWidth(maxWidth);
         scrollPane.getStyleClass().add("custom-scroll-pane");
 
         String css = """
-        .custom-scroll-pane .scroll-bar {
-            -fx-background-color: transparent;
-        }
-
-        .custom-scroll-pane .scroll-bar:vertical .thumb {
-            -fx-background-color: #4A2C00;
-            -fx-background-insets: 2;
-            -fx-background-radius: 5;
-        }
-
-        .custom-scroll-pane .scroll-bar:horizontal .thumb {
-            -fx-background-color: #4A2C00;
-            -fx-background-insets: 2;
-            -fx-background-radius: 5;
-        }
-
-        .custom-scroll-pane .scroll-bar .track {
-            -fx-background-color: transparent;
-        }
-    """;
+        .custom-scroll-pane .scroll-bar { -fx-background-color: transparent; }
+        .custom-scroll-pane .scroll-bar:vertical .thumb { -fx-background-color: #4A2C00; -fx-background-insets: 2; -fx-background-radius: 5; }
+        .custom-scroll-pane .scroll-bar:horizontal .thumb { -fx-background-color: #4A2C00; -fx-background-insets: 2; -fx-background-radius: 5; }
+        .custom-scroll-pane .scroll-bar .track { -fx-background-color: transparent; }
+        """;
 
         scrollPane.setStyle(
                 "-fx-background-color: transparent;" +
@@ -226,65 +129,54 @@ public class PickingPlantStage {
                         "-fx-faint-focus-color: transparent;"
         );
 
-        // افزودن CSS به صحنه
         Scene scene = scrollPane.getScene();
         if (scene != null) {
             scene.getStylesheets().add("data:text/css," + css);
         } else {
-            scrollPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
-                if (newScene != null) {
-                    newScene.getStylesheets().add("data:text/css," + css);
-                }
+            scrollPane.sceneProperty().addListener((obs, o, n) -> {
+                if (n != null) n.getStylesheets().add("data:text/css," + css);
             });
         }
 
         return scrollPane;
     }
 
-
     private ImageView createSelectableCard(int index) {
         ImageView card = new ImageView(cardImages[index]);
         card.setFitWidth(100);
         card.setPreserveRatio(true);
         card.setCursor(Cursor.HAND);
+        card.setPickOnBounds(true);
+        EffectsManagement.yAndScaleHoverEffectForNode(card);
+
+
 
         card.setOnMouseClicked(e -> {
             if (selectedPlants.size() < 6) {
                 String imgPath = cardImages[index].getUrl();
                 String imgName = imgPath.substring(imgPath.lastIndexOf('\\') + 1, imgPath.lastIndexOf('.'));
                 AbstractPlantGameObject.PlantType type = AbstractPlantGameObject.PlantType.valueOf(imgName);
+
                 selectedPlants.add(type);
                 playBtn.setDisable(selectedPlants.size() != 6);
 
-                ImageView clonedCard = new ImageView(cardImages[index]);
-                clonedCard.setFitWidth(100);
-                clonedCard.setPreserveRatio(true);
-                clonedCard.setCursor(Cursor.HAND);
+                ImageView cloned = new ImageView(cardImages[index]);
+                cloned.setFitWidth(100);
+                cloned.setPreserveRatio(true);
+                cloned.setCursor(Cursor.HAND);
+                cloned.setPickOnBounds(true);
+                EffectsManagement.yAndScaleHoverEffectForNode(cloned);
 
-                clonedCard.setOnMouseEntered(ev -> {
-                    clonedCard.setTranslateY(-10);
-                    clonedCard.setScaleX(1.05);
-                    clonedCard.setScaleY(1.05);
-                });
-                clonedCard.setOnMouseExited(ev -> {
-                    clonedCard.setTranslateY(0);
-                    clonedCard.setScaleX(1);
-                    clonedCard.setScaleY(1);
-                });
-
-                clonedCard.setOnMouseClicked(event -> {
-                    if (event.getButton().equals(MouseButton.PRIMARY)) {
-                        selectedPlantHBox.getChildren().remove(selectedPlants.indexOf(type));
-                        selectedPlants.remove(type);
-                        updateCardMargins();
-
-                        card.setOpacity(1);
-                        card.setDisable(false);
-                        playBtn.setDisable(selectedPlants.size() != 6);
-                    }
+                cloned.setOnMouseClicked(ev -> {
+                    selectedPlantHBox.getChildren().remove(selectedPlants.indexOf(type));
+                    selectedPlants.remove(type);
+                    updateCardMargins();
+                    card.setOpacity(1);
+                    card.setDisable(false);
+                    playBtn.setDisable(selectedPlants.size() != 6);
                 });
 
-                selectedPlantHBox.getChildren().add(clonedCard);
+                selectedPlantHBox.getChildren().add(cloned);
                 updateCardMargins();
 
                 card.setDisable(true);
@@ -295,100 +187,75 @@ public class PickingPlantStage {
         return card;
     }
 
-    public void addHoverEffectToImages(HBox hbox) {
-        for (Node node : hbox.getChildren()) {
-            if (node instanceof ImageView) {
-                ImageView imageView = (ImageView) node;
+    private static void hoverEffectForNode(Node node) {
+        node.setOnMouseEntered(ev -> animateNode(node, -14, 1.1, 100));
+        node.setOnMouseExited(ev -> animateNode(node, 0, 1.0, 120));
+    }
 
-                imageView.setOnMouseEntered(e -> {
-                    imageView.setTranslateY(-9);
-                    imageView.setScaleX(1.02);
-                    imageView.setScaleY(1.02);
-                });
+    private static void animateNode(Node node, double toY, double scale, int ms) {
+        TranslateTransition tt = new TranslateTransition(Duration.millis(ms), node);
+        tt.setToY(toY);
+        tt.playFromStart();
 
-                imageView.setOnMouseExited(e -> {
-                    imageView.setTranslateY(0);
-                    imageView.setScaleX(1);
-                    imageView.setScaleY(1);
-                });
-            }
-        }
+        ScaleTransition st = new ScaleTransition(Duration.millis(ms), node);
+        st.setToX(scale);
+        st.setToY(scale);
+        st.playFromStart();
     }
 
     private void updateCardMargins() {
         for (int i = 0; i < selectedPlantHBox.getChildren().size(); i++) {
-            var node = selectedPlantHBox.getChildren().get(i);
-            Insets margin;
-            switch (i) {
-                case 0 -> margin = new Insets(0, 2, 0, 0);
-                case 1 -> margin = new Insets(0, 1, 0, 0);
-                case 2 -> margin = new Insets(0, 0, 0, 0);
-                case 3 -> margin = new Insets(0, 0, 0, 0);
-                case 4 -> margin = new Insets(0, 0, 0, 0);
-                default -> margin = new Insets(0, 0, 0, 0);
-            }
-            HBox.setMargin(node, margin);
+            HBox.setMargin(selectedPlantHBox.getChildren().get(i), switch (i) {
+                case 0 -> new Insets(0, 2, 0, 0);
+                case 1 -> new Insets(0, 1, 0, 0);
+                default -> new Insets(0, 0, 0, 0);
+            });
         }
     }
-
     public Button createStartButton() {
-        double width = 250;
-        double height = 250;
-        String[] imagePath = {
+        double w = 250, h = 250;
+        String[] paths = {
                 "graphics/Items/Buttons/play/normalplay.png",
                 "graphics/Items/Buttons/play/onactionplay.png"
         };
 
-        Image defaultImage = new Image(GlobalSettings.getResource(imagePath[0]));
-        Image hoverImage = new Image(GlobalSettings.getResource(imagePath[1]));
+        Image normal = new Image(GlobalSettings.getResource(paths[0]));
+        Image hover  = new Image(GlobalSettings.getResource(paths[1]));
 
-        ImageView imageView = new ImageView(defaultImage);
-        imageView.setFitWidth(width);
-        imageView.setFitHeight(height);
-        imageView.setPreserveRatio(true);
+        ImageView iv = new ImageView(normal);
+        iv.setFitWidth(w);
+        iv.setFitHeight(h);
+        iv.setPreserveRatio(true);
 
-        Button button = new Button();
-        button.setMinSize(width, height);
-        button.setMaxSize(width, height);
-        button.setGraphic(imageView);
-        button.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+        Button btn = new Button();
+        // مهم: اندازه‌ی دکمه را به اندازه‌ی گرافیک بسپار
+        // این دو خط را حذف کن: btn.setMinSize(w, h); btn.setMaxSize(w, h);
+        btn.setGraphic(iv);
+        btn.setBackground(Background.EMPTY);
+        btn.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-background-insets: 0;");
+        btn.setPickOnBounds(false); // فقط وقتی اشاره‌گر واقعاً روی بدنه‌ی دکمه/گرافیکه، رخداد بگیره
 
+        // Hover فقط وقتی روی خود تصویر هستیم
+        btn.setOnMouseEntered(e -> iv.setImage(hover));
+        btn.setOnMouseExited(e -> iv.setImage(normal));
 
+        btn.setOnAction(e -> {
+            Stage gameStage = mode.equals("day")
+                    ? DayView.createStage(selectedPlants)
+                    : NightView.createStage(selectedPlants);
 
-        button.setOnMouseEntered(e -> {
-            ImageView hoverImageView = new ImageView(hoverImage);
-            hoverImageView.setFitWidth(width);
-            hoverImageView.setFitHeight(height);
-            hoverImageView.setPreserveRatio(true);
-            button.setGraphic(hoverImageView);
-        });
+            if (mode.equals("day")) SoundManager.play(SoundType.DAY_BACKGROUND);
+            else SoundManager.play(SoundType.NIGHT_BACKGROUND);
 
-        button.setOnMouseExited(e -> {
-            ImageView normalImageView = new ImageView(defaultImage);
-            normalImageView.setFitWidth(width);
-            normalImageView.setFitHeight(height);
-            normalImageView.setPreserveRatio(true);
-            button.setGraphic(normalImageView);
-        });
-
-        button.setOnAction(e -> {
-            Stage gameStage;
-            if (_mode.equals("day")){
-                gameStage = DayView.createStage(selectedPlants);
-//                SoundManager.play(SoundType.BACKGROUND);
-            }
-            else {
-                gameStage = NightView.createStage(selectedPlants);
-                SoundManager.play(SoundType.NIGHT_BACKGROUND);
-            }
             gameStage.show();
-            gameStage.setOnHiding(event -> {
+            gameStage.setOnHiding(ev -> {
                 primaryStage.show();
                 Mediator.getInstance().stopGameEngine();
+                SoundManager.stopAll();
             });
             ((Stage) playBtn.getScene().getWindow()).close();
         });
 
-        return button;
+        return btn;
     }
 }

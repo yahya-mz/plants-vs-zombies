@@ -9,22 +9,18 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class NormalZombieAnimations {
+public class PlanternAnimations {
     public enum Animations implements IAnimation {
-        MOVING_FORWARD,
-        DYING,
-        ATTACKING,
-        BURNING,
-        SPAWNING
+        STANDING
     }
 
-    private final static ArrayList<Image[]> animations;
+    private static final ArrayList<Image[]> animations;
 
     static {
         animations = new ArrayList<>();
-        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Zombies/NormalZombie"));
-        for (int i = 0; i < NormalZombieAnimations.Animations.values().length; i++) {
-            var animationImages = new File(animationsDirectory.getPath() + "/" + NormalZombieAnimations.Animations.values()[i].name()).listFiles();
+        var animationsDirectory = new File(GlobalSettings.getDir("graphics/Plants/Plantern"));
+        for (int i = 0; i < PlanternAnimations.Animations.values().length; i++) {
+            var animationImages = new File(animationsDirectory.getPath() + "/" + PlanternAnimations.Animations.values()[i].name()).listFiles();
             Arrays.sort(animationImages, Comparator.comparingInt(f -> {
                 String name = f.getName();
                 int dotIndex = name.lastIndexOf('.');
@@ -42,7 +38,8 @@ public class NormalZombieAnimations {
         }
     }
 
-    public static Image[] getFrames(NormalZombieAnimations.Animations animation) {
+    public static Image[] getFrames(PlanternAnimations.Animations animation) {
         return animations.get(animation.ordinal());
     }
 }
+

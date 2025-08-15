@@ -16,7 +16,9 @@ public abstract class AbstractPlantGameObject extends AbstractGameObject {
         PUFF_SHROOM,
         ICE_SHROOM,
         HYPNO_SHROOM,
-        BLOVER
+        BLOVER,
+        PLANTERN,
+        GRAVE_BUSTER
 
     }
 

@@ -13,6 +13,8 @@ import com.pvz.plantsvszombies.Mediator.Mediator;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class NightEngine extends GameEngine {
     private final Duration _skySunDroppingInterval = Duration.ofSeconds(7);
@@ -27,6 +29,8 @@ public class NightEngine extends GameEngine {
     private final Random _zombieTypeRandom = new Random(System.currentTimeMillis() / 1000);
 
     private final ArrayList<FogGameObject> _fogs = new ArrayList<>();
+
+
 
     private final ArrayList<IEventSubscriber> _midAttackEventSubscribers = new ArrayList<>();
     private final ArrayList<IEventSubscriber> _finalAttackEventSubscribers = new ArrayList<>();
@@ -49,6 +53,7 @@ public class NightEngine extends GameEngine {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 initFog();
+                initGraves();
             }
         });
     }
@@ -66,11 +71,13 @@ public class NightEngine extends GameEngine {
         } else if (getMilliseconds() == _wave_4_Start.toMillis()) {
             _currentWave = 4;
             System.out.println("Wave 4");
+
         } else if (getMilliseconds() == _wave_3_Start.toMillis()) {
             _currentWave = 3;
             System.out.println("Wave 3");
         } else if (getMilliseconds() == _wave_2_Start.toMillis()) {
             _currentWave = 2;
+            convertAllGravesToZombies(); // ← همین‌جا
             System.out.println("Wave 2");
         }
 
@@ -158,6 +165,48 @@ public class NightEngine extends GameEngine {
         }
     }
 
+    private void initGraves() {
+        java.util.List<int[]> candidates = new java.util.ArrayList<>();
+        for (int r = 0; r < _rows; r++) {
+            for (int c = _columns - 3; c < _columns; c++) {
+                candidates.add(new int[]{r, c});
+            }
+        }
+        java.util.Collections.shuffle(candidates, new java.util.Random(
+                System.currentTimeMillis() ^ 0x9E3779B97F4A7C15L));
+
+        int gravesToSpawn = Math.min(5, candidates.size());
+        int placed = 0;
+
+        for (int k = 0; k < candidates.size() && placed < gravesToSpawn; k++) {
+            int row = candidates.get(k)[0];
+            int col = candidates.get(k)[1];
+
+            // این چک الان isOccupied است و قبر را هم شامل می‌شود
+            if (_currentMap.isOccupied(row, col)) continue;
+
+            spawnGrave(row, col);
+            placed++;
+        }
+    }
+    private boolean _gravesConverted = false;
+
+    private void convertAllGravesToZombies() {
+        if (_gravesConverted) return;
+
+        for (GraveGameObject grave : new ArrayList<>(_graves)) {
+            int row = grave.getRow();
+            int col = grave.getColumn();
+
+            grave.dispose(true);
+            _graves.remove(grave);
+
+            spawnZombie(row, col, AbstractZombieGameObject.ZombieType.NORMAL_ZOMBIE);
+        }
+
+        _gravesConverted = true;
+    }
+
     private void load() {
         _gameObjects.clear();
         _gameObjects.addAll(PersistenceManager.load());
@@ -168,7 +217,6 @@ public class NightEngine extends GameEngine {
             }
         });
     }
-
     public int get_currentWave() {return _currentWave;}
     private double getMilliseconds() {
         return this.tick * 1000.0 / GlobalSettings.FPS;

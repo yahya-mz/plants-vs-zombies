@@ -9,6 +9,7 @@ import com.pvz.plantsvszombies.Presentation.Animations.GeneralTransformAnimation
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.SunAnimations;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
+import com.pvz.plantsvszombies.Presentation.GUI.Views.EffectsManagement;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -60,6 +61,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
                 changeStateTo(States.COLLECTING);
             }
         });
+        _node.setOnMouseEntered((e-> _node.setCursor(EffectsManagement.getPointerCustomCursor())));
     }
 
     @Override

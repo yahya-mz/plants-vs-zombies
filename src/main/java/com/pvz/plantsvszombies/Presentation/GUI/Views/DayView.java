@@ -2,13 +2,12 @@ package com.pvz.plantsvszombies.Presentation.GUI.Views;
 
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Engines.DayEngine;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.PuffShroomGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
-import javafx.animation.FadeTransition;
-import javafx.animation.PauseTransition;
-import javafx.animation.SequentialTransition;
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -22,18 +21,18 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
-import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
-import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 
 
 import java.util.List;
 
 public class DayView extends AbstractLevelView {
+    PickingPlantStage pickingPlantStage;
 
     public static final double Width = 1200;
     public static final double Height = 728;
@@ -43,6 +42,10 @@ public class DayView extends AbstractLevelView {
     private StackPane bottommostPlane;
     private final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
     private Button shovelButton;
+    private static ImageCursor customCursor;
+    private Button lastClickedCard = null;
+
+
 
 
     private DayView() {
@@ -53,6 +56,9 @@ public class DayView extends AbstractLevelView {
         var dayView = new DayView();
         dayView.bottommostPlane = new StackPane();//changed
         dayView._gameBoxPane = dayView.bottommostPlane;
+        Image cursorImage = new Image(GlobalSettings.getResource("graphics/Items/Cursor/DayCursor.png"));
+        customCursor = new ImageCursor(cursorImage, cursorImage.getWidth() / 2, cursorImage.getHeight() / 2);
+
 
         //ready-set-plant
         VBox animationBox = new VBox();
@@ -94,6 +100,7 @@ public class DayView extends AbstractLevelView {
 
 
         var scene = new Scene(dayView.bottommostPlane, Width, Height);
+        scene.setCursor(customCursor);
         System.out.println("Requesting BACKGROUND music");
 //        SoundManager.play(SoundType.BACKGROUND);
 
@@ -125,9 +132,14 @@ public class DayView extends AbstractLevelView {
         _visualEngine = new VisualDayEngine(this, dayEngine);
         Mediator.init(dayEngine, _visualEngine);
         Mediator.getInstance().startGameEngine();
-        System.out.println("About to play background music...");
-//        SoundManager.play(SoundType.BACKGROUND);
-        System.out.println("Background music play command sent");
+
+
+        _visualEngine.selectedPlantTypeProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null && lastClickedCard != null) {
+                deactivateButton(lastClickedCard); // مدت دلخواه
+                lastClickedCard = null;
+            }
+        });
 
         this.setOnHiding((event) -> {
             System.out.println("Stopping GameEngine");
@@ -183,17 +195,23 @@ public class DayView extends AbstractLevelView {
 
 
             final AbstractPlantGameObject.PlantType final_plantType = selectedPlants.get(i);
+            btn.setUserData(final_plantType);
+
             btn.setOnMouseClicked(e -> {
                 if (e.getButton().equals(MouseButton.PRIMARY)) {
+                    if (isShovelMode.get()) setIsShovelMode(false);
+
+                    lastClickedCard = btn;
+
                     switch (final_plantType) {
                         case PEASHOOTER -> _visualEngine.setSelectedPlantType(PeashooterVisualObject.class);
-                        case SUNFLOWER -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
-                        case WALL_NUT -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
-                        case JALAPENO -> _visualEngine.setSelectedPlantType(JalapenoVisualObject.class);
-                        case TALL_NUT -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
-                        case CHERRY_BOMB -> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
-                        case SNOW_PEA -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
-                        case REPEATER -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
+                        case SUNFLOWER  -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
+                        case WALL_NUT   -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
+                        case JALAPENO   -> _visualEngine.setSelectedPlantType(JalapenoVisualObject.class);
+                        case TALL_NUT   -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
+                        case CHERRY_BOMB-> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
+                        case SNOW_PEA   -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
+                        case REPEATER   -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
                     }
                 }
             });
@@ -210,26 +228,25 @@ public class DayView extends AbstractLevelView {
 
             buttonBar.getChildren().add(btn);
         }
-        addHoverEffectToImages(buttonBar);
+        for (Node node : buttonBar.getChildren()) {
+            EffectsManagement.yAndScaleHoverEffectForNode(node);
+        }
+
         return buttonBar;
     }
 
-    public static void addHoverEffectToImages(HBox hbox) {
-        for (Node node : hbox.getChildren()) {
-            if (node instanceof Button btn) {
-                btn.setOnMouseEntered(e -> {
-                    btn.setTranslateY(-9);
-                    btn.setScaleX(1.02);
-                    btn.setScaleY(1.02);
-                });
 
-                btn.setOnMouseExited(e -> {
-                    btn.setTranslateY(0);
-                    btn.setScaleX(1);
-                    btn.setScaleY(1);
-                });
-            }
-        }
+    public static void deactivateButton(Button btn) {
+        EffectsManagement.applyDeactivateEffect(btn);
+        Duration duration = EffectsManagement.getCooldownFor(btn);
+
+        Timeline tl = new Timeline(
+                new KeyFrame(duration, e -> {
+                    btn.setEffect(null);
+                    btn.setDisable(false);
+                })
+        );
+        tl.play();
     }
 
     public Button createShovelToolButton() {
@@ -246,7 +263,7 @@ public class DayView extends AbstractLevelView {
         isShovelModeProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal && shovelButton.getScene() != null) {
                 Platform.runLater(() -> {
-                    shovelButton.getScene().setCursor(Cursor.DEFAULT);
+                    shovelButton.getScene().setCursor(customCursor);
                     shovelBarView(shovelButton, new ImageView(shovelFullImage));
                 });
             }
@@ -269,22 +286,9 @@ public class DayView extends AbstractLevelView {
                 });
             }
         });
-        addHoverEffectToShovel(shovelButton);
+        EffectsManagement.scaleHoverEffectForNode(shovelButton);
 
         return shovelButton;
-    }
-    private void addHoverEffectToShovel(Button btn) {
-        btn.setOnMouseEntered(e -> {
-            if (!NightView.getIsShovelMode()) {
-                btn.setScaleX(1.1);
-                btn.setScaleY(1.1);
-            }
-        });
-
-        btn.setOnMouseExited(e -> {
-            btn.setScaleX(1.0);
-            btn.setScaleY(1.0);
-        });
     }
 
     public BooleanProperty isShovelModeProperty() {

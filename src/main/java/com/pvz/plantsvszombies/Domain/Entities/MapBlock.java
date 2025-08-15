@@ -16,6 +16,7 @@ public class MapBlock implements Serializable {
     private final Coordinate _bottom_right;
 
     private AbstractPlantGameObject _plant;
+    private GraveGameObject _grave;
 
     public MapBlock(Coordinate top_left, Coordinate bottom_right, int row, int _column) {
         this._top_left = top_left;
@@ -51,13 +52,17 @@ public class MapBlock implements Serializable {
                         && coordinate.y() >= _top_left.y()
                         && coordinate.y() <= _bottom_right.y();
     }
-
     public void setPlant(AbstractPlantGameObject plant) {
         this._plant = plant;
     }
-
     public AbstractPlantGameObject getPlant() {
         return _plant;
     }
+
+    public void setGrave(GraveGameObject grave){this._grave = grave;}
+    public GraveGameObject getGrave() { return _grave; }
+    public boolean hasGrave() { return _grave != null; }
+
+
 
 }

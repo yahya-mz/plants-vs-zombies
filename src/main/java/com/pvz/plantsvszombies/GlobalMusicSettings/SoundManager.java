@@ -284,8 +284,8 @@ public class SoundManager {
     private static void preloadSounds() {
         // Pre-load commonly used sounds
         SoundType[] commonSounds = {
-            SoundType.ZOMBIE_ATTACK,
-            SoundType.NIGHT_BACKGROUND,
+                SoundType.ZOMBIE_ATTACK,
+                SoundType.NIGHT_BACKGROUND,
                 SoundType.ZOMBIE_GROAN
         };
 

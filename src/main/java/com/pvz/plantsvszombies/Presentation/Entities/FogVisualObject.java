@@ -38,6 +38,10 @@ public class FogVisualObject extends AbstractVisualObject {
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Screen/Fog/Fog_0.png")));
         _node.setManaged(false);
 
+        _node.setMouseTransparent(true);
+        _node.setPickOnBounds(false);
+        _node.setFocusTraversable(false);
+
         var img = (ImageView) _node;
         var height = img.getImage().getHeight();
         var width  = img.getImage().getWidth();

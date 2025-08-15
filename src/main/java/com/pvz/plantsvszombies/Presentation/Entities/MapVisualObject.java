@@ -34,6 +34,10 @@ public class MapVisualObject extends AbstractVisualObject {
     MapGameObject _mapObject;
     private final IVisualEngine _engine;
     private final StackPane[][] visualGrid = new StackPane[5][9];
+    private static final double HOVER_PAD_W = 20;
+    private static final double HOVER_PAD_H = 10;
+
+
 
     public MapVisualObject(MapGameObject object, IVisualEngine engine) {
         this._mapObject = object;
@@ -80,6 +84,7 @@ public class MapVisualObject extends AbstractVisualObject {
 
             for (int col = 0; col < 9; col++) {
                 Button cellButton = new Button();
+                StackPane cell = new StackPane();
                 cellButton.setPrefSize(buttonWidth, buttonHeight);
 // rgba(255, 0, 0, 0.1)
                 cellButton.setStyle("-fx-background-color:transparent ; -fx-border-color: transparent; -fx-border-width: 1;");
@@ -91,19 +96,41 @@ public class MapVisualObject extends AbstractVisualObject {
                 cellButton.setOnMouseClicked(e -> {
                     if (e.getButton().equals(MouseButton.PRIMARY)) {
                         if (_engine.isShovelActivated()) {
-                            _engine.shovelRemover(r, c); // ⬅️ به جای حذف مستقیم، درخواست رو می‌فرسته به VisualDayEngine
-                            return; // خروج زودهنگام چون shovel mode فعال بوده
+                            _engine.shovelRemover(r, c);
+                            return;
                         }
 
-                        if (_engine.getSelectedPlantType() != null) {
-                            _engine.plant(_engine.getSelectedPlantType(), r, c, new Coordinate(cellButton.localToScene(cellButton.getLayoutBounds()).getCenterX(), cellButton.localToScene(cellButton.getLayoutBounds()).getCenterY()));
+                        var selected = _engine.getSelectedPlantType();
+                        if (selected != null) {
+
+                            // ✅ استثنا برای GraveBuster: فقط اگر قبر هست اجازه بده
+                            if (selected == GraveBusterVisualObject.class) {
+                                var hasGrave = _mapObject.getBlock(r, c).getGrave() != null; // یا hasGrave() اگر داری
+                                if (!hasGrave) {
+                                    System.out.println("No grave here for GraveBuster at " + r + "," + c);
+                                    // انتخاب کاربر رو پاک نکن؛ بذار جاشو عوض کنه
+                                    return;
+                                }
+                            }
+
+                            // حالا می‌تونیم plant صدا بزنیم
+                            _engine.plant(selected, r, c,
+                                    new Coordinate(
+                                            cellButton.localToScene(cellButton.getLayoutBounds()).getCenterX(),
+                                            cellButton.localToScene(cellButton.getLayoutBounds()).getCenterY()
+                                    )
+                            );
+
+                            // ✅ فقط وقتی شروع به کاشت کردیم selection رو پاک کن
                             cellButton.setGraphic(null);
                             _engine.clearSelectedPlantType();
+
                         } else {
                             System.out.println("no plant have been selected!!!");
                         }
                     }
                 });
+
 
                 //
                 cellButton.setOnMouseEntered(event -> {
@@ -175,6 +202,18 @@ public class MapVisualObject extends AbstractVisualObject {
                             cellButton.setGraphic(preview);
                         });
                     }
+                    else if (selectedType == PlanternVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageViewForHover("Plantern", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
+                    }
+                    else if (selectedType == GraveBusterVisualObject.class) {
+                        Platform.runLater(() -> {
+                            ImageView preview = createPlantImageViewForHover("GraveBuster", cellButton);
+                            cellButton.setGraphic(preview);
+                        });
+                    }
                 });
 
                 cellButton.setOnMouseExited(e -> {
@@ -199,7 +238,6 @@ public class MapVisualObject extends AbstractVisualObject {
 //                    }
 //                });
 
-                StackPane cell = new StackPane();
 
 //                cell.setOnMouseEntered((e)->{//debug
 //                    System.out.println(e.getScreenX()+" , "+e.getScreenY());
@@ -278,16 +316,14 @@ public class MapVisualObject extends AbstractVisualObject {
         imageView.setSmooth(true);
         imageView.setCache(true);
 
-        double width = referenceButton.getWidth();
-        double height = referenceButton.getHeight();
-
-        imageView.setFitWidth(width - 20);
-        imageView.setFitHeight(height - 10);
+        // ✅ به‌جای set مقدار ثابت، بایند به سایز دکمه با همان پدینگ:
+        imageView.fitWidthProperty().bind(referenceButton.widthProperty().subtract(HOVER_PAD_W));
+        imageView.fitHeightProperty().bind(referenceButton.heightProperty().subtract(HOVER_PAD_H));
 
         imageView.setOpacity(0.4);
-
         return imageView;
     }
+
 
 
     @Override
@@ -295,16 +331,22 @@ public class MapVisualObject extends AbstractVisualObject {
     }
 
     public void plant(AbstractVisualObject object, int row, int column) {
-        object.getNode().boundsInParentProperty().addListener((observable, newVal, oldVal) -> {
-            if (oldVal.getCenterX() == newVal.getCenterX()) {
-                object.spawn();
-            }
-        });
+//        object.getNode().boundsInParentProperty().addListener((observable, newVal, oldVal) -> {
+//            if (oldVal.getCenterX() == newVal.getCenterX()) {
+//                object.spawn();
+//            }
+//        });
 
         StackPane cell = visualGrid[row][column];
         var demo = cell.getWidth();
         ((ImageView) object.getNode()).setFitWidth(demo);
+
+        if (object.getNode() instanceof ImageView iv) {//check this again
+            iv.setMouseTransparent(true);
+        }
         cell.getChildren().add(object.getNode());
+
+        Platform.runLater(object::spawn);//?
     }
 
     public void spawnByCoordinate(AbstractVisualObject object) {

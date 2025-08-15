@@ -176,9 +176,18 @@ public class VisualNightEngine implements IVisualEngine {
                     String bloverObjectId = "Blover_" + UUID.randomUUID();
                     var obj = BloverGameObject.createBloverGameObject(this._gameEngine, bloverObjectId, coordinate, x, y);
                     this._gameEngine.plantObject(obj);
-                }
+                } else if (plantType == PlanternVisualObject.class) {
+                    String planternObjectID = "Plantern_" + UUID.randomUUID();
+                    var obj = PlanternGameObject.createPlanternGameObject(this._gameEngine, planternObjectID, coordinate, x, y);
+                    this._gameEngine.plantObject(obj);
+                } else if (plantType == GraveBusterVisualObject.class) {
+                String id = "GraveBuster_" + UUID.randomUUID();
+                var obj = GraveBusterGameObject.createGraveBusterGameObject(_gameEngine, id, coordinate, x, y);
+                _gameEngine.plantObject(obj);
+            }
 
-            } catch (Exception e) {
+
+        } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         });
@@ -291,6 +300,9 @@ public class VisualNightEngine implements IVisualEngine {
         } else if (gameObject instanceof FogGameObject) {
             var object = new FogVisualObject((FogGameObject) gameObject, temp_this);
             spawnVisualObject(object, 10);
+        } else if (gameObject instanceof GraveGameObject) {
+            var object = new GraveVisualObject((GraveGameObject) gameObject, temp_this);
+            spawnVisualObject(object, -9);
         } else if (gameObject instanceof AbstractPlantGameObject) {
             AbstractVisualObject visualObject = null; // 'might not have been initialized' occurs if we don't put the = null
             switch (gameObject) {
@@ -345,6 +357,14 @@ public class VisualNightEngine implements IVisualEngine {
                 case BloverGameObject bl -> {
                     visualObject = new BloverVisualObject(bl, temp_this);
                     _currentMapVisualObject.plant(visualObject, bl.getRow(), bl.getColumn());
+                }
+                case PlanternGameObject pl -> {
+                    visualObject = new PlanternVisualObject(pl, temp_this);
+                    _currentMapVisualObject.plant(visualObject, pl.getRow(), pl.getColumn());
+                }
+                case GraveBusterGameObject gb -> {
+                    visualObject = new GraveBusterVisualObject(gb, temp_this);
+                    _currentMapVisualObject.plant(visualObject, gb.getRow(), gb.getColumn());
                 }
                 default -> {
                 }

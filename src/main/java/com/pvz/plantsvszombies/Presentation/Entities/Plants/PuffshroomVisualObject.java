@@ -72,7 +72,7 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
             this._currentState = States.SLEEPING;
         }
         if (_currentState.equals(PuffshroomVisualObject.States.STANDING)) {
-            playAnimation(PuffshroomAnimations.Animations.STANDING, Duration.millis(80));//standing
+//            playAnimation(PuffshroomAnimations.Animations.STANDING, Duration.millis(80));//standing
         } else if (_currentState.equals(PuffshroomVisualObject.States.SLEEPING)) {
             playAnimation(PuffshroomAnimations.Animations.SLEEPING, Duration.millis(20));//standing
         }
@@ -82,7 +82,7 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
         switch (state) {
             case SLEEPING -> {
                 _currentState = States.SLEEPING;
-                playAnimation(ScaredyShroomAnimations.Animations.SLEEPING, Duration.millis(80));
+//                playAnimation(ScaredyShroomAnimations.Animations.SLEEPING, Duration.millis(80));
             }
             case STANDING -> {
                 _currentState = States.STANDING;
