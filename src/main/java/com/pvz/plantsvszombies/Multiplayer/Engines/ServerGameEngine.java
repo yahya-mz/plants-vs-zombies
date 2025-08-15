@@ -98,15 +98,10 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
         System.out.println("Waiting for " + _requiredClients + " clients to connect...");
         while (networkManager.getConnectedClientCount() < _requiredClients && !_gameEnded) {
             try {
-                System.out.println("DEBUG: About to process events...");
                 // Process events to populate _connectedClients
                 networkManager.processEvents();
-                System.out.println("DEBUG: Events processed");
                 Thread.sleep(1000);
                 System.out.println("Connected clients: " + networkManager.getConnectedClientCount() + "/" + _requiredClients);
-                System.out.println("DEBUG: _connectedClients size: " + _connectedClients.size());
-                System.out.println("DEBUG: _connectedClients contents: " + _connectedClients);
-                System.out.println("DEBUG: Network manager connected count: " + networkManager.getConnectedClientCount());
             } catch (InterruptedException e) {
                 return;
             }
@@ -121,7 +116,6 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
                 networkManager.processEvents();
                 Thread.sleep(1000);
                 System.out.println("Ready clients: " + _readyClients.size() + "/" + _requiredClients);
-                System.out.println("DEBUG: _connectedClients size: " + _connectedClients.size() + ", _readyClients size: " + _readyClients.size());
             } catch (InterruptedException e) {
                 return;
             }
@@ -253,22 +247,15 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
     }
     
     private void handleClientEvent(SharedEvent event) {
-        System.out.println("DEBUG: Server received event: " + event.getEventType() + " from " + event.getClass().getSimpleName());
-        
         if (event instanceof ClientStatusEvent statusEvent) {
             String clientId = statusEvent.getClientId();
             String status = statusEvent.getStatus();
-            System.out.println("DEBUG: ClientStatusEvent - clientId: " + clientId + ", status: " + status);
             
             switch (status) {
                 case "CONNECTED" -> {
-                    System.out.println("DEBUG: Processing CONNECTED status for client: " + clientId);
                     if (!_connectedClients.contains(clientId)) {
                         _connectedClients.add(clientId);
                         System.out.println("Client connected: " + clientId + " (" + _connectedClients.size() + "/" + _requiredClients + ")");
-                        System.out.println("DEBUG: _connectedClients now contains: " + _connectedClients);
-                    } else {
-                        System.out.println("DEBUG: Client " + clientId + " already in _connectedClients");
                     }
                 }
                 case "LOST" -> {
@@ -298,24 +285,17 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
                     } else if (_connectedClients.isEmpty() && networkManager.getConnectedClientCount() == 0) {
                         // Only shutdown if both our tracking list AND network manager show no clients
                         // This prevents premature shutdown due to tracking bugs
-                        System.out.println("DEBUG: All clients disconnected, shutting down server");
                         endGame(null, GameEndEvent.EndReason.SERVER_SHUTDOWN);
-                    } else if (_connectedClients.isEmpty() && networkManager.getConnectedClientCount() > 0) {
-                        System.out.println("DEBUG: _connectedClients is empty but network manager shows " + networkManager.getConnectedClientCount() + " clients - tracking bug detected");
                     }
                 }
             }
         } else if (event instanceof ClientReadyEvent readyEvent) {
             String clientId = readyEvent.getClientId();
-            System.out.println("DEBUG: Processing ClientReadyEvent for client: " + clientId + " with plants: " + readyEvent.getSelectedPlants());
             if (!_readyClients.contains(clientId)) {
                 _readyClients.add(clientId);
                 _clientPlants.put(clientId, readyEvent.getSelectedPlants());
                 System.out.println("Client ready: " + clientId + " with plants: " + readyEvent.getSelectedPlants());
                 System.out.println("Ready clients: " + _readyClients.size() + "/" + _requiredClients);
-                System.out.println("DEBUG: _readyClients now contains: " + _readyClients);
-            } else {
-                System.out.println("DEBUG: Client " + clientId + " already in _readyClients");
             }
         }
     }

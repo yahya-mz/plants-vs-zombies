@@ -87,7 +87,6 @@ public class MultiplayerGameView {
             
             // Start the client engine if it hasn't been started yet
             if (!clientEngine.isConnected()) {
-                System.out.println("DEBUG: Starting client engine...");
                 clientEngine.start();
                 
                 // Wait a moment for connection to establish
@@ -97,20 +96,11 @@ public class MultiplayerGameView {
                     // Ignore interruption
                 }
                 
-                System.out.println("DEBUG: After start, isConnected: " + clientEngine.isConnected());
-                
                 // Send ready status to server with selected plants
                 if (clientEngine.isConnected()) {
-                    System.out.println("DEBUG: Sending ready status...");
                     clientEngine.sendReadyStatus(selectedPlants);
                     System.out.println("Sent ready status to server with plants: " + selectedPlants);
-                } else {
-                    System.out.println("DEBUG: Client not connected, cannot send ready status");
                 }
-            } else {
-                System.out.println("DEBUG: Client already connected, sending ready status directly");
-                clientEngine.sendReadyStatus(selectedPlants);
-                System.out.println("Sent ready status to server with plants: " + selectedPlants);
             }
             
             // Initialize visual engine based on game mode (simplified for now)
