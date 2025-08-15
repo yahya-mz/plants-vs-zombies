@@ -17,8 +17,7 @@ import javafx.util.Duration;
 public class PuffshroomVisualObject extends AbstractPlantVisualObject {
     public enum States {
         STANDING,
-        SLEEPING,
-        WAKING_UP
+        SLEEPING
     }
 
     private States _currentState;
@@ -47,7 +46,7 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
-                    changeStateTo(States.WAKING_UP);
+                    changeStateTo(States.STANDING);
                 });
             }
         });
@@ -97,10 +96,6 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
             case STANDING -> {
                 _currentState = States.STANDING;
                 playAnimation(PuffshroomAnimations.Animations.STANDING, Duration.millis(80));
-            }
-            case WAKING_UP -> {
-                _currentState = States.WAKING_UP;
-                playAnimation(PuffshroomAnimations.Animations.WAKING_UP, Duration.millis(100));
             }
         }
         return this;

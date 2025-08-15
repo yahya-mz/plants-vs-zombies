@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
@@ -17,7 +18,9 @@ public class DoomShroomGameObject extends AbstractPlantGameObject implements Ser
     public final static Duration EXPLOSION_TIME = Duration.ofSeconds(1);
 
     private int _tick;
+    private boolean _isAwake;
     private transient ArrayList<IEventSubscriber> _explosionEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _wakeUpEventSubscribers = new ArrayList<>();
 
     public static DoomShroomGameObject createCherryBombGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new DoomShroomGameObject(gameEngine, id, coordinate, row, column);
@@ -32,10 +35,18 @@ public class DoomShroomGameObject extends AbstractPlantGameObject implements Ser
 
         this._cost = 100;
         this._health = 50;
+        
+        // Set initial awake state based on game mode
+        GameMode gameMode = _gameEngine.getGameMode();
+        this._isAwake = (gameMode == GameMode.NIGHT);
     }
 
     public void subscribeToExplosionEvent(IEventSubscriber event) {
         this._explosionEventSubscribers.add(event);
+    }
+
+    public void subscribeToWakeUpEvent(IEventSubscriber event) {
+        this._wakeUpEventSubscribers.add(event);
     }
 
     @Override
@@ -53,9 +64,11 @@ public class DoomShroomGameObject extends AbstractPlantGameObject implements Ser
 
     @Override
     public void update() {
-        _tick++;
-        if (getMilliseconds() == EXPLOSION_TIME.toMillis()) {
-            explode();
+        if (_isAwake) {
+            _tick++;
+            if (getMilliseconds() == EXPLOSION_TIME.toMillis()) {
+                explode();
+            }
         }
     }
 
@@ -80,11 +93,25 @@ public class DoomShroomGameObject extends AbstractPlantGameObject implements Ser
         return this._tick * 1000.0 / GlobalSettings.FPS;
     }
 
+    public boolean isAwake() {
+        return this._isAwake;
+    }
+
+    public void wakeUp() {
+        if (!this._isAwake) {
+            this._isAwake = true;
+            for (IEventSubscriber subscriber : _wakeUpEventSubscribers) {
+                subscriber._notify(this);
+            }
+        }
+    }
+
     // Serialization
     @Serial
     private void readObject(ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         _explosionEventSubscribers = new ArrayList<>();
+        _wakeUpEventSubscribers = new ArrayList<>();
     }
 }

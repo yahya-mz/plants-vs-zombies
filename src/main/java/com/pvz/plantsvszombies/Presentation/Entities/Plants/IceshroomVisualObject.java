@@ -51,6 +51,15 @@ public class IceshroomVisualObject extends AbstractPlantVisualObject{
 //            }
 //        });
 
+        gameObject.subscribeToWakeUpEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                Platform.runLater(() -> {
+                    changeStateTo(States.STANDING);
+                });
+            }
+        });
+
         _visualCoordinate = gameObject.getCoordinate();
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Iceshroom/Iceshroom_0.png")));
         ((ImageView) _node).setFitWidth(85);

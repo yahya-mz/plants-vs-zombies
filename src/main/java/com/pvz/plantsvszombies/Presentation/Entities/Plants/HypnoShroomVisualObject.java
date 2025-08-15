@@ -45,6 +45,15 @@ public class HypnoShroomVisualObject extends AbstractPlantVisualObject {
                 _engine.disposeObject(temp_this);
             }
         });
+
+        gameObject.subscribeToWakeUpEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                javafx.application.Platform.runLater(() -> {
+                    changeStateTo(States.STANDING);
+                });
+            }
+        });
     }
 
     @Override

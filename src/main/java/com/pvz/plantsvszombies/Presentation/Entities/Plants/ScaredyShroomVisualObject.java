@@ -61,6 +61,15 @@ public class ScaredyShroomVisualObject extends AbstractPlantVisualObject {
             }
         });
 
+        gameObject.subscribeToWakeUpEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                Platform.runLater(() -> {
+                    changeStateTo(ScaredyShroomGameObject.ScaredyShroomState.STANDING);
+                });
+            }
+        });
+
     }
 
     @Override

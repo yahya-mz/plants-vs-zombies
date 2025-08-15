@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
+import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.GameEngine;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
@@ -21,6 +22,7 @@ public class HypnoShroomGameObject extends AbstractPlantGameObject implements Se
     private int tick = 1;
 
     private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _wakeUpEventSubscribers = new ArrayList<>();
 
     public static HypnoShroomGameObject createHypnoShroomGameObject(GameEngine gameEngine, String id, Coordinate coordinate, int row, int column) {
         return new HypnoShroomGameObject(gameEngine, id, coordinate, row, column);
@@ -36,11 +38,17 @@ public class HypnoShroomGameObject extends AbstractPlantGameObject implements Se
         this._cost = 50;
         this._health = 0;
 
-        _isAwake = _gameEngine instanceof NightEngine;
+        // Set initial awake state based on game mode
+        GameMode gameMode = _gameEngine.getGameMode();
+        this._isAwake = (gameMode == GameMode.NIGHT);
     }
 
     public void subscribeToEatenEvent(IEventSubscriber event) {
         this._eatenEventSubscribers.add(event);
+    }
+
+    public void subscribeToWakeUpEvent(IEventSubscriber event) {
+        this._wakeUpEventSubscribers.add(event);
     }
 
     @Override
@@ -62,6 +70,15 @@ public class HypnoShroomGameObject extends AbstractPlantGameObject implements Se
         return _isAwake;
     }
 
+    public void wakeUp() {
+        if (!this._isAwake) {
+            this._isAwake = true;
+            for (IEventSubscriber subscriber : _wakeUpEventSubscribers) {
+                subscriber._notify(this);
+            }
+        }
+    }
+
     private void eaten() {
         for (IEventSubscriber eventSubscriber : _eatenEventSubscribers) {
             eventSubscriber._notify(this);
@@ -79,5 +96,6 @@ public class HypnoShroomGameObject extends AbstractPlantGameObject implements Se
             throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         _eatenEventSubscribers = new ArrayList<>();
+        _wakeUpEventSubscribers = new ArrayList<>();
     }
 }

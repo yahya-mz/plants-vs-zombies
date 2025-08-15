@@ -11,8 +11,7 @@ import java.util.Objects;
 public class PuffshroomAnimations {
         public enum Animations implements IAnimation {
             STANDING,
-            SLEEPING,
-            WAKING_UP
+            SLEEPING
         }
         private static final ArrayList<Image[]> animations;
 

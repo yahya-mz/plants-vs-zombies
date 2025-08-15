@@ -19,8 +19,7 @@ import com.pvz.plantsvszombies.Domain.Engines.NightEngine;
 public class PuffShroomGameObject extends AbstractPlantGameObject implements Serializable {
     public enum PuffshroomState {
         STANDING,
-        SLEEPING,
-        WAKING_UP
+        SLEEPING
     }
 
     private PuffshroomState _visualState = PuffshroomState.STANDING;
@@ -146,7 +145,7 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
     public void wakeUp() {
         if (!this._isAwake) {
             this._isAwake = true;
-            this._visualState = PuffshroomState.WAKING_UP;
+            this._visualState = PuffshroomState.STANDING;
             for (IEventSubscriber subscriber : _wakeUpEventSubscribers) {
                 subscriber._notify(this);
             }

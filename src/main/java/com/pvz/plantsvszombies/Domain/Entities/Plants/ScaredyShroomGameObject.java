@@ -21,8 +21,7 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
     public enum ScaredyShroomState {
         CRYING,
         SLEEPING,
-        STANDING,
-        WAKING_UP
+        STANDING
     }
 
     private final Duration _coolDown = Duration.ofMillis(4000);
@@ -68,6 +67,10 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
         this._eatenEventSubscribers.add(event);
     }
 
+    public void subscribeToWakeUpEvent(IEventSubscriber event) {
+        this._wakeUpEventSubscribers.add(event);
+    }
+
     public void subscribeToSwitchAwakenessEvent(IEventSubscriber event) {
         this._switchAwakenessEventSubscribers.add(event);
     }
@@ -85,7 +88,7 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
 
     @Override
     public void update() {
-        if (!this._isDisposed && !_state.equals(ScaredyShroomState.SLEEPING)) {
+        if (!this._isDisposed && _isAwake && !_state.equals(ScaredyShroomState.SLEEPING)) {
             tick++;
             var rowsZombies = _gameEngine.getZombiesByRow(_row);
             if (!rowsZombies.isEmpty()) {
@@ -141,6 +144,28 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
         return this.tick * 1000.0 / GlobalSettings.FPS;
     }
 
+    public ScaredyShroomState getState() {
+        return this._state;
+    }
+
+    public void setState(ScaredyShroomState state) {
+        this._state = state;
+    }
+
+    public boolean isAwake() {
+        return this._isAwake;
+    }
+
+    public void wakeUp() {
+        if (!this._isAwake) {
+            this._isAwake = true;
+            this._state = ScaredyShroomState.STANDING;
+            for (IEventSubscriber subscriber : _wakeUpEventSubscribers) {
+                subscriber._notify(this);
+            }
+        }
+    }
+
     // Serialization
     @Serial
     private void readObject(ObjectInputStream in)
@@ -149,5 +174,6 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
         _shootingEventSubscribers = new ArrayList<>();
         _switchAwakenessEventSubscribers = new ArrayList<>();
         _eatenEventSubscribers = new ArrayList<>();
+        _wakeUpEventSubscribers = new ArrayList<>();
     }
 }
