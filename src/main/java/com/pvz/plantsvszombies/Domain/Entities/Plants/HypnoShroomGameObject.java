@@ -38,9 +38,7 @@ public class HypnoShroomGameObject extends AbstractPlantGameObject implements Se
         this._cost = 50;
         this._health = 0;
 
-        // Set initial awake state based on game mode
-        GameMode gameMode = _gameEngine.getGameMode();
-        this._isAwake = (gameMode == GameMode.NIGHT);
+        this._isAwake = (_gameEngine.getGameMode() == GameMode.NIGHT);
     }
 
     public void subscribeToEatenEvent(IEventSubscriber event) {

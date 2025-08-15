@@ -31,6 +31,14 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
         _visualCoordinate = gameObject.getCoordinate();
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/Puffshroom/Puffshroom_0.png")));
 
+        if (gameObject.isAwake()) {
+            _currentState = PuffshroomVisualObject.States.STANDING;
+        } else {
+            _currentState = PuffshroomVisualObject.States.SLEEPING;
+        }
+
+        var temp_this = this;
+
         gameObject.subscribeToShootingEvent(new IEventSubscriber() {//notify
             @Override
             public void _notify(AbstractGameObject gameObject) {
@@ -42,29 +50,24 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
             }
         });
 
-        gameObject.subscribeToWakeUpEvent(new IEventSubscriber() {
-            @Override
-            public void _notify(AbstractGameObject gameObject) {
-                Platform.runLater(() -> {
-                    changeStateTo(States.STANDING);
-                });
-            }
-        });
-//        gameObject.subscribeToSleepingEvent(new IEventSubscriber() {//notify//fix this later
-//            @Override
-//            public void _notify(AbstractGameObject gameObject) {
-//                Platform.runLater(() -> {
-//                    _currentState = ScaredyshroomVisualObject.States.SLEEPING;
-//                });
-//            }
-//        });
-        var temp_this = this;
         gameObject.subscribeToEatenEvent(new IEventSubscriber() {//notify
             @Override
             public void _notify(AbstractGameObject gameObject) {
                 _engine.disposeObject(temp_this);
             }
         });
+
+        gameObject.subscribeToWakeUpEvent(new IEventSubscriber() {
+            @Override
+            public void _notify(AbstractGameObject gameObject) {
+                Platform.runLater(() -> {
+                    _currentState = States.STANDING;
+                    changeStateTo(States.STANDING);
+                });
+            }
+        });
+
+
 
     }
 
@@ -75,16 +78,7 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
 
     @Override
     public void spawn() {
-            if (_engine instanceof VisualNightEngine) {
-            this._currentState = States.STANDING;
-        } else {
-            this._currentState = States.SLEEPING;
-        }
-        if (_currentState.equals(PuffshroomVisualObject.States.STANDING)) {
-            playAnimation(PuffshroomAnimations.Animations.STANDING, Duration.millis(80));//standing
-        } else if (_currentState.equals(PuffshroomVisualObject.States.SLEEPING)) {
-            playAnimation(PuffshroomAnimations.Animations.SLEEPING, Duration.millis(20));//standing
-        }
+        changeStateTo(_currentState);
     }
 
     public PuffshroomVisualObject changeStateTo(PuffshroomVisualObject.States state) {

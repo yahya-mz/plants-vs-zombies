@@ -19,7 +19,7 @@ import com.pvz.plantsvszombies.GlobalSettings;
 public class ScaredyShroomGameObject extends AbstractPlantGameObject implements Serializable {
 
     public enum ScaredyShroomState {
-        CRYING,
+        FEARED,
         SLEEPING,
         STANDING
     }
@@ -31,7 +31,7 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
     public ScaredyShroomState _state;
 
     private transient ArrayList<IEventSubscriber> _shootingEventSubscribers = new ArrayList<>();
-    private transient ArrayList<IEventSubscriber> _switchAwakenessEventSubscribers = new ArrayList<>();
+    private transient ArrayList<IEventSubscriber> _switchFearedEventSubscribers = new ArrayList<>();
     private transient ArrayList<IEventSubscriber> _eatenEventSubscribers = new ArrayList<>();
     private transient ArrayList<IEventSubscriber> _wakeUpEventSubscribers = new ArrayList<>();
 
@@ -48,9 +48,7 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
 
         this._cost = 0;
         
-        // Set initial awake state and visual state based on game mode
-        GameMode gameMode = _gameEngine.getGameMode();
-        this._isAwake = (gameMode == GameMode.NIGHT);
+        this._isAwake = (_gameEngine.getGameMode() == GameMode.NIGHT);
         
         if (this._isAwake) {
             this._state = ScaredyShroomState.STANDING;
@@ -71,8 +69,8 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
         this._wakeUpEventSubscribers.add(event);
     }
 
-    public void subscribeToSwitchAwakenessEvent(IEventSubscriber event) {
-        this._switchAwakenessEventSubscribers.add(event);
+    public void subscribeToSwitchFearedEvent(IEventSubscriber event) {
+        this._switchFearedEventSubscribers.add(event);
     }
 
     @Override
@@ -94,8 +92,8 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
             if (!rowsZombies.isEmpty()) {
                 var frontZombie = rowsZombies.getFirst(); // Most front zombie
                 if (frontZombie.getColumn() - _column < 2) {
-                    _state = ScaredyShroomState.CRYING;
-                    for (IEventSubscriber eventSubscriber : _switchAwakenessEventSubscribers) {
+                    _state = ScaredyShroomState.FEARED;
+                    for (IEventSubscriber eventSubscriber : _switchFearedEventSubscribers) {
                         eventSubscriber._notify(this);
                     }
                     _lastShootTick = 0;
@@ -148,10 +146,6 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
         return this._state;
     }
 
-    public void setState(ScaredyShroomState state) {
-        this._state = state;
-    }
-
     public boolean isAwake() {
         return this._isAwake;
     }
@@ -172,7 +166,7 @@ public class ScaredyShroomGameObject extends AbstractPlantGameObject implements 
             throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         _shootingEventSubscribers = new ArrayList<>();
-        _switchAwakenessEventSubscribers = new ArrayList<>();
+        _switchFearedEventSubscribers = new ArrayList<>();
         _eatenEventSubscribers = new ArrayList<>();
         _wakeUpEventSubscribers = new ArrayList<>();
     }

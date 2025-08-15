@@ -63,25 +63,6 @@ public class ClientGameEngine extends GameEngine {
         System.out.println("Client game engine initialized: " + clientId);
     }
 
-    public ClientGameEngine(double windowWidth, double windowHeight, String serverHost, GameMode gameMode) {
-        this._windowWidth = windowWidth;
-        this._windowHeight = windowHeight;
-        this._gameMode = gameMode;
-        this._gameObjects = new CopyOnWriteArrayList<>();
-
-        // Initialize network manager first
-        this.networkManager = new ClientNetworkManager(serverHost);
-
-        // Generate client ID and set it in both places
-        this.clientId = "Client_" + java.util.UUID.randomUUID().toString().substring(0, 8);
-        this.networkManager.setClientId(this.clientId);
-
-        // Listen for server events
-        this.networkManager.addEventListener(this::handleServerEvent);
-
-        System.out.println("Client game engine initialized: " + clientId + " (mode: " + gameMode + ")");
-    }
-
     @Override
     public void start() {
 

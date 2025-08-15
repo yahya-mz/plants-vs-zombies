@@ -23,52 +23,22 @@ public class ScaredyShroomVisualObject extends AbstractPlantVisualObject {
         _visualCoordinate = gameObject.getCoordinate();
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/ScaredyShroom/ScaredyShroom_0.png")));
 
-        gameObject.subscribeToShootingEvent(new IEventSubscriber() {//notify
-            @Override
-            public void _notify(AbstractGameObject gameObject) {
-                Platform.runLater(() -> {
+        gameObject.subscribeToShootingEvent(gameObj -> Platform.runLater(() -> {
 //                    var bulletVisualObject = new ShroomBulletVisualObject((ShroomBulletGameObject) gameObject, engine);
 //                    _engine.spawnVisualObject(bulletVisualObject);
-                });
-            }
-        });
+        }));
 
-//        gameObject.subscribeToBeingEvent(new IEventSubscriber() {//notify//fix this later
-//            @Override
-//            public void _notify(AbstractGameObject gameObject) {
-//                Platform.runLater(() -> {
-//                    changeStateTo(States.HIDING);
-//                    System.out.println("Shooting: " + gameObject.getCoordinate().x() + "," + gameObject.getCoordinate().y());
-//                    var bulletVisualObject = new ShroomBulletVisualObject((ShroomBulletGameObject) gameObject, engine);
-//                    _engine.spawnVisualObject(bulletVisualObject);
-//                });
-//            }
-//        });
-//        gameObject.subscribeToSleepingEvent(new IEventSubscriber() {//notify//fix this later
-//            @Override
-//            public void _notify(AbstractGameObject gameObject) {
-//                Platform.runLater(() -> {
-//                    changeStateTo(States.SLEEPING);
-//                });
-//            }
-//        });
+
+        gameObject.subscribeToSwitchFearedEvent(gameObj -> Platform.runLater(() -> {
+            changeStateTo(((ScaredyShroomGameObject) gameObj)._state);
+        }));
 
         var temp_this = this;
-        gameObject.subscribeToEatenEvent(new IEventSubscriber() {//notify
-            @Override
-            public void _notify(AbstractGameObject gameObject) {
-                _engine.disposeObject(temp_this);
-            }
-        });
+        gameObject.subscribeToEatenEvent(gameObject1 -> _engine.disposeObject(temp_this));
 
-        gameObject.subscribeToWakeUpEvent(new IEventSubscriber() {
-            @Override
-            public void _notify(AbstractGameObject gameObject) {
-                Platform.runLater(() -> {
-                    changeStateTo(ScaredyShroomGameObject.ScaredyShroomState.STANDING);
-                });
-            }
-        });
+        gameObject.subscribeToWakeUpEvent(gameObj -> Platform.runLater(() -> {
+            changeStateTo(ScaredyShroomGameObject.ScaredyShroomState.STANDING);
+        }));
 
     }
 
@@ -80,8 +50,8 @@ public class ScaredyShroomVisualObject extends AbstractPlantVisualObject {
     @Override
     public void spawn() {
         switch (((ScaredyShroomGameObject) _gameObject)._state) {
-            case CRYING -> {
-                changeStateTo(ScaredyShroomGameObject.ScaredyShroomState.CRYING);
+            case FEARED -> {
+                changeStateTo(ScaredyShroomGameObject.ScaredyShroomState.FEARED);
             }
             case SLEEPING -> {
                 changeStateTo(ScaredyShroomGameObject.ScaredyShroomState.SLEEPING);
@@ -101,23 +71,10 @@ public class ScaredyShroomVisualObject extends AbstractPlantVisualObject {
             case STANDING -> {
                 playAnimation(ScaredyShroomAnimations.Animations.STANDING, Duration.millis(80));
             }
-            case CRYING -> {
+            case FEARED -> {
                 playAnimation(ScaredyShroomAnimations.Animations.CRYING, Duration.millis(80));
             }
         }
         return this;
     }
-
-//    public ScaredyshroomVisualObject changeStateTo(ScaredyshroomVisualObject.States state) {
-//        switch (state) {
-//            case SLEEPING -> {
-//                _currentState = ScaredyshroomVisualObject.States.SLEEPING;
-//                playAnimation(ScaredyshroomAnimations.Animations.SLEEPING, Duration.millis(80));
-//            }
-//            case STANDING -> {
-//                _currentState = Scare.States.STANDING;
-//            }
-//        }
-//        return null;
-//    }
 }

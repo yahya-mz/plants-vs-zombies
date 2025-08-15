@@ -9,6 +9,7 @@ import com.pvz.plantsvszombies.Presentation.Animations.HypnoShroomAnimations;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
@@ -29,7 +30,6 @@ public class HypnoShroomVisualObject extends AbstractPlantVisualObject {
         _engine = engine;
 
         _visualCoordinate = gameObject.getCoordinate();
-        _gameObject = gameObject;
         _node = new ImageView(new Image(GlobalSettings.getResource("graphics/Plants/HypnoShroom/HypnoShroom_0.png")));
 
         if (gameObject.isAwake()) {
@@ -49,7 +49,8 @@ public class HypnoShroomVisualObject extends AbstractPlantVisualObject {
         gameObject.subscribeToWakeUpEvent(new IEventSubscriber() {
             @Override
             public void _notify(AbstractGameObject gameObject) {
-                javafx.application.Platform.runLater(() -> {
+                Platform.runLater(() -> {
+                    _currentState = States.STANDING;
                     changeStateTo(States.STANDING);
                 });
             }
@@ -63,13 +64,14 @@ public class HypnoShroomVisualObject extends AbstractPlantVisualObject {
 
     @Override
     public void spawn() {
-        playAnimation(HypnoShroomAnimations.Animations.STANDING, Duration.millis(80));
+        changeStateTo(_currentState);
     }
 
     public HypnoShroomVisualObject changeStateTo(States state) {
         switch (state) {
-
+            case STANDING -> playAnimation(HypnoShroomAnimations.Animations.STANDING, Duration.millis(80));
+            case SLEEPING -> playAnimation(HypnoShroomAnimations.Animations.SLEEPING, Duration.millis(80));
         }
-        return null;
+        return this;
     }
 }

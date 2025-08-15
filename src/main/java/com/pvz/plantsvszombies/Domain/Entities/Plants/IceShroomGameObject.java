@@ -38,9 +38,7 @@ public class IceShroomGameObject extends AbstractPlantGameObject implements Seri
         this._cost = 100;
         this._health = 50;
         
-        // Set initial awake state based on game mode
-        GameMode gameMode = _gameEngine.getGameMode();
-        this._isAwake = (gameMode == GameMode.NIGHT);
+        this._isAwake = (_gameEngine.getGameMode() == GameMode.NIGHT);
     }
 
     public void subscribeToExplosionEvent(IEventSubscriber event) {

@@ -46,19 +46,13 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
         this._cost = 0;
         this._health = 100;
         
-        // Set initial awake state and visual state based on game mode
-        GameMode gameMode = _gameEngine.getGameMode();
-        this._isAwake = (gameMode == GameMode.NIGHT);
+        this._isAwake = (_gameEngine.getGameMode() == GameMode.NIGHT);
         
         if (this._isAwake) {
             this._visualState = PuffshroomState.STANDING;
         } else {
             this._visualState = PuffshroomState.SLEEPING;
         }
-    }
-
-    public PuffshroomState getVisualState() {
-        return _visualState;
     }
 
     public void setVisualState(PuffshroomState state) {
@@ -132,10 +126,6 @@ public class PuffShroomGameObject extends AbstractPlantGameObject implements Ser
 
     public PuffshroomState getState() {
         return this._visualState;
-    }
-
-    public void setState(PuffshroomState state) {
-        this._visualState = state;
     }
 
     public boolean isAwake() {

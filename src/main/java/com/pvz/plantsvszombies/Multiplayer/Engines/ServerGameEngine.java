@@ -43,19 +43,6 @@ public class ServerGameEngine extends com.pvz.plantsvszombies.Domain.Engines.Day
     private final Random _zombieTypeRandom = new Random();
     private final Random _skyDroppingRandom = new Random();
 
-    public ServerGameEngine(double windowWidth, double windowHeight, int requiredClients) {
-        super(windowWidth, windowHeight);
-        this._requiredClients = requiredClients;
-        this._gameMode = GameMode.DAY; // Default to day mode
-        this._gameObjects = new CopyOnWriteArrayList<>();
-
-        // Initialize network manager
-        this.networkManager = new ServerNetworkManager(12345, requiredClients);
-
-        // Listen for client status events
-        this.networkManager.addEventListener(this::handleClientEvent);
-    }
-
     public ServerGameEngine(double windowWidth, double windowHeight, int requiredClients, GameMode gameMode) {
         super(windowWidth, windowHeight);
         this._requiredClients = requiredClients;

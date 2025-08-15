@@ -37,7 +37,6 @@ public class NightEngine extends GameEngine {
         this._windowWidth = windowWidth;
         this._windowHeight = windowHeight;
         this._gameMode = GameMode.NIGHT;
-
         this._gameObjects = new CopyOnWriteArrayList<>();
     }
 

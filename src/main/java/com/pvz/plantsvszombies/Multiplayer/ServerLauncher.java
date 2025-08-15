@@ -29,10 +29,6 @@ public class ServerLauncher {
             }
         }
         
-        if (args.length >= 2) {
-            gameMode = GameMode.fromString(args[1]);
-        }
-        
         System.out.println("Server Configuration:");
         System.out.println("- Max Players: " + playerCount);
         System.out.println("- Game Mode: " + gameMode.name());
@@ -42,7 +38,7 @@ public class ServerLauncher {
         try {
             // Create and start server
             ServerGameEngine serverEngine = new ServerGameEngine(
-                GlobalSettings.WIDTH, GlobalSettings.HEIGHT, playerCount, gameMode);
+                GlobalSettings.WIDTH, GlobalSettings.HEIGHT, playerCount, GameMode.DAY);
             
             System.out.println("🚀 Starting server...");
             serverEngine.start();
