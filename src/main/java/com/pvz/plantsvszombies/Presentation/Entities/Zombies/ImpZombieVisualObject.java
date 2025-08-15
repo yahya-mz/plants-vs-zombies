@@ -1,7 +1,12 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 
+import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.ImpZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
+import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
 import com.pvz.plantsvszombies.Presentation.Animations.Zombies.ImpZombieAnimations;
@@ -82,6 +87,8 @@ public class ImpZombieVisualObject extends AbstractZombieVisualObject {
     @Override
     public void spawn() {
         _gameObject.spawn();
+        playAnimation(ImpZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(35));
+        SoundManager.play(SoundType.IMP_ZOMBIE);
         changeStateTo(_gameObject.getCurrentState());
     }
 

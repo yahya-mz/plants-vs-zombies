@@ -2,6 +2,8 @@ package com.pvz.plantsvszombies.Presentation.Entities.Zombies;
 
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.AbstractZombieGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Zombies.NormalZombieGameObject;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.Animations.Zombies.NormalZombieAnimations;
@@ -90,6 +92,7 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
                 case MOVING_FORWARD -> {
                     _currentVisualState = AbstractZombieGameObject.GeneralZombieState.MOVING_FORWARD;
                     playAnimation(NormalZombieAnimations.Animations.MOVING_FORWARD, Duration.millis(30));
+                    SoundManager.stop(SoundType.ZOMBIE_ATTACK);
                 }
                 case FREEZY_MOVING_FORWARD -> {
                     _currentVisualState = AbstractZombieGameObject.GeneralZombieState.FREEZY_MOVING_FORWARD;
@@ -99,6 +102,8 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
                     System.out.println("demdeomdeomoed");
                     _currentVisualState = AbstractZombieGameObject.GeneralZombieState.DYING;
                     playAnimation(NormalZombieAnimations.Animations.DYING, Duration.millis(60), 1);
+                    SoundManager.stop(SoundType.ZOMBIE_GROAN);
+                    SoundManager.play(SoundType.ZOMBIE_Falling);
                     setOnAnimationFinished(e -> {
                         Platform.runLater(() -> {
                             _engine.disposeObject(this);
@@ -108,6 +113,7 @@ public class NormalZombieVisualObject extends AbstractZombieVisualObject {
                 case EATING -> {
                     _currentVisualState = AbstractZombieGameObject.GeneralZombieState.EATING;
                     playAnimation(NormalZombieAnimations.Animations.ATTACKING, Duration.millis(30));
+                    SoundManager.play(SoundType.ZOMBIE_ATTACK);
                 }
                 case FREEZY_EATING -> {
                     _currentVisualState = AbstractZombieGameObject.GeneralZombieState.FREEZY_EATING;

@@ -2,13 +2,12 @@ package com.pvz.plantsvszombies.Presentation.GUI.Views;
 
 import com.pvz.plantsvszombies.Domain.Entities.Plants.AbstractPlantGameObject;
 import com.pvz.plantsvszombies.Domain.Engines.DayEngine;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.PuffShroomGameObject;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Mediator.Mediator;
 import com.pvz.plantsvszombies.Presentation.Entities.Plants.*;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualDayEngine;
-import javafx.animation.FadeTransition;
-import javafx.animation.PauseTransition;
-import javafx.animation.SequentialTransition;
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -22,15 +21,18 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
+
 import java.util.List;
 
 public class DayView extends AbstractLevelView {
+    PickingPlantStage pickingPlantStage;
 
     public static final double Width = 1200;
     public static final double Height = 728;
@@ -40,15 +42,23 @@ public class DayView extends AbstractLevelView {
     private final BooleanProperty isShovelMode = new SimpleBooleanProperty(false);
     private Button shovelButton;
     private final Label _counterLabel = new Label();
+    private static ImageCursor customCursor;
+    private Button lastClickedCard = null;
+
+
 
 
     private DayView() {
     }
 
     public static DayView createStage(List<AbstractPlantGameObject.PlantType> selectedPlants) {
+        System.out.println("DayView.createStage() called");
         var dayView = new DayView();
         dayView.bottommostPlane = new StackPane();//changed
         dayView._gameBoxPane = dayView.bottommostPlane;
+        Image cursorImage = new Image(GlobalSettings.getResource("graphics/Items/Cursor/DayCursor.png"));
+        customCursor = new ImageCursor(cursorImage, cursorImage.getWidth() / 2, cursorImage.getHeight() / 2);
+
 
         //ready-set-plant
         VBox animationBox = new VBox();
@@ -90,11 +100,18 @@ public class DayView extends AbstractLevelView {
 
 
         var scene = new Scene(dayView.bottommostPlane, Width, Height);
+        scene.setCursor(customCursor);
+        System.out.println("Requesting BACKGROUND music");
+//        SoundManager.play(SoundType.BACKGROUND);
+
 
 
         dayView.setScene(scene);
         dayView.setResizable(false);
+
+        System.out.println("About to call setupEngines...");
         dayView.setupEngines();
+
 
         return dayView;
 
@@ -108,6 +125,14 @@ public class DayView extends AbstractLevelView {
         Mediator.getInstance().startGameEngine();
         Mediator.getInstance().runEngine();
 
+
+
+        _visualEngine.selectedPlantTypeProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null && lastClickedCard != null) {
+                deactivateButton(lastClickedCard); // مدت دلخواه
+                lastClickedCard = null;
+            }
+        });
 
         this.setOnHiding((event) -> {
             System.out.println("Stopping GameEngine");
@@ -123,6 +148,11 @@ public class DayView extends AbstractLevelView {
         counterBox.setMinWidth(50);
 
         return counterBox;
+    }
+
+    public int setMyCounterValue() {
+        counterValue.set(0);
+        return counterValue.get();
     }
 
     public HBox createTopPlantSelectionBar(List<AbstractPlantGameObject.PlantType> selectedPlants) {
@@ -155,8 +185,14 @@ public class DayView extends AbstractLevelView {
 
 
             final AbstractPlantGameObject.PlantType final_plantType = selectedPlants.get(i);
+            btn.setUserData(final_plantType);
+
             btn.setOnMouseClicked(e -> {
                 if (e.getButton().equals(MouseButton.PRIMARY)) {
+                    if (isShovelMode.get()) setIsShovelMode(false);
+
+                    lastClickedCard = btn;
+
                     switch (final_plantType) {
                         case PEASHOOTER -> _visualEngine.setSelectedPlantType(PeashooterVisualObject.class);
                         case SUNFLOWER -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
@@ -172,6 +208,13 @@ public class DayView extends AbstractLevelView {
                         case HYPNO_SHROOM -> _visualEngine.setSelectedPlantType(HypnoShroomVisualObject.class);
                         case BLOVER -> _visualEngine.setSelectedPlantType(BloverVisualObject.class);
                         case COFFEE_BEAN -> _visualEngine.setSelectedPlantType(CoffeeBeanVisualObject.class);
+                        case SUNFLOWER  -> _visualEngine.setSelectedPlantType(SunFlowerVisualObject.class);
+                        case WALL_NUT   -> _visualEngine.setSelectedPlantType(WallNutVisualObject.class);
+                        case JALAPENO   -> _visualEngine.setSelectedPlantType(JalapenoVisualObject.class);
+                        case TALL_NUT   -> _visualEngine.setSelectedPlantType(TallnutVisualObject.class);
+                        case CHERRY_BOMB-> _visualEngine.setSelectedPlantType(CherryBombVisualObject.class);
+                        case SNOW_PEA   -> _visualEngine.setSelectedPlantType(SnowPeaVisualObject.class);
+                        case REPEATER   -> _visualEngine.setSelectedPlantType(RepeaterVisualObject.class);
                     }
                 }
             });
@@ -188,26 +231,25 @@ public class DayView extends AbstractLevelView {
 
             buttonBar.getChildren().add(btn);
         }
-        addHoverEffectToImages(buttonBar);
+        for (Node node : buttonBar.getChildren()) {
+            EffectsManagement.yAndScaleHoverEffectForNode(node);
+        }
+
         return buttonBar;
     }
 
-    public static void addHoverEffectToImages(HBox hbox) {
-        for (Node node : hbox.getChildren()) {
-            if (node instanceof Button btn) {
-                btn.setOnMouseEntered(e -> {
-                    btn.setTranslateY(-9);
-                    btn.setScaleX(1.02);
-                    btn.setScaleY(1.02);
-                });
 
-                btn.setOnMouseExited(e -> {
-                    btn.setTranslateY(0);
-                    btn.setScaleX(1);
-                    btn.setScaleY(1);
-                });
-            }
-        }
+    public static void deactivateButton(Button btn) {
+        EffectsManagement.applyDeactivateEffect(btn);
+        Duration duration = EffectsManagement.getCooldownFor(btn);
+
+        Timeline tl = new Timeline(
+                new KeyFrame(duration, e -> {
+                    btn.setEffect(null);
+                    btn.setDisable(false);
+                })
+        );
+        tl.play();
     }
 
     public Button createShovelToolButton() {
@@ -220,11 +262,10 @@ public class DayView extends AbstractLevelView {
 
         shovelBarView(shovelButton, shovelFullView);
 
-        // ✅ فقط یک‌بار لیسنر اضافه می‌کنیم
         isShovelModeProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal && shovelButton.getScene() != null) {
                 Platform.runLater(() -> {
-                    shovelButton.getScene().setCursor(Cursor.DEFAULT);
+                    shovelButton.getScene().setCursor(customCursor);
                     shovelBarView(shovelButton, new ImageView(shovelFullImage));
                 });
             }
@@ -247,7 +288,7 @@ public class DayView extends AbstractLevelView {
                 });
             }
         });
-        addHoverEffectToShovel(shovelButton);
+        EffectsManagement.scaleHoverEffectForNode(shovelButton);
 
         return shovelButton;
     }
@@ -311,6 +352,7 @@ public class DayView extends AbstractLevelView {
     }
 
     public void playImageSequenceInBox(Pane targetBox, Runnable onFinished) {
+
         String[] imagePaths = {
                 "graphics/Items/Messages/ready.png",
                 "graphics/Items/Messages/set.png",

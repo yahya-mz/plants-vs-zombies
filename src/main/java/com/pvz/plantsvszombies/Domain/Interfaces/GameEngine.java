@@ -1,6 +1,11 @@
 package com.pvz.plantsvszombies.Domain.Interfaces;
 
-
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+//import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pvz.plantsvszombies.Domain.Common.Coordinate;
 import com.pvz.plantsvszombies.Domain.Common.GameMode;
 import com.pvz.plantsvszombies.Domain.Entities.*;
@@ -21,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public abstract class GameEngine {
     protected double _windowWidth;
@@ -28,6 +34,7 @@ public abstract class GameEngine {
 
     protected final int _rows = 5;
     protected final int _columns = 9;
+
 
     protected int tick = 1;
     private final IntegerProperty _point = new SimpleIntegerProperty(0);
@@ -40,6 +47,7 @@ public abstract class GameEngine {
 
     protected final ArrayList<IEventSubscriber> _winEventSubscribers = new ArrayList<>();
     protected final ArrayList<IEventSubscriber> _lostEventSubscribers = new ArrayList<>();
+    protected final ArrayList<GraveGameObject> _graves = new ArrayList<>();
 
     public abstract void start();
 
@@ -101,9 +109,10 @@ public abstract class GameEngine {
 
     public void disposeObject(AbstractGameObject object) {
         _gameObjects.remove(object);
-        if (object instanceof AbstractPlantGameObject) {
-            _currentMap.getBlock(((AbstractPlantGameObject) object).getRow(),
-                    ((AbstractPlantGameObject) object).getColumn()).setPlant(null);
+        if (object instanceof AbstractPlantGameObject p) {
+            _currentMap.getBlock(p.getRow(), p.getColumn()).setPlant(null);
+        } else if (object instanceof GraveGameObject g) {
+            _currentMap.getBlock(g.getRow(), g.getColumn()).setGrave(null);
         }
     }
 
@@ -117,8 +126,24 @@ public abstract class GameEngine {
 
     public void plantObject(AbstractPlantGameObject object) throws Exception {
         if (_point.get() < object.getCost()) {
-//            return;
+            return;
         }
+
+        if (object instanceof com.pvz.plantsvszombies.Domain.Entities.Plants.GraveBusterGameObject) {
+            if (_currentMap.getBlock(object.getRow(), object.getColumn()).getGrave() == null) {
+                throw new Exception("Exception: No grave exists in row:" + object.getRow() + " col:" + object.getColumn() + " for GraveBuster.");
+            }
+            // GraveBuster را فقط اسپاون کن (روی بلاک setPlant نکن)
+            this._gameObjects.add(object);
+            subtractPoint(object.getCost());
+
+            for (IEventSubscriber eventSubscriber : _gameObjectSpawnEventSubscribers) {
+                eventSubscriber._notify(object);
+            }
+            return;
+        }
+
+
         if (object instanceof CoffeeBeanGameObject) {
             if (!_currentMap.isOccupied(object.getRow(), object.getColumn()) ||
                     !(_currentMap.getPlantAtBlock(object.getRow(), object.getColumn()) instanceof AbstractNightPlantGameObject)) {
@@ -185,6 +210,28 @@ public abstract class GameEngine {
         }
     }
 
+    public void spawnGrave(int row, int col) {
+        String graveObjectId = "Grave" + UUID.randomUUID();
+        var block = _currentMap.getBlock(row, col);
+        Coordinate coordinate = block.getCenterCoordinate();
+
+        GraveGameObject grave = GraveGameObject.createGraveGameObject(this, graveObjectId,
+                coordinate.copy(), row, col);
+
+        // ثبت روی بلاک (هر کدوم که ساختی)
+         block.setGrave(grave);
+        _currentMap.placeGrave(grave);
+         _graves.add(grave);
+
+        this._gameObjects.add(grave);
+        for (IEventSubscriber eventSubscriber : _gameObjectSpawnEventSubscribers) {
+            eventSubscriber._notify(grave);
+        }
+    }
+
+
+
+
     public List<AbstractZombieGameObject> queryZombies(Predicate<AbstractZombieGameObject> predicate) {
         return _gameObjects.stream().filter(obj -> obj instanceof AbstractZombieGameObject &&
                         (predicate.test((AbstractZombieGameObject) obj))).map(obj -> (AbstractZombieGameObject) obj)
@@ -196,6 +243,25 @@ public abstract class GameEngine {
                         (predicate.test((AbstractZombieGameObject) obj))).map(obj -> (AbstractZombieGameObject) obj)
                 .findFirst().orElse(null);
     }
+
+    public List<FogGameObject> queryFogs(Predicate<FogGameObject> predicate) {
+        return _gameObjects.stream()
+                .filter(obj -> obj instanceof FogGameObject &&
+                        predicate.test((FogGameObject) obj))
+                .map(obj -> (FogGameObject) obj)
+                .toList();
+    }
+
+    public FogGameObject queryFog(Predicate<FogGameObject> predicate) {
+        return _gameObjects.stream()
+                .filter(obj -> obj instanceof FogGameObject &&
+                        predicate.test((FogGameObject) obj))
+                .map(obj -> (FogGameObject) obj)
+                .findFirst()
+                .orElse(null);
+    }
+
+
 
     public List<AbstractGameObject> getGameObjects() {
         return this._gameObjects.stream().toList();

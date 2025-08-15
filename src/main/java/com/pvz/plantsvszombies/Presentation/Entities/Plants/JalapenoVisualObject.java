@@ -3,6 +3,8 @@ package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.JalapenoGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
@@ -28,6 +30,7 @@ public class JalapenoVisualObject extends AbstractPlantVisualObject {
                     playAnimation(JalapenoAnimations.Animations.FIRING, Duration.millis(50), 1);
                     _node.setManaged(false);
                     ((ImageView) _node).setPreserveRatio(false);
+                    SoundManager.play(SoundType.JALAPENO_EXPLOSION);
 
                     _node.setTranslateX(-_engine.getWidth());
                     ((ImageView) _node).setFitWidth(2 * _engine.getWidth());

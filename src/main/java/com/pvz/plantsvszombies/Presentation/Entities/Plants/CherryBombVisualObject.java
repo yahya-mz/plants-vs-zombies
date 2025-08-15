@@ -1,8 +1,10 @@
 package com.pvz.plantsvszombies.Presentation.Entities.Plants;
 
 import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
-import com.pvz.plantsvszombies.Domain.Entities.Plants.CherryBombGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.Domain.Entities.Plants.CherryBombGameObject;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.CherryBombAnimations;
 import com.pvz.plantsvszombies.Presentation.Animations.IAnimation;
@@ -27,6 +29,7 @@ public class CherryBombVisualObject extends AbstractPlantVisualObject {
             public void _notify(AbstractGameObject gameObject) {
                 Platform.runLater(() -> {
                     playAnimation(CherryBombAnimations.Animations.EXPLODED, Duration.millis(50), 1);
+                    SoundManager.play(SoundType.CHERRY_BOMB_EXPLOSION);
                     setOnAnimationFinished(e -> {
                         _engine.disposeObject(temp_this);
                     });

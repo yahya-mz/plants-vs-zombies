@@ -48,7 +48,15 @@ public class PuffshroomVisualObject extends AbstractPlantVisualObject {
                 });
             }
         });
-
+//        gameObject.subscribeToSleepingEvent(new IEventSubscriber() {//notify//fix this later
+//            @Override
+//            public void _notify(AbstractGameObject gameObject) {
+//                Platform.runLater(() -> {
+//                    _currentState = ScaredyshroomVisualObject.States.SLEEPING;
+//                });
+//            }
+//        });
+        var temp_this = this;
         gameObject.subscribeToEatenEvent(new IEventSubscriber() {//notify
             @Override
             public void _notify(AbstractGameObject gameObject) {

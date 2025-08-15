@@ -61,6 +61,7 @@ public class SkySunVisualObject extends AbstractAnimatedVisualObject {
                 changeStateTo(States.COLLECTING);
             }
         });
+        _node.setOnMouseEntered((e-> _node.setCursor(EffectsManagement.getPointerCustomCursor())));
     }
 
     @Override

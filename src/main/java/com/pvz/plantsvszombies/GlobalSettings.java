@@ -1,6 +1,8 @@
 package com.pvz.plantsvszombies;
 
+
 import java.util.Objects;
+import java.net.URL;
 
 public class GlobalSettings {
     public static final int WIDTH = 1280;
@@ -10,12 +12,18 @@ public class GlobalSettings {
     public static final int FPS = 30;
 
     public static String getResource(String path) {
-        try{
-            return Objects.requireNonNull(GlobalSettings.class.getResource(path)).toString();
-        }catch (NullPointerException ex){
-            System.out.println("The requested resource doesn't exist: "+ex.getMessage());
+        try {
+            URL resource = GlobalSettings.class.getResource(path);
+            if (resource != null) {
+                return resource.toExternalForm();
+            } else {
+                System.err.println("Resource not found: " + path);
+                return "";
+            }
+        } catch (Exception ex) {
+            System.err.println("Error loading resource " + path + ": " + ex.getMessage());
+            return "";
         }
-        return "";
     }
     public static String getDir(String path) {
         try{

@@ -82,7 +82,8 @@ public class MapGameObject extends AbstractGameObject implements Serializable {
     }
 
     public boolean isOccupied(int row, int column) {
-        return (_blocks[_columns * row + column].getPlant() != null);
+        MapBlock b = _blocks[_columns * row + column];
+        return (b.getPlant() != null) || b.hasGrave(); // ← قبر هم اشغال‌کننده است
     }
 
     public AbstractPlantGameObject getPlantAtBlock(int row, int column) {
@@ -101,6 +102,12 @@ public class MapGameObject extends AbstractGameObject implements Serializable {
     public void plant(AbstractPlantGameObject plant) {//calling visual
         this._blocks[plant.getRow() * _columns + plant.getColumn()].setPlant(plant);
     }
+
+    public void placeGrave(GraveGameObject grave) {
+        _blocks[grave.getRow() * _columns + grave.getColumn()].setGrave(grave);
+        // اگر خواستی event مخصوص قبر هم اضافه کن، فعلاً لازم نیست
+    }
+
 
     public void subscribeToBlocksReadyEvent(IEventSubscriber eventSubscriber) {
         _blocksReadyEventSubscribers.add(eventSubscriber);

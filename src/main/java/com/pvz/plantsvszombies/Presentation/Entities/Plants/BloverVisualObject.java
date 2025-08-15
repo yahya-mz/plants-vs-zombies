@@ -4,6 +4,8 @@ import com.pvz.plantsvszombies.Domain.Entities.AbstractGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.BloverGameObject;
 import com.pvz.plantsvszombies.Domain.Entities.Plants.CherryBombGameObject;
 import com.pvz.plantsvszombies.Domain.Interfaces.IEventSubscriber;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundManager;
+import com.pvz.plantsvszombies.GlobalMusicSettings.SoundType;
 import com.pvz.plantsvszombies.GlobalSettings;
 import com.pvz.plantsvszombies.Presentation.Animations.*;
 import com.pvz.plantsvszombies.Presentation.Engines.VisualEngine;
@@ -59,6 +61,7 @@ public class BloverVisualObject extends AbstractPlantVisualObject {
             _gameObject.spawn();
             var framesCount = BloverAnimations.getFrames(BloverAnimations.Animations.BLOWING).length;
             playAnimation(BloverAnimations.Animations.BLOWING, Duration.millis(CherryBombGameObject.EXPLOSION_TIME.toMillis()).divide(framesCount), 1);//standing//the animation is not inf is one time only
+            SoundManager.play(SoundType.BLOVER);
         });
     }
 }
