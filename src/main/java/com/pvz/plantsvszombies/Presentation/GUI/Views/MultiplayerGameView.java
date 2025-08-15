@@ -181,6 +181,9 @@ public class MultiplayerGameView {
         
         // Start status update timer
         startStatusUpdates();
+        
+        // Start game loop for client engine
+        startGameLoop();
     }
     
     private HBox createStatusBar() {
@@ -281,6 +284,28 @@ public class MultiplayerGameView {
         
         statusThread.setDaemon(true);
         statusThread.start();
+    }
+    
+    private void startGameLoop() {
+        // Start game loop for client engine at 30 FPS
+        Thread gameThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    if (clientEngine != null && clientEngine.isConnected()) {
+                        clientEngine.update();
+                    }
+                    Thread.sleep(33); // ~30 FPS (1000ms / 30 = 33ms)
+                } catch (InterruptedException e) {
+                    break;
+                } catch (Exception e) {
+                    System.err.println("Error in client game loop: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
+        
+        gameThread.setDaemon(true);
+        gameThread.start();
     }
     
     public Pane getGameBoxPane() {
