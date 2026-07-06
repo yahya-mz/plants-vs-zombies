@@ -91,37 +91,33 @@
 
 <div dir="ltr">
 
-```text
-screenshots/plant-cards/
-```
-
 </div>
 
 <div dir="ltr" align="center">
 
 <table>
   <tr>
-    <td align="center"><img src="screenshots/plant-cards/BLOVER.png" width="72" alt="Blover card"><br><sub>Blover</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/CHERRY_BOMB.png" width="72" alt="Cherry Bomb card"><br><sub>Cherry Bomb</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/COFFEE_BEAN.png" width="72" alt="Coffee Bean card"><br><sub>Coffee Bean</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/DOOM_SHROOM.png" width="72" alt="Doom-shroom card"><br><sub>Doom-shroom</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/GRAVE_BUSTER.png" width="72" alt="Grave Buster card"><br><sub>Grave Buster</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/HYPNO_SHROOM.png" width="72" alt="Hypno-shroom card"><br><sub>Hypno-shroom</sub></td>
+    <td align="center"><img src="screenshots/BLOVER.png" width="72" alt="Blover card"><br><sub>Blover</sub></td>
+    <td align="center"><img src="screenshots/CHERRY_BOMB.png" width="72" alt="Cherry Bomb card"><br><sub>Cherry Bomb</sub></td>
+    <td align="center"><img src="screenshots/COFFEE_BEAN.png" width="72" alt="Coffee Bean card"><br><sub>Coffee Bean</sub></td>
+    <td align="center"><img src="screenshots/DOOM_SHROOM.png" width="72" alt="Doom-shroom card"><br><sub>Doom-shroom</sub></td>
+    <td align="center"><img src="screenshots/GRAVE_BUSTER.png" width="72" alt="Grave Buster card"><br><sub>Grave Buster</sub></td>
+    <td align="center"><img src="screenshots/HYPNO_SHROOM.png" width="72" alt="Hypno-shroom card"><br><sub>Hypno-shroom</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="screenshots/plant-cards/ICE_SHROOM.png" width="72" alt="Ice-shroom card"><br><sub>Ice-shroom</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/JALAPENO.png" width="72" alt="Jalapeno card"><br><sub>Jalapeno</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/PEASHOOTER.png" width="72" alt="Peashooter card"><br><sub>Peashooter</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/PLANTERN.png" width="72" alt="Plantern card"><br><sub>Plantern</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/PUFF_SHROOM.png" width="72" alt="Puff-shroom card"><br><sub>Puff-shroom</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/REPEATER.png" width="72" alt="Repeater card"><br><sub>Repeater</sub></td>
+    <td align="center"><img src="screenshots/ICE_SHROOM.png" width="72" alt="Ice-shroom card"><br><sub>Ice-shroom</sub></td>
+    <td align="center"><img src="screenshots/JALAPENO.png" width="72" alt="Jalapeno card"><br><sub>Jalapeno</sub></td>
+    <td align="center"><img src="screenshots/PEASHOOTER.png" width="72" alt="Peashooter card"><br><sub>Peashooter</sub></td>
+    <td align="center"><img src="screenshots/PLANTERN.png" width="72" alt="Plantern card"><br><sub>Plantern</sub></td>
+    <td align="center"><img src="screenshots/PUFF_SHROOM.png" width="72" alt="Puff-shroom card"><br><sub>Puff-shroom</sub></td>
+    <td align="center"><img src="screenshots/REPEATER.png" width="72" alt="Repeater card"><br><sub>Repeater</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="screenshots/plant-cards/SCAREDY_SHROOM.png" width="72" alt="Scaredy-shroom card"><br><sub>Scaredy-shroom</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/SNOW_PEA.png" width="72" alt="Snow Pea card"><br><sub>Snow Pea</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/SUNFLOWER.png" width="72" alt="Sunflower card"><br><sub>Sunflower</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/TALL_NUT.png" width="72" alt="Tall-nut card"><br><sub>Tall-nut</sub></td>
-    <td align="center"><img src="screenshots/plant-cards/WALL_NUT.png" width="72" alt="Wall-nut card"><br><sub>Wall-nut</sub></td>
+    <td align="center"><img src="screenshots/SCAREDY_SHROOM.png" width="72" alt="Scaredy-shroom card"><br><sub>Scaredy-shroom</sub></td>
+    <td align="center"><img src="screenshots/SNOW_PEA.png" width="72" alt="Snow Pea card"><br><sub>Snow Pea</sub></td>
+    <td align="center"><img src="screenshots/SUNFLOWER.png" width="72" alt="Sunflower card"><br><sub>Sunflower</sub></td>
+    <td align="center"><img src="screenshots/TALL_NUT.png" width="72" alt="Tall-nut card"><br><sub>Tall-nut</sub></td>
+    <td align="center"><img src="screenshots/WALL_NUT.png" width="72" alt="Wall-nut card"><br><sub>Wall-nut</sub></td>
   </tr>
 </table>
 
